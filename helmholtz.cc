@@ -21,14 +21,14 @@
 #include <deal.II/lac/sparse_direct.h>
 
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -378,9 +378,9 @@ namespace TransmissionProblem
 
     Triangulation<dim>            triangulation;
 
-    MappingQ<dim>                 mapping;
+    std::unique_ptr<Mapping<dim>> mapping;
 
-    FE_Q<dim>                     fe;
+    FE_SimplexP<dim>              fe;
     DoFHandler<dim>               dof_handler;
 
     std::map<types::global_dof_index,ScalarType> boundary_values;
@@ -399,7 +399,7 @@ namespace TransmissionProblem
   template <int dim>
   HelmholtzProblem<dim>::HelmholtzProblem(const double omega)
     : omega (omega)
-    , mapping(1)
+      , mapping(ReferenceCells::Tetrahedron.get_default_mapping<dim,dim>(1))
     , fe(TransmissionProblem::fe_degree)
     , dof_handler(triangulation)
   {}
@@ -420,6 +420,8 @@ namespace TransmissionProblem
     std::ifstream input (instance_folder + "/" + mesh_file_name);
     grid_in.read_msh (input);
 
+    std::cout << "The mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
+    
     // Now implement the heuristic for mesh refinement described in
     // readme.md: If positive, just do a number of global refinement
     // steps. If negative, interpret it as the number of mesh points
@@ -452,6 +454,8 @@ namespace TransmissionProblem
 
     dof_handler.distribute_dofs(fe);
 
+    std::cout << "The mesh has " << dof_handler.n_dofs() << " unknowns" << std::endl;
+    
     boundary_values.clear();
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
@@ -705,15 +709,13 @@ namespace TransmissionProblem
     // MeshWorker::mesh_loop() does all of this in parallel, using
     // as many processor cores as your machine happens to have.
     const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
-    ScratchData<dim>   scratch_data(mapping,
-                                  fe,
-                                  n_gauss_points,
-                                  update_values | update_gradients |
+    ScratchData<dim>   scratch_data(*mapping,
+                                    fe,
+                                    n_gauss_points,
+                                    update_values | update_gradients |
                                     update_hessians | update_quadrature_points |
                                     update_JxW_values,
-                                  update_values | update_gradients |
-                                    update_hessians | update_quadrature_points |
-                                    update_JxW_values | update_normal_vectors);
+                                    update_default);
     CopyData           copy_data(dof_handler.get_fe().dofs_per_cell);
     MeshWorker::mesh_loop(dof_handler.begin_active(),
                           dof_handler.end(),
@@ -721,9 +723,7 @@ namespace TransmissionProblem
                           copier,
                           scratch_data,
                           copy_data,
-                          MeshWorker::assemble_own_cells |
-                            MeshWorker::assemble_boundary_faces |
-                            MeshWorker::assemble_own_interior_faces_once,
+                          MeshWorker::assemble_own_cells,
                           /* face_worker= */ {},
                           /* face_worker= */ {});
 
@@ -764,7 +764,7 @@ namespace TransmissionProblem
     // Compute the integral of the absolute value of the solution.
     const QGauss<dim>  quadrature_formula(fe.degree + 2);
     const unsigned int n_q_points = quadrature_formula.size();
-    FEValues<dim> fe_values(mapping,
+    FEValues<dim> fe_values(*mapping,
                             fe,
                             quadrature_formula,
                             update_values | update_quadrature_points | update_JxW_values);
