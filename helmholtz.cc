@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2019 by Wolfgang Bangerth and SAATI Co.
+ * Copyright (C) 2021 by Wolfgang Bangerth and SAATI Co.
  *
  * ---------------------------------------------------------------------
  */
@@ -11,7 +11,6 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/timer.h>
-#include <deal.II/base/std_cxx14/memory.h>
 
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -39,15 +38,8 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
-// The two most interesting header files will be these two:
 #include <deal.II/fe/fe_interface_values.h>
 #include <deal.II/meshworker/mesh_loop.h>
-// The first of these is responsible for providing the class FEInterfaceValue
-// that can be used to evaluate quantities such as the jump or average
-// of shape functions (or their gradients) across interfaces between cells.
-// This class will be quite useful in evaluating the penalty terms that appear
-// in the C0IP formulation.
-
 
 #include <fstream>
 #include <future>
@@ -57,11 +49,12 @@
 #include <cmath>
 #include <cstdio>
 #include <complex>
+#include <memory>
 
 std::string instance_folder;
 std::ofstream logger;
 
-namespace MembraneOscillation
+namespace TransmissionProblem
 {
   using namespace dealii;
 
@@ -70,10 +63,7 @@ namespace MembraneOscillation
   // The following namespace defines material parameters. We use SI units.
   namespace MaterialParameters
   {
-    double density;
-    double thickness;
-    ScalarType tension;
-    ScalarType stiffness_D;
+    double wave_speed;
 
     std::vector<double> frequencies;
   }
@@ -88,33 +78,12 @@ namespace MembraneOscillation
   void
   declare_parameters (ParameterHandler &prm)
   {
-    prm.declare_entry ("Mesh file name", "./square_mesh.vtk",
+    prm.declare_entry ("Mesh file name", "./mesh.msh",
                        Patterns::FileName(),
                        "The name of the file from which to read the mesh.");
-    prm.declare_entry ("Thickness", "0.0001",
+    prm.declare_entry ("Wave speed", "340",
                        Patterns::Double(0),
-                       "Thickness of the membrane. Units: [m].");
-    prm.declare_entry ("Density", "100",
-                       Patterns::Double(0),
-                       "Volumetric density of the membrane material. Units: [kg/m^3].");
-    prm.declare_entry ("Young's modulus", "200e6",
-                       Patterns::Double(0),
-                       "The magnitude of the Young's modulus. Units: [Pa].");
-    prm.declare_entry ("Young's modulus loss tangent", "2",
-                       Patterns::Double(0,90),
-                       "The angle used to make the Young's modulus complex-valued. "
-                       "Units: [degrees].");
-    prm.declare_entry ("Poisson's ratio", "0.3",
-                       Patterns::Double(0,0.5),
-                       "Poisson's ratio. Units: none.");
-    prm.declare_entry ("Tension", "30",
-                       Patterns::Double(0),
-                       "The tension coefficient T that describes the membrane part of "
-                       "the material behavior. Units: [N/m].");
-    prm.declare_entry ("Tension loss tangent", "0",
-                       Patterns::Double(0,90),
-                       "The angle used to make the tension complex-valued. "
-                       "Units: [degrees].");
+                       "The wave speed in the medium in question. Units: [m/s].");
 
     prm.declare_entry ("Frequencies", "linear_spacing(100,10000,100)",
                        Patterns::Anything(),
@@ -154,16 +123,7 @@ namespace MembraneOscillation
     
     using namespace MaterialParameters;
     
-    // First get the independent parameters from the input file:
-    double E, E_loss_tangent, T, T_loss_tangent, poissons_ratio;
-    
-    thickness      = prm.get_double ("Thickness");
-    density        = prm.get_double ("Density");
-    E              = prm.get_double ("Young's modulus");
-    E_loss_tangent = prm.get_double ("Young's modulus loss tangent");
-    poissons_ratio = prm.get_double ("Poisson's ratio");
-    T              = prm.get_double ("Tension");
-    T_loss_tangent = prm.get_double ("Tension loss tangent");
+    wave_speed = prm.get_double ("Wave speed");
 
     mesh_file_name = prm.get ("Mesh file name");
 
@@ -289,17 +249,6 @@ namespace MembraneOscillation
                                + frequency_descriptor + ">, did not match any of "
                                "the recognized formats."));    
 
-    // Then compute the dependent ones. Note that we interpret the angle in degrees.
-    const ScalarType youngs_modulus
-      = E * std::exp(std::complex<double>(0,2*numbers::PI*E_loss_tangent/360));
-    tension
-      = T * std::exp(std::complex<double>(0,2*numbers::PI*T_loss_tangent/360));
-
-    stiffness_D
-      = (youngs_modulus *
-         ScalarType(thickness * thickness * thickness
-                    / 12 / (1 - poissons_ratio * poissons_ratio)));
-
     fe_degree               = prm.get_integer ("Finite element polynomial degree");
     n_mesh_refinement_steps = prm.get_integer ("Number of mesh refinement steps");
 
@@ -400,29 +349,6 @@ namespace MembraneOscillation
     return false;
   }
 
-  
-
-  template <int dim>
-  class RightHandSide : public Function<dim>
-  {
-    public:
-      static_assert(dim == 2, "Only dim==2 is implemented");
-
-      RightHandSide (const double omega)
-      : omega (omega)
-      {}
-
-      virtual double value(const Point<dim>  &/*p*/,
-                           const unsigned int /*component*/ = 0) const override
-
-      {
-        return 1;
-      }
-
-    private:
-      double omega;
-  };
-
 
 
   // @sect3{The main class}
@@ -474,7 +400,7 @@ namespace MembraneOscillation
   HelmholtzProblem<dim>::HelmholtzProblem(const double omega)
     : omega (omega)
     , mapping(1)
-    , fe(MembraneOscillation::fe_degree)
+    , fe(TransmissionProblem::fe_degree)
     , dof_handler(triangulation)
   {}
 
@@ -487,12 +413,12 @@ namespace MembraneOscillation
   template <int dim>
   void HelmholtzProblem<dim>::make_grid()
   {
-    std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std_cxx14::make_unique<TimerOutput::Scope>(timer_output, "Make grid") : nullptr);
+    std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Make grid") : nullptr);
     
     GridIn<dim> grid_in;
     grid_in.attach_triangulation (triangulation);
     std::ifstream input (instance_folder + "/" + mesh_file_name);
-    grid_in.read_vtk (input);
+    grid_in.read_msh (input);
 
     // Now implement the heuristic for mesh refinement described in
     // readme.md: If positive, just do a number of global refinement
@@ -502,26 +428,11 @@ namespace MembraneOscillation
       triangulation.refine_global(n_mesh_refinement_steps);
     else
       {
+        Assert (false, ExcMessage("Need to implement a scheme that is based on the wavelength"));
+        
         const int N = -n_mesh_refinement_steps;
         
-        const double lambda_1 = 2 * numbers::PI *
-                                std::sqrt (std::real(MaterialParameters::tension)
-                                           /
-                                           (MaterialParameters::density
-                                            *
-                                            MaterialParameters::thickness))
-                                /
-                                omega;
-        const double lambda_2 = 2 * numbers::PI *
-                                std::pow (std::real(MaterialParameters::stiffness_D)
-                                           /
-                                           (MaterialParameters::density
-                                            *
-                                            MaterialParameters::thickness),
-                                          0.25)
-                                /
-                                std::sqrt(omega);
-        const double lambda  = std::max (lambda_1, lambda_2);
+        const double lambda  = 1000;
 
         const double diameter = GridTools::diameter(triangulation);
         const double delta_x = std::min(lambda, diameter) / N * fe_degree;
@@ -537,7 +448,7 @@ namespace MembraneOscillation
   template <int dim>
   void HelmholtzProblem<dim>::setup_system()
   {
-    std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std_cxx14::make_unique<TimerOutput::Scope>(timer_output, "Set up system") : nullptr);
+    std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Set up system") : nullptr);
 
     dof_handler.distribute_dofs(fe);
 
@@ -548,27 +459,8 @@ namespace MembraneOscillation
                                              boundary_values);
 
     DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
-    {
-      std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
-      std::vector<types::global_dof_index> neighbor_dof_indices (fe.dofs_per_cell);
-      for (const auto &cell : dof_handler.active_cell_iterators())
-        {
-          cell->get_dof_indices (local_dof_indices);
-          for (auto i : local_dof_indices)
-            for (auto j : local_dof_indices)
-              c_sparsity.add (i,j);
-
-          for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-            if (cell->at_boundary(f) == false)
-              {
-                cell->neighbor(f)->get_dof_indices (neighbor_dof_indices);
-                for (auto i : local_dof_indices)
-                  for (auto j : neighbor_dof_indices)
-                    c_sparsity.add (i,j);
-              }
-        }
-      c_sparsity.compress();
-    }
+    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
+    c_sparsity.compress();
     
         
     sparsity_pattern.copy_from(c_sparsity);
@@ -627,14 +519,14 @@ namespace MembraneOscillation
                                                  update_gradients |
                                                  update_quadrature_points |
                                                  update_JxW_values,
-                const UpdateFlags interface_update_flags =
+                const UpdateFlags face_update_flags =
                   update_values | update_gradients | update_quadrature_points |
                   update_JxW_values | update_normal_vectors)
       : fe_values(mapping, fe, QGauss<dim>(quadrature_degree), update_flags)
-      , fe_interface_values(mapping,
-                            fe,
-                            QGauss<dim - 1>(quadrature_degree),
-                            interface_update_flags)
+      , fe_face_values(mapping,
+                       fe,
+                       QGauss<dim - 1>(quadrature_degree),
+                       face_update_flags)
     {}
 
 
@@ -643,14 +535,14 @@ namespace MembraneOscillation
                   scratch_data.fe_values.get_fe(),
                   scratch_data.fe_values.get_quadrature(),
                   scratch_data.fe_values.get_update_flags())
-      , fe_interface_values(scratch_data.fe_values.get_mapping(),
-                            scratch_data.fe_values.get_fe(),
-                            scratch_data.fe_interface_values.get_quadrature(),
-                            scratch_data.fe_interface_values.get_update_flags())
+      , fe_face_values(scratch_data.fe_values.get_mapping(),
+                       scratch_data.fe_values.get_fe(),
+                       scratch_data.fe_face_values.get_quadrature(),
+                       scratch_data.fe_face_values.get_update_flags())
     {}
 
-    FEValues<dim>          fe_values;
-    FEInterfaceValues<dim> fe_interface_values;
+    FEValues<dim>     fe_values;
+    FEFaceValues<dim> fe_face_values;
   };
 
 
@@ -669,7 +561,7 @@ namespace MembraneOscillation
 
     struct FaceData
     {
-      FullMatrix<ScalarType>                   cell_matrix;
+      FullMatrix<ScalarType>               cell_matrix;
       std::vector<types::global_dof_index> joint_dof_indices;
     };
 
@@ -682,32 +574,11 @@ namespace MembraneOscillation
 
 
 
-  // The more interesting part is where we actually assemble the linear system.
-  // Fundamentally, this function has five parts:
-  // - The definition of the `cell_worker` "lambda function", a small
-  //   function that is defined within the surrounding `assemble_system()`
-  //   function and that will be responsible for computing the local
-  //   integrals on an individual cell; it will work on a copy of the
-  //   `ScratchData` class and put its results into the corresponding
-  //   `CopyData` object.
-  // - The definition of the `face_worker` lambda function that does
-  //   the integration of all terms that live on the interfaces between
-  //   cells.
-  // - The definition of the `boundary_worker` function that does the
-  //   same but for cell faces located on the boundary of the domain.
-  // - The definition of the `copier` function that is responsible
-  //   for copying all of the data the previous three functions have
-  //   put into copy objects for a single cell, into the global matrix
-  //   and right hand side.
-  //
-  // The fifth part is the one where we bring all of this together.
-  //
-  // Let us go through each of these pieces necessary for the assembly
-  // in turns.
+  // TODO
   template <int dim>
   void HelmholtzProblem<dim>::assemble_system()
   {
-    std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std_cxx14::make_unique<TimerOutput::Scope>(timer_output, "Assemble linear system") : nullptr);
+    std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Assemble linear system") : nullptr);
 
     using Iterator = typename DoFHandler<dim>::active_cell_iterator;
 
@@ -741,7 +612,7 @@ namespace MembraneOscillation
     auto cell_worker = [&](const Iterator &  cell,
                            ScratchData<dim> &scratch_data,
                            CopyData &        copy_data) {
-      std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std_cxx14::make_unique<TimerOutput::Scope>(timer_output, "Assemble linear system - cell") : nullptr);
+      std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Assemble linear system - cell") : nullptr);
       
       copy_data.cell_matrix = 0;
       copy_data.cell_rhs    = 0;
@@ -751,8 +622,6 @@ namespace MembraneOscillation
 
       const FEValues<dim> &fe_values = scratch_data.fe_values;
 
-      const RightHandSide<dim> right_hand_side (omega);
-
       const unsigned int dofs_per_cell =
         scratch_data.fe_values.get_fe().dofs_per_cell;
 
@@ -761,30 +630,24 @@ namespace MembraneOscillation
         {
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             {
-              const Tensor<2,dim> hessian_i = fe_values.shape_hessian(i, qpoint);
               const Tensor<1,dim> grad_i    = fe_values.shape_grad(i, qpoint);
               const double        value_i   = fe_values.shape_value(i, qpoint);
               
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
-                  const Tensor<2,dim> hessian_j = fe_values.shape_hessian(j, qpoint);
                   const Tensor<1,dim> grad_j    = fe_values.shape_grad(j, qpoint);
                   const double        value_j   = fe_values.shape_value(j, qpoint);
 
                   copy_data.cell_matrix(i, j) +=
-                    (MaterialParameters::stiffness_D *
-                     scalar_product(
-                       hessian_i,   // nabla^2 phi_i(x)
-                       hessian_j)   // nabla^2 phi_j(x)
+                    (
                      +
-                     MaterialParameters::tension *
+                     MaterialParameters::wave_speed *
+                     MaterialParameters::wave_speed *
                      grad_i *
                      grad_j
                      -
                      omega *
                      omega *
-                     MaterialParameters::thickness *
-                     MaterialParameters::density *
                      value_i *
                      value_j
                      )
@@ -793,218 +656,13 @@ namespace MembraneOscillation
 
               copy_data.cell_rhs(i) +=
                 fe_values.shape_value(i, qpoint) * // phi_i(x)
-                right_hand_side.value(
-                  fe_values.quadrature_point(qpoint)) * // f(x)
+                0 * // f(x)=0
                 fe_values.JxW(qpoint);                  // dx
             }
         }
     };
+    
 
-
-    // The next building block is the one that assembles penalty terms on each
-    // of the interior faces of the mesh. As described in the documentation of
-    // MeshWorker::mesh_loop(), this function receives arguments that denote
-    // a cell and its neighboring cell, as well as (for each of the two
-    // cells) the face (and potentially sub-face) we have to integrate
-    // over. Again, we also get a scratch object, and a copy object
-    // for putting the results in.
-    //
-    // The function has three parts itself. At the top, we initialize
-    // the FEInterfaceValues object and create a new `CopyData::FaceData`
-    // object to store our input in. This gets pushed to the end of the
-    // `copy_data.face_data` variable. We need to do this because
-    // the number of faces (or subfaces) over which we integrate for a
-    // given cell differs from cell to cell, and the sizes of these
-    // matrices also differ, depending on what degrees of freedom
-    // are adjacent to the face or subface. As discussed in the documentation
-    // of MeshWorker::mesh_loop(), the copy object is reset every time a new
-    // cell is visited, so that what we push to the end of
-    // `copy_data.face_data()` is really all that the later `copier` function
-    // gets to see when it copies the contributions of each cell to the global
-    // matrix and right hand side objects.
-    auto face_worker = [&](const Iterator &    cell,
-                           const unsigned int &f,
-                           const unsigned int &sf,
-                           const Iterator &    ncell,
-                           const unsigned int &nf,
-                           const unsigned int &nsf,
-                           ScratchData<dim> &  scratch_data,
-                           CopyData &          copy_data) {
-      std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std_cxx14::make_unique<TimerOutput::Scope>(timer_output, "Assemble linear system - face") : nullptr);
-      
-      FEInterfaceValues<dim> &fe_interface_values =
-        scratch_data.fe_interface_values;
-      fe_interface_values.reinit(cell, f, sf, ncell, nf, nsf);
-
-      copy_data.face_data.emplace_back();
-      CopyData::FaceData &copy_data_face = copy_data.face_data.back();
-
-      copy_data_face.joint_dof_indices =
-        fe_interface_values.get_interface_dof_indices();
-
-      const unsigned int n_interface_dofs =
-        fe_interface_values.n_current_interface_dofs();
-      copy_data_face.cell_matrix.reinit(n_interface_dofs, n_interface_dofs);
-
-      // The second part deals with determining what the penalty
-      // parameter should be. The simplest formula for this parameter $\gamma$
-      // is $\frac{p(p+1)}{h_K}$ where $p$ is the polynomial degree of the
-      // finite element used and $h_K$ is the size of cell $K$. But this
-      // is not quite so straightforward: If one uses highly stretched cells,
-      // then a more involved theory says that $h$ should be replaced be the
-      // diameter of cell $K$ normal to the direction of the edge in question.
-      // It turns out that there is a function in deal.II for that. Secondly,
-      // $h_K$ may be different when viewed from the two different sides of
-      // a face.
-      //
-      // To stay on the safe side, we take the maximum of the two values.
-      // We will note that it is possible that this computation has to be
-      // further adjusted if one were to use hanging nodes resulting from
-      // adaptive mesh refinement.
-      const unsigned int p = fe.degree;
-      const double       gamma_over_h =
-        std::max((1.0 * p * (p + 1) /
-                  cell->extent_in_direction(
-                    GeometryInfo<dim>::unit_normal_direction[f])),
-                 (1.0 * p * (p + 1) /
-                  ncell->extent_in_direction(
-                    GeometryInfo<dim>::unit_normal_direction[nf])));
-
-      // Finally, and as usual, we loop over the quadrature points
-      // and indices `i` and `j` to add up the contributions of this
-      // face or sub-face. These are then stored in the `copy_data.face_data`
-      // object created above. As for the cell worker, we pull the evalation
-      // of averages and jumps out of the loops if possible, introducing
-      // local variables that store these results. The assembly then only
-      // needs to use these local variables in the innermost loop.
-      for (unsigned int qpoint = 0;
-           qpoint < fe_interface_values.n_quadrature_points;
-           ++qpoint)
-        {
-          const auto &n = fe_interface_values.normal(qpoint);
-
-          for (unsigned int i = 0; i < n_interface_dofs; ++i)
-            {
-              const double av_hessian_i_dot_n_dot_n
-                = (fe_interface_values.average_hessian(i, qpoint) * n * n);
-              const double jump_grad_i_dot_n
-                = (fe_interface_values.jump_gradient(i, qpoint) * n);
-              
-              for (unsigned int j = 0; j < n_interface_dofs; ++j)
-                {
-                  const double av_hessian_j_dot_n_dot_n
-                    = (fe_interface_values.average_hessian(j, qpoint) * n * n);
-                  const double jump_grad_j_dot_n
-                    = (fe_interface_values.jump_gradient(j, qpoint) * n);
-
-              
-                  copy_data_face.cell_matrix(i, j) +=
-                    MaterialParameters::stiffness_D *                  
-                    (-
-                     av_hessian_i_dot_n_dot_n // - {grad^2 v n n }
-                     * jump_grad_j_dot_n // [grad u n]
-                     -
-                     av_hessian_j_dot_n_dot_n // - {grad^2 u n n }
-                     * jump_grad_i_dot_n // [grad v n]
-                     +
-                     // gamma/h [grad u n ][grad v n]:
-                     gamma_over_h
-                     * jump_grad_i_dot_n
-                     * jump_grad_j_dot_n
-                    )
-                    *
-                    fe_interface_values.JxW(qpoint); // dx
-                }
-            }
-        }
-    };
-
-
-    // The third piece is to do the same kind of assembly for faces that
-    // are at the boundary. The idea is the same as above, of course,
-    // with only the difference that there are now penalty terms that
-    // also go into the right hand side.
-    //
-    // As before, the first part of the function simply sets up some
-    // helper objects:
-    auto boundary_worker = [&](const Iterator &    cell,
-                               const unsigned int &face_no,
-                               ScratchData<dim> &  scratch_data,
-                               CopyData &          copy_data) {
-      std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std_cxx14::make_unique<TimerOutput::Scope>(timer_output, "Assemble linear system - boundary") : nullptr);
-      
-      FEInterfaceValues<dim> &fe_interface_values = scratch_data.fe_interface_values;
-      fe_interface_values.reinit(cell, face_no);
-      const auto &q_points = fe_interface_values.get_quadrature_points();
-
-      copy_data.face_data.emplace_back();
-      CopyData::FaceData &copy_data_face = copy_data.face_data.back();
-
-      const unsigned int n_dofs        = fe_interface_values.n_current_interface_dofs();
-      copy_data_face.joint_dof_indices = fe_interface_values.get_interface_dof_indices();
-
-      copy_data_face.cell_matrix.reinit(n_dofs, n_dofs);
-
-      const std::vector<double> &        JxW     = fe_interface_values.get_JxW_values();
-      const std::vector<Tensor<1, dim>> &normals = fe_interface_values.get_normal_vectors();
-
-
-      // Positively, because we now only deal with one cell adjacent to the
-      // face (as we are on the boundary), the computation of the penalty
-      // factor $\gamma$ is substantially simpler:
-      const unsigned int p = fe.degree;
-      const double       gamma_over_h =
-        (1.0 * p * (p + 1) /
-         cell->extent_in_direction(
-           GeometryInfo<dim>::unit_normal_direction[face_no]));
-
-      // The third piece is the assembly of terms. This is now slightly more
-      // involved since these contains both terms for the matrix and for
-      // the right hand side. The latter requires us to evaluate the
-      //
-      for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)
-        {
-          const auto &n = normals[qpoint];
-
-          for (unsigned int i = 0; i < n_dofs; ++i)
-            {
-              const double av_hessian_i_dot_n_dot_n
-                = (fe_interface_values.average_hessian(i, qpoint) * n * n);
-              const double jump_grad_i_dot_n
-                = (fe_interface_values.jump_gradient(i, qpoint) * n);
-              
-              for (unsigned int j = 0; j < n_dofs; ++j)
-                {
-                  const double av_hessian_j_dot_n_dot_n
-                    = (fe_interface_values.average_hessian(j, qpoint) * n * n);
-
-                  const double jump_grad_j_dot_n
-                    = (fe_interface_values.jump_gradient(j, qpoint) * n);
-                  
-                  copy_data_face.cell_matrix(i, j) +=
-                    MaterialParameters::stiffness_D *
-                    (-av_hessian_i_dot_n_dot_n  // - {grad^2 v n n }
-                     * jump_grad_j_dot_n        //   * [grad u n]
-                     //
-                     -av_hessian_j_dot_n_dot_n  // - {grad^2 u n n }
-                     * jump_grad_i_dot_n        //   * [grad v n]
-                     //
-                     +
-                     gamma_over_h *             // + gamma_over_h
-                     jump_grad_i_dot_n          //   * [grad v n]
-                     * jump_grad_j_dot_n        //   * [grad u n]
-                    ) *
-                    JxW[qpoint]; // dx
-                }
-
-
-              // Ordinarily, the rhs vector would contain a term that makes sure the
-              // boundary conditions of the form du/dn=h are taken care of. But for the
-              // purposes of the current program, h=0 and so the additional term is
-              // simply zero. So there is no term of that form we need to add here.              
-            }
-        }
-    };
 
     // Part 4 was a small function that copies the data produced by the
     // cell, interior, and boundary face assemblers above into the
@@ -1017,7 +675,7 @@ namespace MembraneOscillation
     // and that the `face_worker` and `boundary_worker` have added
     // to the `copy_data.face_data` array.
     auto copier = [&](const CopyData &copy_data) {
-      std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std_cxx14::make_unique<TimerOutput::Scope>(timer_output, "Assemble linear system - copy") : nullptr);
+      std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Assemble linear system - copy") : nullptr);
       
       for (unsigned int i=0; i<copy_data.cell_matrix.m(); ++i)
         for (unsigned int j=0; j<copy_data.cell_matrix.m(); ++j)
@@ -1066,8 +724,8 @@ namespace MembraneOscillation
                           MeshWorker::assemble_own_cells |
                             MeshWorker::assemble_boundary_faces |
                             MeshWorker::assemble_own_interior_faces_once,
-                          boundary_worker,
-                          face_worker);
+                          /* face_worker= */ {},
+                          /* face_worker= */ {});
 
     MatrixTools::apply_boundary_values (boundary_values,
                                         system_matrix,
@@ -1085,7 +743,7 @@ namespace MembraneOscillation
   template <int dim>
   void HelmholtzProblem<dim>::solve()
   {
-    std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std_cxx14::make_unique<TimerOutput::Scope>(timer_output, "Solve linear system") : nullptr);
+    std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Solve linear system") : nullptr);
 
     solution = system_rhs;
     
@@ -1101,7 +759,7 @@ namespace MembraneOscillation
   template <int dim>
   void HelmholtzProblem<dim>::postprocess()
   {
-    std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std_cxx14::make_unique<TimerOutput::Scope>(timer_output, "Postprocess") : nullptr);
+    std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Postprocess") : nullptr);
 
     // Compute the integral of the absolute value of the solution.
     const QGauss<dim>  quadrature_formula(fe.degree + 2);
@@ -1112,7 +770,6 @@ namespace MembraneOscillation
                             update_values | update_quadrature_points | update_JxW_values);
 
     ScalarType integral_solution = 0;
-    double integral_p = 0;
 
     double max_solution = 0;
     double max_p = 0;
@@ -1123,14 +780,10 @@ namespace MembraneOscillation
       {
         fe_values.reinit(cell);
         fe_values.get_function_values(solution, function_values_solution);
-        RightHandSide<dim>(omega).value_list (fe_values.get_quadrature_points(),
-                                              function_values_p);
             
         for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
           {
             integral_solution += function_values_solution[q_point] *
-                                 fe_values.JxW(q_point);
-            integral_p        += function_values_p[q_point] *
                                  fe_values.JxW(q_point);
 
             max_solution = std::max (max_solution,
@@ -1155,7 +808,7 @@ namespace MembraneOscillation
   void
   HelmholtzProblem<dim>::output_results()
   {
-    std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std_cxx14::make_unique<TimerOutput::Scope>(timer_output, "Creating visual output") : nullptr);
+    std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Creating visual output") : nullptr);
 
     DataOut<dim> data_out;
 
@@ -1185,15 +838,21 @@ namespace MembraneOscillation
   {
     check_for_termination_signal();
 
+    std::cout << "omega=" << omega << ", make_grid" << std::endl;
+    
     make_grid();
+
+    std::cout << "omega=" << omega << ", setup_system" << std::endl;
     setup_system();
 
     check_for_termination_signal();
 
+    std::cout << "omega=" << omega << ", assemble_system" << std::endl;    
     assemble_system();
 
     check_for_termination_signal();
 
+    std::cout << "omega=" << omega << ", solve" << std::endl;    
     solve();
 
     // Do postprocessing:
@@ -1292,7 +951,7 @@ namespace MembraneOscillation
     std::ofstream frequency_response (instance_folder + "/frequency_response.txt");
     frequency_response << buffer.str();
   }
-} // namespace MembraneOscillation
+} // namespace TransmissionProblem
 
 
 
@@ -1322,7 +981,7 @@ int main(int argc, char *argv[])
   try
     {
       using namespace dealii;
-      using namespace MembraneOscillation;
+      using namespace TransmissionProblem;
 
       // Set the limit for internal thread creation to one -- i.e.,
       // deal.II will not create any threads itself for things such as
