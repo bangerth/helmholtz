@@ -280,10 +280,9 @@ namespace TransmissionProblem
   // a global map.
   struct OutputData
   {
-    ScalarType normalized_amplitude_integral;
-    double normalized_maximum_amplitude;
+    FullMatrix<ScalarType> P, U;
 
-    std::string visualization_file_name;
+    std::vector<std::string> visualization_file_names;
   };
   
     
@@ -378,22 +377,22 @@ namespace TransmissionProblem
   private:
     void make_grid();
     void setup_system();
-    void assemble_system();
+    void assemble_system(const unsigned int current_source_port);
     void solve();
-    void postprocess();
-    void output_results();
+    void postprocess(const unsigned int current_source_port);
+    void output_results(const unsigned int current_source_port);
 
     // The frequency that this instance of the class is supposed to solve for.
     const double                  omega;
 
-    Triangulation<dim>            triangulation;
-
+    Triangulation<dim>              triangulation;
+    std::vector<types::boundary_id> port_boundary_ids;
+    std::vector<double>             port_areas;
+    
     std::unique_ptr<Mapping<dim>> mapping;
 
     FE_SimplexP<dim>              fe;
     DoFHandler<dim>               dof_handler;
-
-    std::map<types::global_dof_index,ScalarType> boundary_values;
 
     SparsityPattern               sparsity_pattern;
     SparseMatrix<ScalarType>      system_matrix;
@@ -453,6 +452,48 @@ namespace TransmissionProblem
                >= delta_x)
           triangulation.refine_global();
       }
+
+    // Figure out what boundary ids we have that describe ports. We
+    // take these as all of those boundary ids that are non-zero
+    port_boundary_ids = {0,1,2}, // TODO: triangulation.get_boundary_ids();
+    port_boundary_ids.erase (std::find(port_boundary_ids.begin(),
+                                       port_boundary_ids.end(),
+                                       types::boundary_id(0)));
+
+    // Now also correctly size the matrices we compute for each
+    // frequency
+    output_data.P.reinit (port_boundary_ids.size(),
+                          port_boundary_ids.size());
+    output_data.U.reinit (port_boundary_ids.size(),
+                          port_boundary_ids.size());
+
+    // As a final step, compute the areas of the various ports so we
+    // can later normalize when computing average pressures and
+    // velocities:
+    port_areas.resize (port_boundary_ids.size(), 0.);
+    const QGauss<dim-1>  quadrature_formula(fe.degree + 2);
+    const unsigned int n_q_points = quadrature_formula.size();
+    FEFaceValues<dim> fe_face_values(*mapping,
+                                     fe,
+                                     quadrature_formula,
+                                     update_JxW_values);
+    for (const auto cell : dof_handler.active_cell_iterators())
+      for (const auto face : cell->face_iterators())
+        if (face->at_boundary())
+          if (std::find(port_boundary_ids.begin(),
+                        port_boundary_ids.end(),
+                        face->boundary_id()) !=
+              port_boundary_ids.end()) // a port
+            {
+              const unsigned int this_port = (std::find(port_boundary_ids.begin(),
+                                                        port_boundary_ids.end(),
+                                                        face->boundary_id())
+                                              - port_boundary_ids.begin());
+              
+              fe_face_values.reinit(cell, face);
+              for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+                port_areas[this_port] += fe_face_values.JxW(q_point);
+            }
   }
 
 
@@ -466,12 +507,6 @@ namespace TransmissionProblem
 
     std::cout << "The mesh has " << dof_handler.n_dofs() << " unknowns" << std::endl;
     
-    boundary_values.clear();
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             0,
-                                             Functions::ZeroFunction<dim,ScalarType>(),
-                                             boundary_values);
-
     DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
     c_sparsity.compress();
@@ -588,9 +623,8 @@ namespace TransmissionProblem
 
 
 
-  // TODO
   template <int dim>
-  void HelmholtzProblem<dim>::assemble_system()
+  void HelmholtzProblem<dim>::assemble_system(const unsigned int current_source_port)
   {
     std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Assemble linear system") : nullptr);
 
@@ -709,6 +743,12 @@ namespace TransmissionProblem
                           /* face_worker= */ {},
                           /* face_worker= */ {});
 
+    std::map<types::global_dof_index,ScalarType> boundary_values;
+    VectorTools::interpolate_boundary_values(dof_handler,
+                                             port_boundary_ids[current_source_port],
+                                             Functions::ConstantFunction<dim,ScalarType>(1),
+                                             boundary_values);
+
     MatrixTools::apply_boundary_values (boundary_values,
                                         system_matrix,
                                         solution,
@@ -739,47 +779,73 @@ namespace TransmissionProblem
   // this implies computing the integral over the magnitude of the solution.
   // It will be small in general, except in the vicinity of eigenvalues.
   template <int dim>
-  void HelmholtzProblem<dim>::postprocess()
+  void HelmholtzProblem<dim>::postprocess(const unsigned int current_source_port)
   {
     std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Postprocess") : nullptr);
 
     // Compute the integral of the absolute value of the solution.
-    const QGauss<dim>  quadrature_formula(fe.degree + 2);
+    const QGauss<dim-1>  quadrature_formula(fe.degree + 2);
     const unsigned int n_q_points = quadrature_formula.size();
-    FEValues<dim> fe_values(*mapping,
-                            fe,
-                            quadrature_formula,
-                            update_values | update_quadrature_points | update_JxW_values);
+    FEFaceValues<dim> fe_face_values(*mapping,
+                                     fe,
+                                     quadrature_formula,
+                                     update_values
+                                     | update_gradients
+                                     | update_quadrature_points
+                                     | update_normal_vectors
+                                     | update_JxW_values);
 
-    ScalarType integral_solution = 0;
-
-    double max_solution = 0;
-    double max_p = 0;
-
-    std::vector<ScalarType> function_values_solution(n_q_points);
-    std::vector<double> function_values_p(n_q_points);
-    for (auto cell : dof_handler.active_cell_iterators())
-      {
-        fe_values.reinit(cell);
-        fe_values.get_function_values(solution, function_values_solution);
+    std::vector<ScalarType> solution_values(n_q_points);
+    std::vector<Tensor<1,dim,ScalarType>> solution_gradients(n_q_points);
+    for (const auto cell : dof_handler.active_cell_iterators())
+      for (const auto face : cell->face_iterators())
+        if (face->at_boundary())
+          if (std::find(port_boundary_ids.begin(),
+                        port_boundary_ids.end(),
+                        face->boundary_id()) !=
+              port_boundary_ids.end()) // a port
+            {
+              const unsigned int this_port = (std::find(port_boundary_ids.begin(),
+                                                        port_boundary_ids.end(),
+                                                        face->boundary_id())
+                                              - port_boundary_ids.begin());
+              
+              fe_face_values.reinit(cell, face);
+              fe_face_values.get_function_values   (solution, solution_values);
+              fe_face_values.get_function_gradients(solution, solution_gradients);
+              
             
-        for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
-          {
-            integral_solution += function_values_solution[q_point] *
-                                 fe_values.JxW(q_point);
+              for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+                {
+                  // Compute the integral over the pressure on each
+                  // port (including the source port, where we should
+                  // eventually get an average pressure of one):
+                  output_data.P(current_source_port, this_port)
+                    +=  (solution_values[q_point] *
+                         fe_face_values.JxW(q_point));
 
-            max_solution = std::max (max_solution,
-                                     std::abs(function_values_solution[q_point]));
-            max_p        = std::max (max_p,
-                                     std::abs(function_values_p[q_point]));
-          }
+                  // Then also compute the integral over the
+                  // velocity. Since the pressure has units
+                  // Pa=kg/m/s^2, we get the velocity by
+                  //   U=...
+                  // with units
+                  //     
+                  const auto velocity = omega * solution_gradients[q_point];
+                  
+                  output_data.U(current_source_port, this_port)
+                    +=  (velocity *
+                         fe_face_values.normal_vector(q_point) *
+                         fe_face_values.JxW(q_point));
+                }
+            }
+
+    // Finally, normalize this column of the matrices by the area so
+    // we get averages:
+    for (unsigned int i=0; i<port_areas.size(); ++i)
+      {
+        output_data.P(current_source_port, i) /= port_areas[i];
+        output_data.U(current_source_port, i) /= port_areas[i];
       }
-
-    output_data.normalized_amplitude_integral
-      = integral_solution/max_p;
-          
-    output_data.normalized_maximum_amplitude
-      = max_solution/max_p;
   }
 
 
@@ -788,7 +854,7 @@ namespace TransmissionProblem
   // It looks exactly like the one in step-6, for example.
   template <int dim>
   void
-  HelmholtzProblem<dim>::output_results()
+  HelmholtzProblem<dim>::output_results(const unsigned int current_source_port)
   {
     std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Creating visual output") : nullptr);
 
@@ -800,6 +866,8 @@ namespace TransmissionProblem
 
     std::string file_name = instance_folder + "/visualization/solution-" +
                             std::to_string(static_cast<unsigned int>(omega/2/numbers::PI)) +
+                            "." +
+                            std::to_string(current_source_port) +
                             ".vtu";
     std::ofstream output_vtu(file_name);
     AssertThrow (output_vtu,
@@ -808,7 +876,7 @@ namespace TransmissionProblem
                              "visualization data."));
     data_out.write_vtu(output_vtu);
 
-    output_data.visualization_file_name = file_name;
+    output_data.visualization_file_names.emplace_back (file_name);
   }
 
 
@@ -820,27 +888,32 @@ namespace TransmissionProblem
   {
     check_for_termination_signal();
 
-    std::cout << "omega=" << omega << ", make_grid" << std::endl;
-    
     make_grid();
 
-    std::cout << "omega=" << omega << ", setup_system" << std::endl;
     setup_system();
 
-    check_for_termination_signal();
+    for (unsigned int current_source_port=0;
+         current_source_port<port_boundary_ids.size();
+         ++current_source_port)
+      {
+        check_for_termination_signal();
 
-    std::cout << "omega=" << omega << ", assemble_system" << std::endl;    
-    assemble_system();
+        std::cout << "omega=" << omega
+                  << ", source port boundary id=" << port_boundary_ids[current_source_port]
+                  << std::endl;    
+        assemble_system(current_source_port);
 
-    check_for_termination_signal();
+        check_for_termination_signal();
 
-    std::cout << "omega=" << omega << ", solve" << std::endl;    
-    solve();
+        solve();
 
-    // Do postprocessing:
-    output_results();
-    postprocess();
+        check_for_termination_signal();
 
+        // Do postprocessing:
+        output_results(current_source_port);
+        postprocess(current_source_port);
+      }
+    
     // Finally, put the result into the output variable that we can
     // read from main(). Make sure that access to the variable is
     // properly guarded across threads.
@@ -899,37 +972,37 @@ namespace TransmissionProblem
 
     // First output how many frequencies have already been computed:
     std::ostringstream buffer;
-    buffer << "# " << results.size()
-           << "/"
-           << MaterialParameters::frequencies.size()
-           << " frequencies computed"
-           << "\n\n";
-
-    // Then output individual information for each frequency
-    buffer << "# Columns are as follows:\n"
-           << "# 1: Frequency [Hz]\n"
-           << "# 2: Real part of the volume displacement divided by the amplitude of pressure [m^3/Pa]\n"
-           << "# 3: Imaginary part of the same\n"
-           << "# 4: Real part of the impedance [Pa.s/m^3]\n"
-           << "# 5: Imaginary part of the same\n"
-           << "# 6: Absolute value of maximal displacement divided by amplitude of pressure [m/Pa]\n"
-           << "# 7: File name for graphical output of the displacement visualization.\n";
     for (auto result : results)
       {
+        const unsigned int field_width = 24;
+        
         const auto omega = result.first;
-        const auto impedance = 1./result.second.normalized_amplitude_integral
-                               /omega/std::complex<double>(0.,1.);
-          
-        buffer << omega/2/numbers::PI << ' '
-               << std::real(result.second.normalized_amplitude_integral) << ' '
-               << std::imag(result.second.normalized_amplitude_integral) << ' '
-               << std::real(impedance) << ' '
-               << std::imag(impedance) << ' '
-               << result.second.normalized_maximum_amplitude << ' '
-               << '"' << result.second.visualization_file_name << '"'
-               << std::endl;
-      }
+        buffer << "Results for frequency f="
+               << omega/2/numbers::PI << ":\n"
+               << "==============================\n\n";
 
+        buffer << "P = [\n";
+        for (unsigned int i=0; i<result.second.P.m(); ++i)
+          {
+            buffer << "      [";
+            for (unsigned int j=0; j<result.second.P.n(); ++j)
+              buffer << std::setw(field_width) << result.second.P(i,j) << ' ';
+            buffer << "]\n";
+          }
+        buffer << "]\n";
+        
+        buffer << "\n\nU = [\n";
+        for (unsigned int i=0; i<result.second.U.m(); ++i)
+          {
+            buffer << "      [";
+            for (unsigned int j=0; j<result.second.P.n(); ++j)
+              buffer << std::setw(field_width) << result.second.U(i,j) << ' ';
+            buffer << "]\n";
+          }
+        buffer << "]\n";
+        buffer << "\n\n\n" << std::flush;
+      }
+    
     std::ofstream frequency_response (instance_folder + "/frequency_response.txt");
     frequency_response << buffer.str();
   }
