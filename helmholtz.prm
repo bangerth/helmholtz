@@ -1,5 +1,5 @@
 set Mesh file name = ./mesh.msh
-set Wave speed = 340
+set Wave speed = 343
 set Wave speed loss tangent = 2
 
 set Frequencies = list(5,10,15)
