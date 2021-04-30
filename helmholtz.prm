@@ -1,6 +1,8 @@
 set Mesh file name = ./mesh.msh
 set Wave speed = 340
-set Frequencies = list(100,200)
+set Wave speed loss tangent = 2
+
+set Frequencies = list(5,10,15)
 set Number of mesh refinement steps = 0
 set Finite element polynomial degree = 2
 set Number of threads = 1
