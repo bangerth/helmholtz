@@ -596,33 +596,6 @@ namespace TransmissionProblem
 
     using Iterator = typename DoFHandler<dim>::active_cell_iterator;
 
-    // The first piece is the `cell_worker` that does the assembly
-    // on the cell interiors. It is a (lambda) function that takes
-    // a cell (input), a scratch object, and a copy object (output)
-    // as arguments. It looks like the assembly functions of many
-    // other of the tutorial programs, or at least the body of the
-    // loop over all cells.
-    //
-    // The terms we integrate here are the cell contribution
-    // @f{align*}{
-    //    A^K_{ij} = \int_K \nabla^2\varphi_i(x) : \nabla^2\varphi_j(x) dx
-    // @f}
-    // to the global matrix, and
-    // @f{align*}{
-    //    f^K_i = \int_K varphi_i(x) f(x) dx
-    // @f}
-    // to the right hand side vector.
-    //
-    // We use the same technique as used in the assembly of step-22
-    // to accelerate the function: Instead of calling
-    // `fe_values.shape_hessian(i, qpoint)` in the innermost loop,
-    // we instead create a variable `hessian_i` that evaluates this
-    // value once in the loop over `i` and re-use the so-evaluated
-    // value in the loop over `j`. For symmetry, we do the same with a
-    // variable `hessian_j`, although it is indeed only used once and
-    // we could have left the call to `fe_values.shape_hessian(j,qpoint)`
-    // in the instruction that computes the scalar product between
-    // the two terms.
     auto cell_worker = [&](const Iterator &  cell,
                            ScratchData<dim> &scratch_data,
                            CopyData &        copy_data) {
