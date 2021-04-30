@@ -63,7 +63,7 @@ namespace TransmissionProblem
   // The following namespace defines material parameters. We use SI units.
   namespace MaterialParameters
   {
-    double wave_speed;
+    std::complex<double> wave_speed;
 
     std::vector<double> frequencies;
   }
@@ -84,6 +84,10 @@ namespace TransmissionProblem
     prm.declare_entry ("Wave speed", "340",
                        Patterns::Double(0),
                        "The wave speed in the medium in question. Units: [m/s].");
+    prm.declare_entry ("Wave speed loss tangent", "20",
+                       Patterns::Double(0,90),
+                       "The angle used to make the wave speed complex-valued. "
+                       "Units: [degrees].");
 
     prm.declare_entry ("Frequencies", "linear_spacing(100,10000,100)",
                        Patterns::Anything(),
@@ -122,8 +126,14 @@ namespace TransmissionProblem
 
     
     using namespace MaterialParameters;
+
+    // Read the (real-valued) wave speed and its loss tangent. Then
+    // make the wave speed complex-valued.
+    const double c              = prm.get_double ("Wave speed");
+    const double c_loss_tangent = prm.get_double ("Wave speed loss tangent");
+
+    wave_speed = c * std::exp(std::complex<double>(0,2*numbers::PI*c_loss_tangent/360));
     
-    wave_speed = prm.get_double ("Wave speed");
 
     mesh_file_name = prm.get ("Mesh file name");
 
