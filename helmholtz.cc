@@ -723,7 +723,6 @@ namespace TransmissionProblem
                                     fe,
                                     n_gauss_points,
                                     update_values | update_gradients |
-                                    update_hessians | update_quadrature_points |
                                     update_JxW_values,
                                     update_default);
     CopyData           copy_data(dof_handler.get_fe().dofs_per_cell);
