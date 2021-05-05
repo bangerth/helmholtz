@@ -37,6 +37,8 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vector_tools_point_value.h>
+#include <deal.II/numerics/vector_tools_point_gradient.h>
 
 #include <deal.II/fe/fe_interface_values.h>
 #include <deal.II/meshworker/mesh_loop.h>
@@ -77,6 +79,9 @@ namespace TransmissionProblem
 
   unsigned int n_threads = 0;
 
+  std::vector<Point<3>> evaluation_points;
+
+
   void
   declare_parameters (ParameterHandler &prm)
   {
@@ -103,6 +108,15 @@ namespace TransmissionProblem
                        Patterns::Double(0,90),
                        "The angle used to make the wave speed complex-valued. "
                        "Units: [degrees].");
+
+    prm.declare_entry ("Evaluation points", "",
+                       Patterns::List (Patterns::List(Patterns::Double(),3,3,","),
+                                       0, Patterns::List::max_int_value, ";"),
+                       "A list of points at which the program evaluates both the pressure "
+                       "and the (volumetric) velocity. Each point is specified by x,y,z "
+                       "coordinates using the same units as used for the mesh (and then "
+                       "scaled by the value of the 'Geometry conversion factor to meters' "
+                       "parameter). Points are separated by semicolons.");
 
     prm.declare_entry ("Frequencies", "linear_spacing(100,10000,100)",
                        Patterns::Anything(),
@@ -137,22 +151,42 @@ namespace TransmissionProblem
   {
     // First read parameter values from the input file 'helmholtz.prm'
     prm.parse_input (instance_folder + "/helmholtz.prm");
+
+    // Start with geometry things: The mesh, the scaling factor, evaluation points
+    mesh_file_name = prm.get ("Mesh file name");
     geometry_conversion_factor = prm.get_double ("Geometry conversion factor to meters");
+    {
+      const auto points = Utilities::split_string_list (prm.get("Evaluation points"), ';');
+      for (const auto point : points)
+        {
+          const auto coordinates = Utilities::split_string_list (point, ',');
+          AssertDimension (coordinates.size(), 3);
 
-    
-    using namespace MaterialParameters;
+          Point<3> p;
+          for (unsigned int d=0; d<3; ++d)
+            p[d] = Utilities::string_to_double(coordinates[d]);
 
+          p *= geometry_conversion_factor;
+
+          evaluation_points.push_back (p);
+        }
+    }
+
+
+    // Next up: Material parameters.
+    //
     // Read the (real-valued) wave speed and its loss tangent. Then
     // make the wave speed complex-valued.
+    using namespace MaterialParameters;
+
     const double c              = prm.get_double ("Wave speed");
     const double c_loss_tangent = prm.get_double ("Wave speed loss tangent");
 
     wave_speed = c * std::exp(std::complex<double>(0,2*numbers::PI*c_loss_tangent/360));
 
     density = prm.get_double ("Density");
-    
 
-    mesh_file_name = prm.get ("Mesh file name");
+
 
     // Read and parse the entry that determines which frequencies to compute.
     // Recall that the format is one of the following:
@@ -298,6 +332,10 @@ namespace TransmissionProblem
   struct OutputData
   {
     FullMatrix<ScalarType> P, U;
+
+    std::vector<std::complex<double>>             evaluation_point_pressures;
+    std::vector<Tensor<1,3,std::complex<double>>> evaluation_point_velocities;
+
 
     std::vector<std::string> visualization_file_names;
   };
@@ -804,15 +842,16 @@ namespace TransmissionProblem
 
 
 
-  // The next function postprocesses the solution. In the current context,
-  // this implies computing the integral over the magnitude of the solution.
-  // It will be small in general, except in the vicinity of eigenvalues.
+  // The next function postprocesses the solution. In the current
+  // context, this implies computing integrals over the solution at
+  // all ports, as well as evaluating the solution at specific points.
   template <int dim>
   void HelmholtzProblem<dim>::postprocess(const unsigned int current_source_port)
   {
     std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Postprocess") : nullptr);
 
-    // Compute the integral of the absolute value of the solution.
+    // *** Step 1:
+    // Compute integrals of the solution
     const QGauss<dim-1>  quadrature_formula(fe.degree + 2);
     const unsigned int n_q_points = quadrature_formula.size();
     FEFaceValues<dim> fe_face_values(*mapping,
@@ -876,6 +915,25 @@ namespace TransmissionProblem
       {
         output_data.P(current_source_port, i) /= port_areas[i];
         output_data.U(current_source_port, i) /= port_areas[i];
+      }
+
+
+    // *** Step 2:
+    // Evaluate the solution at specific points
+    for (const auto &p : evaluation_points)
+      {
+        // First evaluate the values
+        output_data.evaluation_point_pressures
+          .push_back (VectorTools::point_value (*mapping, dof_handler, solution,
+                                                p));
+
+        // Then also the velocities. Recall from above that
+        //   v = -1/(j rho omega) nabla p
+        output_data.evaluation_point_velocities
+          .push_back (VectorTools::point_gradient (*mapping, dof_handler, solution,
+                                                   p));
+        output_data.evaluation_point_velocities.back()
+          *= -1./(std::complex<double>(0,1)*MaterialParameters::density*omega);
       }
   }
 
@@ -1058,6 +1116,26 @@ namespace TransmissionProblem
             buffer << "]\n";
           }
         buffer << "]\n";
+        buffer << "\n\n\n" << std::flush;
+
+
+        // Then also output locations, pressures, and velocities at
+        // the evaluation points. Output the location in the
+        // coordinates originally provided in the output file.
+        buffer << "Pressure and velocity at explicitly specified evaluation points:\n"
+               << "================================================================\n\n";
+
+        for (unsigned int i=0; i<evaluation_points.size(); ++i)
+          {
+            buffer << "Point at "
+                   << evaluation_points[i] / geometry_conversion_factor
+                   << ":  pressure="
+                   << result.second.evaluation_point_pressures[i]
+                   << ", velocity="
+                   << result.second.evaluation_point_velocities[i]
+                   << '\n';
+          }
+
         buffer << "\n\n\n" << std::flush;
       }
 
