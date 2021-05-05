@@ -477,7 +477,7 @@ namespace TransmissionProblem
                                      fe,
                                      quadrature_formula,
                                      update_JxW_values);
-    for (const auto cell : dof_handler.active_cell_iterators())
+    for (const auto cell : triangulation.active_cell_iterators())
       for (const auto face : cell->face_iterators())
         if (face->at_boundary())
           if (std::find(port_boundary_ids.begin(),
