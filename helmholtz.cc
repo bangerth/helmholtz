@@ -995,11 +995,30 @@ namespace TransmissionProblem
     // final form, not partly written.
     std::lock_guard<std::mutex> guard (results_mutex);
 
-    // First output how many frequencies have already been computed:
     std::ostringstream buffer;
     for (auto result : results)
       {
-        const unsigned int field_width = 24;
+        const unsigned int field_width = 12;
+
+        // Filter out values that are in essence zero
+        for (unsigned int i=0; i<result.second.P.m(); ++i)
+          for (unsigned int j=0; j<result.second.P.n(); ++j)
+            {
+              if (std::fabs(std::real(result.second.P(i,j))) < 1e-12 * result.second.P.l1_norm())
+                result.second.P(i,j).real(0);
+              if (std::fabs(std::imag(result.second.P(i,j))) < 1e-12 * result.second.P.l1_norm())
+                result.second.P(i,j).imag(0);
+            }
+
+        for (unsigned int i=0; i<result.second.U.m(); ++i)
+          for (unsigned int j=0; j<result.second.U.n(); ++j)
+            {
+              if (std::fabs(std::real(result.second.P(i,j))) < 1e-12 * result.second.P.l1_norm())
+                result.second.P(i,j).real(0);
+              if (std::fabs(std::imag(result.second.P(i,j))) < 1e-12 * result.second.P.l1_norm())
+                result.second.P(i,j).imag(0);
+            }
+
         
         const auto omega = result.first;
         buffer << "Results for frequency f="
@@ -1011,7 +1030,11 @@ namespace TransmissionProblem
           {
             buffer << "      [";
             for (unsigned int j=0; j<result.second.P.n(); ++j)
-              buffer << std::setw(field_width) << result.second.P(i,j) << ' ';
+              buffer << std::setw(field_width) << std::right << std::real(result.second.P(i,j))
+                     << (std::imag(result.second.P(i,j)) >= 0 ? '+' : '-')
+                     << "j*"
+                     << std::setw(field_width) << std::left << std::fabs(std::imag(result.second.P(i,j)))
+                     << ' ';
             buffer << "]\n";
           }
         buffer << "]\n";
@@ -1021,7 +1044,11 @@ namespace TransmissionProblem
           {
             buffer << "      [";
             for (unsigned int j=0; j<result.second.P.n(); ++j)
-              buffer << std::setw(field_width) << result.second.U(i,j) << ' ';
+              buffer << std::setw(field_width) << std::right << std::real(result.second.U(i,j))
+                     << (std::imag(result.second.U(i,j)) >= 0 ? '+' : '-')
+                     << "j*"
+                     << std::setw(field_width) << std::left << std::fabs(std::imag(result.second.U(i,j)))
+                     << ' ';
             buffer << "]\n";
           }
         buffer << "]\n";
