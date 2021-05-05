@@ -829,12 +829,14 @@ namespace TransmissionProblem
                   // Pa=kg/m/s^2, we get the velocity by
                   //   U=...
                   // with units
-                  //     
+                  //
+                  // Note that the velocity is computed *into* the
+                  // volume, i.e., with the negative outward normal.
                   const auto velocity = omega * solution_gradients[q_point];
                   
                   output_data.U(current_source_port, this_port)
                     +=  (velocity *
-                         fe_face_values.normal_vector(q_point) *
+                         (-fe_face_values.normal_vector(q_point)) *
                          fe_face_values.JxW(q_point));
                 }
             }
