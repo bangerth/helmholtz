@@ -64,6 +64,7 @@ namespace TransmissionProblem
   namespace MaterialParameters
   {
     std::complex<double> wave_speed;
+    double density;
 
     std::vector<double> frequencies;
   }
@@ -92,9 +93,12 @@ namespace TransmissionProblem
                        "the evaluation points are given in multiples of inches, "
                        "then this factor should be set to 0.0254 because one inch "
                        "equals 0.0254 meters = 25.4 mm.");
-    prm.declare_entry ("Wave speed", "340",
+    prm.declare_entry ("Wave speed", "343",
                        Patterns::Double(0),
                        "The wave speed in the medium in question. Units: [m/s].");
+    prm.declare_entry ("Density", "1.18",
+                       Patterns::Double(0),
+                       "The density of the medium in question. Units: [kg/m^3].");
     prm.declare_entry ("Wave speed loss tangent", "20",
                        Patterns::Double(0,90),
                        "The angle used to make the wave speed complex-valued. "
@@ -144,6 +148,8 @@ namespace TransmissionProblem
     const double c_loss_tangent = prm.get_double ("Wave speed loss tangent");
 
     wave_speed = c * std::exp(std::complex<double>(0,2*numbers::PI*c_loss_tangent/360));
+
+    density = prm.get_double ("Density");
     
 
     mesh_file_name = prm.get ("Mesh file name");
@@ -848,14 +854,14 @@ namespace TransmissionProblem
                          fe_face_values.JxW(q_point));
 
                   // Then also compute the integral over the
-                  // velocity. Since the pressure has units
-                  // Pa=kg/m/s^2, we get the velocity by
-                  //   U=...
+                  // velocity. The volumetric velocity is defined as
+                  //   v = -1/(j rho omega) nabla p
                   // with units
                   //
                   // Note that the velocity is computed *into* the
                   // volume, i.e., with the negative outward normal.
-                  const auto velocity = omega * solution_gradients[q_point];
+                  const auto velocity = -1./(std::complex<double>(0,1)*MaterialParameters::density*omega)
+                                        * solution_gradients[q_point];
                   
                   output_data.U(current_source_port, this_port)
                     +=  (velocity *

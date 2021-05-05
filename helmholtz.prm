@@ -2,6 +2,7 @@ set Mesh file name = ./mesh.msh
 set Geometry conversion factor to meters = 0.001
 set Wave speed = 343
 set Wave speed loss tangent = 2
+set Density = 1.18
 
 set Frequencies = list(5000,10000,15000)
 set Number of mesh refinement steps = 0
