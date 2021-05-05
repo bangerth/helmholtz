@@ -69,6 +69,7 @@ namespace TransmissionProblem
   }
 
   std::string mesh_file_name;
+  double geometry_conversion_factor;
   
   unsigned int fe_degree = 2;
   int n_mesh_refinement_steps = 5;
@@ -80,7 +81,17 @@ namespace TransmissionProblem
   {
     prm.declare_entry ("Mesh file name", "./mesh.msh",
                        Patterns::FileName(),
-                       "The name of the file from which to read the mesh.");
+                       "The name of the file from which to read the mesh. "
+                       "The extents of the geometry so described are scaled "
+                       "by the 'Geometry conversion factor to SI units' parameter.");
+    prm.declare_entry ("Geometry conversion factor to meters", "1",
+                       Patterns::Double(),
+                       "A conversion factor from whatever length units are used "
+                       "for the geometry description and for the description of "
+                       "arbitrary evaluation points, to meters. For example, if the mesh and "
+                       "the evaluation points are given in multiples of inches, "
+                       "then this factor should be set to 0.0254 because one inch "
+                       "equals 0.0254 meters = 25.4 mm.");
     prm.declare_entry ("Wave speed", "340",
                        Patterns::Double(0),
                        "The wave speed in the medium in question. Units: [m/s].");
@@ -122,7 +133,7 @@ namespace TransmissionProblem
   {
     // First read parameter values from the input file 'helmholtz.prm'
     prm.parse_input (instance_folder + "/helmholtz.prm");
-    
+    geometry_conversion_factor = prm.get_double ("Geometry conversion factor to meters");
 
     
     using namespace MaterialParameters;
@@ -430,6 +441,8 @@ namespace TransmissionProblem
     grid_in.read_msh (input);
 
     std::cout << "The mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
+    // Scale the triangulation by the geometry factor
+    GridTools::scale (geometry_conversion_factor, triangulation);
     
     // Now implement the heuristic for mesh refinement described in
     // readme.md: If positive, just do a number of global refinement
