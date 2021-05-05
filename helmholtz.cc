@@ -71,7 +71,7 @@ namespace TransmissionProblem
 
   std::string mesh_file_name;
   double geometry_conversion_factor;
-  
+
   unsigned int fe_degree = 2;
   int n_mesh_refinement_steps = 5;
 
@@ -184,7 +184,7 @@ namespace TransmissionProblem
            ',');
         AssertThrow (min_max_steps.size() == 3,
                      ExcMessage ("Wrong format for 'linear_spacing'."));
-                            
+
         const double min_omega = Utilities::string_to_double(min_max_steps[0])
                                  * 2 * numbers::PI;
         const double max_omega = Utilities::string_to_double(min_max_steps[1])
@@ -223,7 +223,7 @@ namespace TransmissionProblem
            ',');
         AssertThrow (min_max_steps.size() == 3,
                      ExcMessage ("Wrong format for 'exp_spacing'."));
-                            
+
         const double log_min_omega = std::log(Utilities::string_to_double(min_max_steps[0])
                                               * 2 * numbers::PI);
         const double log_max_omega = std::log(Utilities::string_to_double(min_max_steps[1])
@@ -274,7 +274,7 @@ namespace TransmissionProblem
                    ExcMessage ("The format for the description of the frequencies to "
                                "be solved for, namely <"
                                + frequency_descriptor + ">, did not match any of "
-                               "the recognized formats."));    
+                               "the recognized formats."));
 
     fe_degree               = prm.get_integer ("Finite element polynomial degree");
     n_mesh_refinement_steps = prm.get_integer ("Number of mesh refinement steps");
@@ -286,11 +286,11 @@ namespace TransmissionProblem
 
     n_threads = prm.get_integer ("Number of threads");
   }
-  
 
-  
 
-  
+
+
+
   // A data structure that is used to collect the results of the computations
   // for one frequency. The main class fills this for a given frequency
   // in various places of its member functions, and at the end puts it into
@@ -301,9 +301,9 @@ namespace TransmissionProblem
 
     std::vector<std::string> visualization_file_names;
   };
-  
-    
-  
+
+
+
   // A variable that will collect the data (value) for all frequencies
   // omega (key). Since we will access it from different threads, we also
   // need a mutex to guard access to it.
@@ -312,7 +312,7 @@ namespace TransmissionProblem
 
   TimerOutput timer_output = TimerOutput (logger, TimerOutput::summary,
                                           TimerOutput::wall_times);
-  
+
 
   // Check whether an external program has left a signal that
   // indicates that the current program run should terminate without
@@ -331,7 +331,7 @@ namespace TransmissionProblem
 
     if (termination_requested == true)
       return true;
-    
+
     // Try and see whether we can open the file at all. If we can't,
     // then no termination signal has been sent. If so, return 'true',
     // but before that set a flag that ensures we don't have to do the
@@ -363,7 +363,7 @@ namespace TransmissionProblem
         std::lock_guard<std::mutex> results_lock(results_mutex);
         logger << "INFO *** Terminating program upon request." << std::endl;
         std::exit (1);
-        
+
         return true;
       }
 
@@ -405,7 +405,7 @@ namespace TransmissionProblem
     Triangulation<dim>              triangulation;
     std::vector<types::boundary_id> port_boundary_ids;
     std::vector<double>             port_areas;
-    
+
     std::unique_ptr<Mapping<dim>> mapping;
 
     FE_SimplexP<dim>              fe;
@@ -440,7 +440,7 @@ namespace TransmissionProblem
   void HelmholtzProblem<dim>::make_grid()
   {
     std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Make grid") : nullptr);
-    
+
     GridIn<dim> grid_in;
     grid_in.attach_triangulation (triangulation);
     std::ifstream input (instance_folder + "/" + mesh_file_name);
@@ -449,7 +449,7 @@ namespace TransmissionProblem
     std::cout << "The mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
     // Scale the triangulation by the geometry factor
     GridTools::scale (geometry_conversion_factor, triangulation);
-    
+
     // Now implement the heuristic for mesh refinement described in
     // readme.md: If positive, just do a number of global refinement
     // steps. If negative, interpret it as the number of mesh points
@@ -459,9 +459,9 @@ namespace TransmissionProblem
     else
       {
         Assert (false, ExcMessage("Need to implement a scheme that is based on the wavelength"));
-        
+
         const int N = -n_mesh_refinement_steps;
-        
+
         const double lambda  = 1000;
 
         const double diameter = GridTools::diameter(triangulation);
@@ -508,7 +508,7 @@ namespace TransmissionProblem
                                                         port_boundary_ids.end(),
                                                         face->boundary_id())
                                               - port_boundary_ids.begin());
-              
+
               fe_face_values.reinit(cell, face);
               for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 port_areas[this_port] += fe_face_values.JxW(q_point);
@@ -525,12 +525,12 @@ namespace TransmissionProblem
     dof_handler.distribute_dofs(fe);
 
     std::cout << "The mesh has " << dof_handler.n_dofs() << " unknowns" << std::endl;
-    
+
     DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
     c_sparsity.compress();
-    
-        
+
+
     sparsity_pattern.copy_from(c_sparsity);
     system_matrix.reinit(sparsity_pattern);
 
@@ -653,7 +653,7 @@ namespace TransmissionProblem
                            ScratchData<dim> &scratch_data,
                            CopyData &        copy_data) {
       std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Assemble linear system - cell") : nullptr);
-      
+
       copy_data.cell_matrix = 0;
       copy_data.cell_rhs    = 0;
 
@@ -672,7 +672,7 @@ namespace TransmissionProblem
             {
               const Tensor<1,dim> grad_i    = fe_values.shape_grad(i, qpoint);
               const double        value_i   = fe_values.shape_value(i, qpoint);
-              
+
               for (unsigned int j = 0; j < dofs_per_cell; ++j)
                 {
                   const Tensor<1,dim> grad_j    = fe_values.shape_grad(j, qpoint);
@@ -701,7 +701,7 @@ namespace TransmissionProblem
             }
         }
     };
-    
+
 
 
     // Part 4 was a small function that copies the data produced by the
@@ -716,7 +716,7 @@ namespace TransmissionProblem
     // to the `copy_data.face_data` array.
     auto copier = [&](const CopyData &copy_data) {
       std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Assemble linear system - copy") : nullptr);
-      
+
       for (unsigned int i=0; i<copy_data.cell_matrix.m(); ++i)
         for (unsigned int j=0; j<copy_data.cell_matrix.m(); ++j)
           system_matrix.add(copy_data.local_dof_indices[i],
@@ -797,7 +797,7 @@ namespace TransmissionProblem
     std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Solve linear system") : nullptr);
 
     solution = system_rhs;
-    
+
     SparseDirectUMFPACK direct_solver;
     direct_solver.solve(system_matrix, solution);
   }
@@ -838,12 +838,12 @@ namespace TransmissionProblem
                                                         port_boundary_ids.end(),
                                                         face->boundary_id())
                                               - port_boundary_ids.begin());
-              
+
               fe_face_values.reinit(cell, face);
               fe_face_values.get_function_values   (solution, solution_values);
               fe_face_values.get_function_gradients(solution, solution_gradients);
-              
-            
+
+
               for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
                 {
                   // Compute the integral over the pressure on each
@@ -862,7 +862,7 @@ namespace TransmissionProblem
                   // volume, i.e., with the negative outward normal.
                   const auto velocity = -1./(std::complex<double>(0,1)*MaterialParameters::density*omega)
                                         * solution_gradients[q_point];
-                  
+
                   output_data.U(current_source_port, this_port)
                     +=  (velocity *
                          (-fe_face_values.normal_vector(q_point)) *
@@ -931,7 +931,7 @@ namespace TransmissionProblem
 
         std::cout << "omega=" << omega
                   << ", source port boundary id=" << port_boundary_ids[current_source_port]
-                  << std::endl;    
+                  << std::endl;
         assemble_system(current_source_port);
 
         check_for_termination_signal();
@@ -944,7 +944,7 @@ namespace TransmissionProblem
         output_results(current_source_port);
         postprocess(current_source_port);
       }
-    
+
     // Finally, put the result into the output variable that we can
     // read from main(). Make sure that access to the variable is
     // properly guarded across threads.
@@ -1025,7 +1025,7 @@ namespace TransmissionProblem
                 result.second.P(i,j).imag(0);
             }
 
-        
+
         const auto omega = result.first;
         buffer << "Results for frequency f="
                << omega/2/numbers::PI << ":\n"
@@ -1044,7 +1044,7 @@ namespace TransmissionProblem
             buffer << "]\n";
           }
         buffer << "]\n";
-        
+
         buffer << "\n\nU = [\n";
         for (unsigned int i=0; i<result.second.U.m(); ++i)
           {
@@ -1060,7 +1060,7 @@ namespace TransmissionProblem
         buffer << "]\n";
         buffer << "\n\n\n" << std::flush;
       }
-    
+
     std::ofstream frequency_response (instance_folder + "/frequency_response.txt");
     frequency_response << buffer.str();
   }
@@ -1087,7 +1087,7 @@ int main(int argc, char *argv[])
     {
       instance_folder = std::string(".");
     }
-  
+
   logger = std::ofstream (instance_folder + "/output.log");
   logger << "INFO Program started with argument '" << instance_folder << "'" << std::endl;
 
@@ -1103,7 +1103,7 @@ int main(int argc, char *argv[])
       // use parallelism itself, the overall parallelism is determined
       // by how many tasks we create explicitly below.
       MultithreadInfo::set_thread_limit (1);
-      
+
 
       // Remove any previous output file so that nobody gets confused
       // if the program were to be aborted before we write into it the
@@ -1129,7 +1129,7 @@ int main(int argc, char *argv[])
           for (const double omega : MaterialParameters::frequencies)
             tasks.emplace_back (std::async (std::launch::async,
                                             [=]() { solve_one_frequency (omega); }));
-      
+
           logger << "INFO Number of frequencies scheduled: "
                     << tasks.size() << std::endl;
 
@@ -1166,7 +1166,7 @@ int main(int argc, char *argv[])
                   std::lock_guard<std::mutex> lock(mutex);
                   if (leftover_frequencies.size() == 0)
                     return;
-                
+
                   next_omega = leftover_frequencies.front();
                   leftover_frequencies.erase (leftover_frequencies.begin());
                 }
@@ -1196,9 +1196,9 @@ int main(int argc, char *argv[])
           for (auto &thread : threads)
             thread.join();
         }
-      
+
       logger << "INFO Number of frequencies computed: "
-                << results.size() << std::endl;      
+                << results.size() << std::endl;
 
       // Whether or not a termination signal has been sent, try to
       // remove the file that indicates this signal. That's because if
