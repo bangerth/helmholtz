@@ -743,11 +743,21 @@ namespace TransmissionProblem
                           /* face_worker= */ {},
                           /* face_worker= */ {});
 
+    // Figure out boundary conditions. We want a unit pressure on the
+    // source port, and zero pressure on the other ports. Also zero
+    // Neumann conditions on the remaining boundary, but we don't need
+    // to do anything specific for that.
     std::map<types::global_dof_index,ScalarType> boundary_values;
     VectorTools::interpolate_boundary_values(dof_handler,
                                              port_boundary_ids[current_source_port],
                                              Functions::ConstantFunction<dim,ScalarType>(1),
                                              boundary_values);
+    for (const auto b_id : port_boundary_ids)
+      if (b_id != port_boundary_ids[current_source_port])
+        VectorTools::interpolate_boundary_values(dof_handler,
+                                                 b_id,
+                                                 Functions::ZeroFunction<dim,ScalarType>(),
+                                                 boundary_values);
 
     MatrixTools::apply_boundary_values (boundary_values,
                                         system_matrix,
