@@ -464,7 +464,6 @@ namespace TransmissionProblem
   template <int dim>
   HelmholtzProblem<dim>::HelmholtzProblem(const double omega)
     : omega (omega)
-      , mapping(ReferenceCells::Tetrahedron.get_default_mapping<dim,dim>(1))
     , dof_handler(triangulation)
   {}
 
@@ -516,9 +515,15 @@ namespace TransmissionProblem
     Assert (triangulation.get_reference_cells().size() == 1,
             ExcMessage("We don't know how to deal with this kind of mesh."));
     if (triangulation.get_reference_cells()[0] == ReferenceCells::Tetrahedron)
-      fe = std::make_unique<FE_SimplexP<dim>>(TransmissionProblem::fe_degree);
+      {
+        fe = std::make_unique<FE_SimplexP<dim>>(TransmissionProblem::fe_degree);
+        mapping = ReferenceCells::Tetrahedron.get_default_mapping<dim,dim>(1);
+      }
     else if (triangulation.get_reference_cells()[0] == ReferenceCells::Hexahedron)
-      fe = std::make_unique<FE_Q<dim>>(TransmissionProblem::fe_degree);
+      {
+        fe = std::make_unique<FE_Q<dim>>(TransmissionProblem::fe_degree);
+        mapping = ReferenceCells::Hexahedron.get_default_mapping<dim,dim>(1);
+      }
     else
       Assert (false, ExcMessage("We don't know how to deal with this kind of mesh."));
 
