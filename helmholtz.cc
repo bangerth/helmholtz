@@ -28,6 +28,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/fe/fe_simplex_p.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -440,22 +441,22 @@ namespace TransmissionProblem
     // The frequency that this instance of the class is supposed to solve for.
     const double                  omega;
 
-    Triangulation<dim>              triangulation;
-    std::vector<types::boundary_id> port_boundary_ids;
-    std::vector<double>             port_areas;
+    Triangulation<dim>                   triangulation;
+    std::vector<types::boundary_id>      port_boundary_ids;
+    std::vector<double>                  port_areas;
 
-    std::unique_ptr<Mapping<dim>> mapping;
+    std::unique_ptr<Mapping<dim>>        mapping;
 
-    FE_SimplexP<dim>              fe;
-    DoFHandler<dim>               dof_handler;
+    std::unique_ptr<FiniteElement<dim>> fe;
+    DoFHandler<dim>                     dof_handler;
 
-    SparsityPattern               sparsity_pattern;
-    SparseMatrix<ScalarType>      system_matrix;
+    SparsityPattern                     sparsity_pattern;
+    SparseMatrix<ScalarType>            system_matrix;
 
-    Vector<ScalarType>            solution;
-    Vector<ScalarType>            system_rhs;
+    Vector<ScalarType>                  solution;
+    Vector<ScalarType>                  system_rhs;
 
-    OutputData                    output_data;
+    OutputData                          output_data;
   };
 
 
@@ -464,7 +465,6 @@ namespace TransmissionProblem
   HelmholtzProblem<dim>::HelmholtzProblem(const double omega)
     : omega (omega)
       , mapping(ReferenceCells::Tetrahedron.get_default_mapping<dim,dim>(1))
-    , fe(TransmissionProblem::fe_degree)
     , dof_handler(triangulation)
   {}
 
@@ -510,6 +510,19 @@ namespace TransmissionProblem
           triangulation.refine_global();
       }
 
+
+    // Depending on what reference cell the triangulation uses, pick
+    // the right finite element
+    Assert (triangulation.get_reference_cells().size() == 1,
+            ExcMessage("We don't know how to deal with this kind of mesh."));
+    if (triangulation.get_reference_cells()[0] == ReferenceCells::Tetrahedron)
+      fe = std::make_unique<FE_SimplexP<dim>>(TransmissionProblem::fe_degree);
+    else if (triangulation.get_reference_cells()[0] == ReferenceCells::Hexahedron)
+      fe = std::make_unique<FE_Q<dim>>(TransmissionProblem::fe_degree);
+    else
+      Assert (false, ExcMessage("We don't know how to deal with this kind of mesh."));
+
+    
     // Figure out what boundary ids we have that describe ports. We
     // take these as all of those boundary ids that are non-zero
     port_boundary_ids = {0,1,2}, // TODO: triangulation.get_boundary_ids();
@@ -524,14 +537,15 @@ namespace TransmissionProblem
     output_data.U.reinit (port_boundary_ids.size(),
                           port_boundary_ids.size());
 
+    
     // As a final step, compute the areas of the various ports so we
     // can later normalize when computing average pressures and
     // velocities:
     port_areas.resize (port_boundary_ids.size(), 0.);
-    const QGauss<dim-1>  quadrature_formula(fe.degree + 2);
+    const QGauss<dim-1>  quadrature_formula(fe->degree + 2);
     const unsigned int n_q_points = quadrature_formula.size();
     FEFaceValues<dim> fe_face_values(*mapping,
-                                     fe,
+                                     *fe,
                                      quadrature_formula,
                                      update_JxW_values);
     for (const auto cell : triangulation.active_cell_iterators())
@@ -560,7 +574,7 @@ namespace TransmissionProblem
   {
     std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Set up system") : nullptr);
 
-    dof_handler.distribute_dofs(fe);
+    dof_handler.distribute_dofs(*fe);
 
     std::cout << "The mesh has " << dof_handler.n_dofs() << " unknowns" << std::endl;
 
@@ -784,7 +798,7 @@ namespace TransmissionProblem
     // as many processor cores as your machine happens to have.
     const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
     ScratchData<dim>   scratch_data(*mapping,
-                                    fe,
+                                    *fe,
                                     n_gauss_points,
                                     update_values | update_gradients |
                                     update_JxW_values,
@@ -852,10 +866,10 @@ namespace TransmissionProblem
 
     // *** Step 1:
     // Compute integrals of the solution
-    const QGauss<dim-1>  quadrature_formula(fe.degree + 2);
+    const QGauss<dim-1>  quadrature_formula(fe->degree + 2);
     const unsigned int n_q_points = quadrature_formula.size();
     FEFaceValues<dim> fe_face_values(*mapping,
-                                     fe,
+                                     *fe,
                                      quadrature_formula,
                                      update_values
                                      | update_gradients
@@ -951,7 +965,7 @@ namespace TransmissionProblem
 
     data_out.attach_dof_handler(dof_handler);
     data_out.add_data_vector(solution, "solution");
-    data_out.build_patches(fe.degree);
+    data_out.build_patches(fe->degree);
 
     std::string file_name = instance_folder + "/visualization/solution-" +
                             std::to_string(static_cast<unsigned int>(omega/2/numbers::PI)) +
