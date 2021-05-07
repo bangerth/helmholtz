@@ -214,4 +214,180 @@ may or may not be those listed first in the input file.
 
 # How this program was tested
 
-*TODO*
+We can check for the correctness of the program using the following
+set up:
+
+The mesh is a cylinder along the _x_-axis with length 4 and radius
+1. We use a scaling factor of 0.001, so this corresponds to a length
+_L_=4mm and radius _r_=1mm.
+
+The solution to this problem is one-dimensional, and reads
+```
+  p(x) = a*exp(j*k*x) + b*exp(-j*k*x)
+```
+with _k=omega/c_ and _a,b_ so that
+```
+  p(0) = 1
+  p(L) = 0
+```
+which implies
+```
+  a+b=1
+  a*exp(j*omega/c*L) + b*exp(-j*omega/c*L)=0
+```
+Inserting the first of these equations into the second, and multiplying by
+`exp(j*omega/c*L)`, we get
+```
+  (1-b)*exp(2*j*omega/c*L) + b=0
+```
+which implies
+```
+  exp(2*j*omega/c*L) + (1-exp(2*j*omega/c*L))*b=0
+```
+and consequently
+```
+  b = -exp(2*j*omega/c*L) / [ 1-exp(2*j*omega/c*L) ]
+  a = (1-b)
+    = 1+exp(2*j*omega/c*L) / [ 1-exp(2*j*omega/c*L) ]
+    = 1 / [ 1-exp(2*j*omega/c*L) ]
+```
+Taken together, this results in the following solution:
+```
+  p(x) = exp(j*omega/c*x)/[ 1-exp(2*j*omega/c*L) ]
+         - exp(2*j*omega/c*L) * exp(-j*omega/c*x)/[ 1-exp(2*j*omega/c*L) ]
+       = [ exp(j*omega/c*x) - exp(j*omega/c*(2L-x)) ]
+           / [ 1-exp(2*j*omega/c*L) ]
+```
+We can easily verify that `p(0)=1` and `p(L)=0`, as expected.
+
+Furthermore, we can compute the (volumetric) velocity as
+```
+  u(x) = -1/(j rho omega) nabla p
+```
+of which only the _x_-component is nonzero and reads as
+```
+  u_x(x) = -1/(rho c) [ exp(j*omega/c*x) + exp(j*omega/c*(2L-x)) ]
+           / [ 1-exp(2*j*omega/c*L) ]
+```
+So, at the left end of the cylinder, we have
+```
+  u_x(0) = -1/(rho c) [ 1 + exp(2*j*omega/c*L)) ]
+           / [ 1-exp(2*j*omega/c*L) ]
+```
+and at the right end
+```
+  u_x(L) = -2/(rho c) exp(j*omega/c*L) / [ 1-exp(2*j*omega/c*L) ]
+```
+
+We can test all of this for a concrete choice of wave speed `c`,
+density `rho`, and frequency `omega = 2*pi*f` using the cylinder
+of length `L=4mm` described above. Using the following input file,
+```
+set Mesh file name                       = ../helmholtz/geometries/cylinder/cylinder.msh
+set Geometry conversion factor to meters = 0.001
+set Evaluation points                    = 
+
+set Wave speed                           = 343
+set Wave speed loss tangent              = 0
+set Density                              = 1.18
+
+set Frequencies                          = list(100000)
+set Number of mesh refinement steps      = 0
+set Finite element polynomial degree     = 2
+set Number of threads                    = 1
+```
+we have `rho=1.18 kg/m^3`, `c=343 m/s`, and `f=100 kHz` (which
+produces a wave length of 3.43mm, just short of the length of the
+cylinder). A visualization of the real part of the pressure solution
+looks as follows, on a hexahedral mesh with 11,121 unknowns:
+
+![xxx](geometries/cylinder/100kHz-hex.png)
+
+For this set of frequencies, we then expect
+```
+  u_x(0) = 0-0.00144j    # 
+```
+and at the right end
+```
+  u_x(L) = 0-0.00286j    # 
+```
+where at the right end, the sign needs to be flipped to obtain the
+_inward_ velocity. Indeed, on the mesh shown above, the program
+produces these values for the two ports:
+```
+  -0.00146963j
+  +0.00290720j
+```
+This matches to good accuracy the expected values, and a further
+refined mesh will result in even better accuracy.
+
+
+The results above are obtained with a purely real wave speed (loss
+angle zero, no attenuation).
+```
+set Mesh file name                       = ../helmholtz/geometries/cylinder/cylinder.msh
+set Geometry conversion factor to meters = 0.001
+set Evaluation points                    = 
+
+set Wave speed                           = 343
+set Wave speed loss tangent              = 10
+set Density                              = 1.18
+
+set Frequencies                          = list(100000)
+set Number of mesh refinement steps      = 0
+set Finite element polynomial degree     = 2
+set Number of threads                    = 1
+```
+With these values, we then get the following expected values:
+```
+  u_x(0) = 0.002238 - 0.000752j
+```
+and at the right end
+```
+  u_x(L) = 0.0005134 - 0.00125j
+```
+On the same mesh as shown in the previous figure, the obtained values
+for the inward volumetric velocities are
+```
+   0.00226466 -0.000784016j
+  -0.000514756+0.001271710j
+```
+which is again a decent approximation after accounting for having to
+switch the sign on the second value.
+
+
+The experiments above were obtained on a hexahedral mesh, which
+deal.II can produce internally but which are typically difficult to
+generate with gmsh at high quality. Rather, gmsh generates meshes such
+as this one:
+
+![xxx](geometries/cylinder/100kHz-1-times-refined.png)
+
+On this mesh (with 8,373 unknowns), we obtain the following data for the case without attenuation:
+```
+  0+0.0113104j
+  0+0.0135220j
+```
+And with attenuation:
+```
+  0.002123660-0.001048370j
+  0.000867854+0.000220157j
+```
+This is not quite as accurate, but we can ask gmsh to refine the mesh
+once more. The solution then looks like this, on a mesh with 60,777
+unknowns:
+
+![xxx](geometries/cylinder/100kHz-2-times-refined.png)
+
+Now the corresponding values are
+```
+  0+0.00476238j
+  0+0.00564701j  
+```
+without attenuation, and
+```
+  0.00243613-0.000537977j
+  0.000911112+0.000468191j
+```
+with attenuation. These values are now quite close to the analytically
+obtained (correct) values shown above.
