@@ -283,9 +283,9 @@ We can test all of this for a concrete choice of wave speed `c`,
 density `rho`, and frequency `omega = 2*pi*f` using the cylinder
 of length `L=4mm` described above. Using the following input file,
 ```
-set Mesh file name                       = ../helmholtz/geometries/cylinder/cylinder.msh
+set Mesh file name                       = ../helmholtz/geometries/cylinder/cylinder-2-times-refined.msh
 set Geometry conversion factor to meters = 0.001
-set Evaluation points                    = 
+set Evaluation points                    = 1,0.5,0.5
 
 set Wave speed                           = 343
 set Wave speed loss tangent              = 0
@@ -293,7 +293,7 @@ set Density                              = 1.18
 
 set Frequencies                          = list(100000)
 set Number of mesh refinement steps      = 0
-set Finite element polynomial degree     = 2
+set Finite element polynomial degree     = 1
 set Number of threads                    = 1
 ```
 we have `rho=1.18 kg/m^3`, `c=343 m/s`, and `f=100 kHz` (which
@@ -325,9 +325,9 @@ refined mesh will result in even better accuracy.
 The results above are obtained with a purely real wave speed (loss
 angle zero, no attenuation).
 ```
-set Mesh file name                       = ../helmholtz/geometries/cylinder/cylinder.msh
+set Mesh file name                       = ../helmholtz/geometries/cylinder/cylinder-2-times-refined.msh
 set Geometry conversion factor to meters = 0.001
-set Evaluation points                    = 
+set Evaluation points                    = 1,0.5,0.5
 
 set Wave speed                           = 343
 set Wave speed loss tangent              = 10
@@ -335,7 +335,7 @@ set Density                              = 1.18
 
 set Frequencies                          = list(100000)
 set Number of mesh refinement steps      = 0
-set Finite element polynomial degree     = 2
+set Finite element polynomial degree     = 1
 set Number of threads                    = 1
 ```
 With these values, we then get the following expected values:
