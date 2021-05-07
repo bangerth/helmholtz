@@ -361,33 +361,56 @@ deal.II can produce internally but which are typically difficult to
 generate with gmsh at high quality. Rather, gmsh generates meshes such
 as this one:
 
-![xxx](geometries/cylinder/100kHz-1-times-refined.png)
+![xxx](geometries/cylinder/100kHz-2-times-refined.png)
 
 On this mesh (with 8,373 unknowns), we obtain the following data for the case without attenuation:
 ```
-  0+0.0113104j
-  0+0.0135220j
+  0-0.00157234j
+  0+0.00275222j
 ```
 And with attenuation:
 ```
-  0.002123660-0.001048370j
-  0.000867854+0.000220157j
+  0.002103030-0.00100064j
+ -0.000452395+0.00121371j
 ```
-This is not quite as accurate, but we can ask gmsh to refine the mesh
+This is not quite as accurate, though not a terrible approximation
+either. That said, we can ask gmsh to refine the mesh
 once more. The solution then looks like this, on a mesh with 60,777
 unknowns:
 
-![xxx](geometries/cylinder/100kHz-2-times-refined.png)
+![xxx](geometries/cylinder/100kHz-3-times-refined.png)
 
 Now the corresponding values are
 ```
-  0+0.00476238j
-  0+0.00564701j  
+  0-j*0.00155675
+  0+j*0.00282744
 ```
 without attenuation, and
 ```
-  0.00243613-0.000537977j
-  0.000911112+0.000468191j
+  0.002172990-0.000892128j
+ -0.000500042+0.001238410j
 ```
-with attenuation. These values are now quite close to the analytically
+with attenuation. These values are now substantially closer to the analytically
 obtained (correct) values shown above.
+
+
+Finally, the input files above allow the evaluation of point values
+for pressure and velocity. At the point of our choice, `(1, 0.5,
+0.5)`, we can evaluate the pressure as
+```
+  p(1)   = -0.8297662828 - 0.4150015992e-6j
+  u_x(1) = -0.266e-8     - 0.001775594289j
+```
+For the coarser of the tetrahedral meshes,
+we obtain
+```
+  pressure = -0.763803+0j
+  u_x      = -0.00212938j
+```
+whereas for the finer mesh, we get
+```
+  pressure = -0.810079+0j
+  u_x      = -0.00178777j
+```
+As before the values on the finer mesh are reasonably close to the
+analytical values.
