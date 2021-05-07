@@ -152,12 +152,12 @@ The output of the program consists of three pieces:
 
 ### The file `frequency_response.txt`
 
-*TODO:* Update with the exact contents of these files once known.
+*TODO:* Update with the exact contents of these files once settled upon.
 
 
 ### The file `frequency_response.csv`
 
-*TODO:* Update with the exact contents of these files once known.
+*TODO:* Update with the exact contents of these files once settled upon.
 
 
 
