@@ -78,8 +78,8 @@ volumetric velocity will be evaluated for each frequency. Points are
 separated by semicolons, and the components of the points are
 separated by commas.
 
-The second block describes the mechanical properties of the
-membrane. All parameters are given in SI units. `Wave speed loss
+The second block describes where to find the mechanical properties of the
+medium. All parameters are given in SI units. `Wave speed loss
 tangent` is
 dimensionless (or, more precisely, has the units of a geometric angle)
 and is interpreted in degrees.
@@ -165,7 +165,7 @@ The output of the program consists of three pieces:
 
 The `frequency_response.txt` and `frequency_response.csv` files are
 updated every time the program has finished computing the response of
-the membrane for a particular frequency. As a consequence, the file
+the cavity for a particular frequency. As a consequence, the file
 contains a record of all computed frequencies.
 
 To monitor the progress of computations -- for example for displaying
@@ -175,7 +175,7 @@ progress: The first line of the file has a format that, during
 computations, says something like "`# 42/100 frequencies computed`",
 allowing for a quick overview where computations currently are. If you
 want something fancier, you can actually parse the contents of the
-file and update a graph of the frequency-dependent membrane response
+file and update a graph of the frequency-dependent cavity response
 every time you read through the file. This way, the graph will fill in
 over time.
 
