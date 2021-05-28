@@ -35,6 +35,8 @@ method (FEM).
 
 # Input
 
+## The `.prm` file
+
 The program reads the parameter values that determine what is to be
 computed from an input file. If the executable is called without
 arguments, then the input file is implicitly assumed to be a
@@ -54,9 +56,7 @@ set Mesh file name                       = ./mesh.msh
 set Geometry conversion factor to meters = 0.001
 set Evaluation points                    = -25,15,1 ; -25,15,2
 
-set Wave speed                           = 343
-set Wave speed loss tangent              = 2
-set Density                              = 1.18
+set Material model file name             = air.txt
 
 set Frequencies                          = list(5000,10000,15000)
 set Number of mesh refinement steps      = 0
@@ -78,11 +78,9 @@ volumetric velocity will be evaluated for each frequency. Points are
 separated by semicolons, and the components of the points are
 separated by commas.
 
-The second block describes where to find the mechanical properties of the
-medium. All parameters are given in SI units. `Wave speed loss
-tangent` is
-dimensionless (or, more precisely, has the units of a geometric angle)
-and is interpreted in degrees.
+The second block describes where to find the frequency-dependent
+mechanical properties of the medium. All parameters are given in SI
+units. The detailed format of this file is discussed below.
 
 The third block describes the frequencies that should be
 computed. There are three possibilities for this parameter:
@@ -141,6 +139,44 @@ the program may use as many threads as it pleases, whereas a positive
 number limits how many threads (and consequently CPU cores) the
 program will use.
 
+
+## Describing the material properties of the medium
+
+The `.prm` file mentioned above makes reference to a file that
+contains the frequency-dependent material properties of the
+medium. (In the example above, it is called `air.txt`.) This file
+needs to have the following format:
+```
+%frequency(Hz)    density(kg/m3), real/imag          bulk modulus(Pa), real/imag
+10                1.7507     -251.40                 112615.491      119.669
+60.201            1.7507     -41.763                 112631.842      720.021
+110.402           1.7507     -22.776                 112671.498      1318.65
+160.603           1.7506     -15.66                  112734.259      1914.15
+210.804           1.7505     -11.934                 112819.809      2505.12
+261.005           1.7504     -9.6422                 112927.724      3090.22
+311.206           1.7502     -8.0903                 113057.471      3668.13
+361.407           1.75       -6.97                   113208.422      4237.61
+[...]
+```
+The first line of this file is treated as a comment and
+ignored. Following lines provide the frequency at the beginning of the
+line, followed by real and imaginary parts of the density and bulk
+modulus.
+
+When asked to compute the response of a cavity at a specific
+frequency, the solver linearly interpolates between lines of the
+file. For example, at a frequency of 185.7035 Hz, it will use density and
+bulk modulus values halfway between the ones tabulated for 160.603 and
+210.804 Hz. If the solver is asked for a frequency below the very
+first frequency provided in the file, it simply uses the values of the
+first value provided. Similarly for a frequency above the last one
+provided: It just takes the last provided values. This allows to
+specify air in the following way, using only a single line, given that
+air has no substantial frequency dependence to its material properties:
+```
+%         frequency(Hz)        density(kg/m3), real/imag      bulk modulus(Pa), real/imag
+          10                   1.205728     0                 142090.344491053     0       
+```
 
 
 # Output
