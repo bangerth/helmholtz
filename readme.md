@@ -196,6 +196,11 @@ The output of the program consists of three pieces:
 *TODO:* Update with the exact contents of these files once settled upon.
 
 
+### The file `output.log`
+
+*TODO:* Update with the exact contents of these files once settled upon.
+
+
 
 ### Monitoring progress
 
