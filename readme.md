@@ -56,7 +56,7 @@ set Mesh file name                       = ./mesh.msh
 set Geometry conversion factor to meters = 0.001
 set Evaluation points                    = -25,15,1 ; -25,15,2
 
-set Material model file name             = air.txt
+set Material properties file name        = air.txt
 
 set Frequencies                          = list(5000,10000,15000)
 set Number of mesh refinement steps      = 0
@@ -161,7 +161,7 @@ needs to have the following format:
 The first line of this file is treated as a comment and
 ignored. Following lines provide the frequency at the beginning of the
 line, followed by real and imaginary parts of the density and bulk
-modulus.
+modulus. The file needs to end in a newline.
 
 When asked to compute the response of a cavity at a specific
 frequency, the solver linearly interpolates between lines of the
