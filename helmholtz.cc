@@ -8,6 +8,7 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
+#include <deal.II/base/function_lib.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/timer.h>
@@ -23,6 +24,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -66,10 +68,13 @@ namespace TransmissionProblem
   // The following namespace defines material parameters. We use SI units.
   namespace MaterialParameters
   {
-    std::complex<double> wave_speed;
-    double density;
-
     std::vector<double> frequencies;
+
+    std::unique_ptr<Functions::InterpolatedTensorProductGridData<1>> density_real;
+    std::unique_ptr<Functions::InterpolatedTensorProductGridData<1>> density_imag;
+
+    std::unique_ptr<Functions::InterpolatedTensorProductGridData<1>> bulk_modulus_real;
+    std::unique_ptr<Functions::InterpolatedTensorProductGridData<1>> bulk_modulus_imag;
   }
 
   std::string mesh_file_name;
@@ -99,16 +104,11 @@ namespace TransmissionProblem
                        "the evaluation points are given in multiples of inches, "
                        "then this factor should be set to 0.0254 because one inch "
                        "equals 0.0254 meters = 25.4 mm.");
-    prm.declare_entry ("Wave speed", "343",
-                       Patterns::Double(0),
-                       "The wave speed in the medium in question. Units: [m/s].");
-    prm.declare_entry ("Density", "1.18",
-                       Patterns::Double(0),
-                       "The density of the medium in question. Units: [kg/m^3].");
-    prm.declare_entry ("Wave speed loss tangent", "20",
-                       Patterns::Double(0,90),
-                       "The angle used to make the wave speed complex-valued. "
-                       "Units: [degrees].");
+
+    prm.declare_entry ("Material properties file name",
+                       "./material_properties.txt",
+                       Patterns::FileName(),
+                       "The name of the file from which to read the mechanical material response.");
 
     prm.declare_entry ("Evaluation points", "",
                        Patterns::List (Patterns::List(Patterns::Double(),3,3,","),
@@ -175,18 +175,70 @@ namespace TransmissionProblem
 
 
     // Next up: Material parameters.
-    //
-    // Read the (real-valued) wave speed and its loss tangent. Then
-    // make the wave speed complex-valued.
-    using namespace MaterialParameters;
+    const std::string material_properties_file_name
+      = prm.get ("Material properties file name");
+    {
+      std::ifstream material_input (material_properties_file_name);
+      AssertThrow (material_input, ExcIO());
 
-    const double c              = prm.get_double ("Wave speed");
-    const double c_loss_tangent = prm.get_double ("Wave speed loss tangent");
+      // discard the first line as a comment
+      {
+        std::string dummy;
+        std::getline(material_input, dummy);
+      }
 
-    wave_speed = c * std::exp(std::complex<double>(0,2*numbers::PI*c_loss_tangent/360));
+      std::vector<double> frequencies;
+      std::vector<double> rho_real;
+      std::vector<double> rho_imag;
+      std::vector<double> K_real;
+      std::vector<double> K_imag;
 
-    density = prm.get_double ("Density");
+      // Read until we find the end of the file
+      while (true)
+        {
+          double f, rr, ri, Kr, Ki;
+          material_input >> f >> rr >> ri >> Kr >> Ki;
 
+          if (material_input.good())
+            {
+              frequencies.push_back (f);
+              rho_real.push_back (rr);
+              rho_imag.push_back (ri);
+              K_real.push_back (Kr);
+              K_imag.push_back (Ki);
+            }
+          else
+            break;
+        }
+
+      logger << "INFO Read material parameters for "
+             << frequencies.size()
+             << " frequencies ranging from "
+             << frequencies.front()
+             << " to "
+             << frequencies.back()
+             << "Hz."
+             << std::endl;
+
+      // Now convert these arrays into Table objects as desired by the
+      // InterpolatedTensorProductGridData class
+      Table<1,double> rr (frequencies.size(), rho_real.begin());
+      Table<1,double> ri (frequencies.size(), rho_imag.begin());
+      Table<1,double> Kr (frequencies.size(), K_real.begin());
+      Table<1,double> Ki (frequencies.size(), K_imag.begin());
+
+      // And finally use these to initialize the
+      // InterpolatedTensorProductGridData objects themselves
+      const std::array<std::vector<double>,1> f({{frequencies}});
+      MaterialParameters::density_real
+        = std::make_unique<Functions::InterpolatedTensorProductGridData<1>>(f, rr);
+      MaterialParameters::density_imag
+        = std::make_unique<Functions::InterpolatedTensorProductGridData<1>>(f, ri);
+      MaterialParameters::bulk_modulus_real
+        = std::make_unique<Functions::InterpolatedTensorProductGridData<1>>(f, Kr);
+      MaterialParameters::bulk_modulus_imag
+        = std::make_unique<Functions::InterpolatedTensorProductGridData<1>>(f, Ki);
+    }
 
 
     // Read and parse the entry that determines which frequencies to compute.
@@ -438,8 +490,14 @@ namespace TransmissionProblem
     void postprocess(const unsigned int current_source_port);
     void output_results(const unsigned int current_source_port);
 
-    // The frequency that this instance of the class is supposed to solve for.
+    // The frequency that this instance of the class is supposed to
+    // solve for, along with the density and wave speed to be used for
+    // this frequency.
     const double                  omega;
+
+    const std::complex<double> density;
+    const std::complex<double> wave_speed;
+
 
     Triangulation<dim>                   triangulation;
     std::vector<types::boundary_id>      port_boundary_ids;
@@ -464,6 +522,11 @@ namespace TransmissionProblem
   template <int dim>
   HelmholtzProblem<dim>::HelmholtzProblem(const double omega)
     : omega (omega)
+      , density (MaterialParameters::density_real->value(Point<1>(omega)),
+                 MaterialParameters::density_imag->value(Point<1>(omega)))
+      , wave_speed (std::sqrt(std::complex<double>(MaterialParameters::bulk_modulus_real->value(Point<1>(omega)),
+                                                   MaterialParameters::bulk_modulus_imag->value(Point<1>(omega)))
+                              / density))
     , dof_handler(triangulation)
   {}
 
@@ -738,8 +801,8 @@ namespace TransmissionProblem
                   copy_data.cell_matrix(i, j) +=
                     (
                      +
-                     MaterialParameters::wave_speed *
-                     MaterialParameters::wave_speed *
+                     wave_speed *
+                     wave_speed *
                      grad_i *
                      grad_j
                      -
@@ -918,7 +981,7 @@ namespace TransmissionProblem
                   //
                   // Note that the velocity is computed *into* the
                   // volume, i.e., with the negative outward normal.
-                  const auto velocity = -1./(std::complex<double>(0,1)*MaterialParameters::density*omega)
+                  const auto velocity = -1./(std::complex<double>(0,1)*density*omega)
                                         * solution_gradients[q_point];
 
                   output_data.U(current_source_port, this_port)
@@ -952,7 +1015,7 @@ namespace TransmissionProblem
           .push_back (VectorTools::point_gradient (*mapping, dof_handler, solution,
                                                    p));
         output_data.evaluation_point_velocities.back()
-          *= -1./(std::complex<double>(0,1)*MaterialParameters::density*omega);
+          *= -1./(std::complex<double>(0,1)*density*omega);
       }
   }
 
