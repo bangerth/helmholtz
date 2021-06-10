@@ -242,7 +242,6 @@ namespace TransmissionProblem
         = std::make_unique<Functions::InterpolatedTensorProductGridData<1>>(f, Ki);
     }
 
-
     // Read and parse the entry that determines which frequencies to compute.
     // Recall that the format is one of the following:
     // - linear_spacing(min,max,n_steps)
@@ -415,16 +414,8 @@ namespace TransmissionProblem
   //
   // Once detected, we delete the file again and terminate the
   // program.
-  bool check_for_termination_signal()
+  void check_for_termination_signal()
   {
-    static bool termination_requested = false;
-
-    static std::mutex mutex;
-    std::lock_guard<std::mutex> lock_guard (mutex);
-
-    if (termination_requested == true)
-      return true;
-
     // Try and see whether we can open the file at all. If we can't,
     // then no termination signal has been sent. If so, return 'true',
     // but before that set a flag that ensures we don't have to do the
@@ -434,30 +425,19 @@ namespace TransmissionProblem
     // output file.)
     std::ifstream in(instance_folder + "/termination_signal");
     if (!in)
-      {
-        termination_requested = false;
-        return false;
-      }
+      return;
 
     // OK, the file exists, but does it contain the right content?
     std::string line;
     std::getline(in, line);
     if (line == "STOP")
       {
-        termination_requested = true;
-
         // Close the file handle and remove the file.
         in.close();
         std::remove ((instance_folder + "/termination_signal").c_str());
 
-        // Now wait for the lock that guards access to the output file
-        // and if we have it, we know that nothing else is writing to
-        // the file at the moment and we can safely abort the program.
-        std::lock_guard<std::mutex> results_lock(results_mutex);
         logger << "INFO *** Terminating program upon request." << std::endl;
         std::exit (1);
-
-        return true;
       }
 
     // The file exists, but it has the wrong content (or no content so
@@ -465,7 +445,6 @@ namespace TransmissionProblem
     // will have caught the driver program having created but not
     // written to the file. The next time we check, we might find the
     // file in the correct state.
-    return false;
   }
 
 
@@ -1107,11 +1086,7 @@ namespace TransmissionProblem
     // non-trivial place one ends up when a task executes, whether we
     // are supposed to actually do anything, or should instead stop
     // working on the frequency this task corresponds to.
-    if (check_for_termination_signal() == true)
-      {
-        logger << "INFO Aborting work on omega = " << omega << std::endl;
-        return;
-      }
+    check_for_termination_signal();
 
     try
       {
