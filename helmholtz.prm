@@ -1,6 +1,5 @@
 set Mesh file name                       = ../helmholtz/geometries/cylinder/cylinder-2-times-refined.msh
 set Geometry conversion factor to meters = 0.001
-set Evaluation points                    = 1,0.5,0.5
 
 set Material properties file name       = ../helmholtz/material-models/air.txt
 # set Wave speed                           = 343
@@ -8,6 +7,8 @@ set Material properties file name       = ../helmholtz/material-models/air.txt
 # set Density                              = 1.18
 
 set Frequencies                          = list(100000)
+set Evaluation points                    = 1,0.5,0.5
+
 set Number of mesh refinement steps      = 0
 set Finite element polynomial degree     = 1
 set Number of threads                    = 1

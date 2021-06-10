@@ -57,6 +57,8 @@
 #include <memory>
 
 std::string instance_folder;
+std::string output_file_prefix;
+  
 std::ofstream logger;
 
 namespace TransmissionProblem
@@ -107,7 +109,7 @@ namespace TransmissionProblem
 
     prm.declare_entry ("Material properties file name",
                        "./material_properties.txt",
-                       Patterns::FileName(),
+                       Patterns::FileName(Patterns::FileName::input),
                        "The name of the file from which to read the mechanical material response.");
 
     prm.declare_entry ("Evaluation points", "",
@@ -1035,7 +1037,9 @@ namespace TransmissionProblem
     data_out.add_data_vector(solution, "solution");
     data_out.build_patches(fe->degree);
 
-    std::string file_name = instance_folder + "/visualization/solution-" +
+    const std::string file_name = instance_folder + "/" +
+                                  output_file_prefix +
+                                  "visualization/solution-" +
                             std::to_string(static_cast<unsigned int>(omega/2/numbers::PI)) +
                             "." +
                             std::to_string(current_source_port) +
@@ -1221,7 +1225,9 @@ namespace TransmissionProblem
         buffer << "\n\n\n" << std::flush;
       }
 
-    std::ofstream frequency_response (instance_folder + "/frequency_response.txt");
+    std::ofstream frequency_response (instance_folder + "/" +
+                                      output_file_prefix +
+                                      "frequency_response.txt");
     frequency_response << buffer.str();
   }
 } // namespace TransmissionProblem
@@ -1242,13 +1248,17 @@ int main(int argc, char *argv[])
   if (argc >= 2)
     {
       instance_folder = std::string(argv[1]);
+      if (argc >= 3)
+        output_file_prefix = std::string(argv[2]);
     }
   else
     {
       instance_folder = std::string(".");
     }
 
-  logger = std::ofstream (instance_folder + "/output.log");
+  logger = std::ofstream (instance_folder + "/" +
+                          output_file_prefix +
+                          "output.log");
   logger << "INFO Program started with argument '" << instance_folder << "'" << std::endl;
 
   try
@@ -1268,7 +1278,9 @@ int main(int argc, char *argv[])
       // Remove any previous output file so that nobody gets confused
       // if the program were to be aborted before we write into it the
       // first time.
-      std::remove ((instance_folder + "/frequency_response.txt").c_str());
+      std::remove ((instance_folder + "/" +
+                    output_file_prefix +
+                    "frequency_response.txt").c_str());
 
       // Get the global set of parameters from an input file
       {

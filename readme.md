@@ -35,30 +35,44 @@ method (FEM).
 
 # Input
 
+## Calling the program
+
+The executable (let us assume that it is called `helmholtz.exe`) is
+called on the command line in the following way:
+```
+  helmholtz.exe <instancefolder> <outputfileprefix>
+```
+where `<instancefolder>` is the name of a directory into which all
+output files will be written, and `<outputfileprefix>` is a string
+that will be prefixed to output file names so that multiple,
+concurrent runs of the same program can avoid overwriting each others'
+output files.
+
+If `<outputfileprefix>` is omitted, then the empty string will be used
+as a prefix. If `<instancefolder>` is omitted, then the current
+directory `"."` will be used for output files.
+
+
 ## The `.prm` file
 
+All remaining parameters will be read from a file called
+`helmholtz.prm` located in the `<instancefolder>` passed on the
+command line as described above.
+
 The program reads the parameter values that determine what is to be
-computed from an input file. If the executable is called without
-arguments, then the input file is implicitly assumed to be a
-file called `helmholtz.prm`, located in the directory in which the
-executable is run. In that case, output is also written into this
-directory. On the other hand, if the executable is called with a
-command line argument, then this argument is interpreted as the name
-of a directory in which the input file `helmholtz.prm` is located,
-and to which the output files are to be written.
-
-
+computed from this input file.
 The syntax of the `helmholtz.prm` file is as follows (the values shown
 here on the right hand side of the assignment of course need to be
 replaced by values appropriate to a simulation):
 ```
 set Mesh file name                       = ./mesh.msh
 set Geometry conversion factor to meters = 0.001
-set Evaluation points                    = -25,15,1 ; -25,15,2
 
 set Material properties file name        = air.txt
 
 set Frequencies                          = list(5000,10000,15000)
+set Evaluation points                    = -25,15,1 ; -25,15,2
+
 set Number of mesh refinement steps      = 0
 set Finite element polynomial degree     = 2
 set Number of threads                    = 1
@@ -72,11 +86,6 @@ factor: mesh files generally are drawn up in community-specific units
 units (i.e., kilograms, meters, seconds) and the parameter describes
 the scaling from length units used in the mesh file to meters. In the
 example above, this corresponds to the mesh file using millimeters.
-The third parameter describes a list of three-dimensional points
-(using the same units as the mesh file) at which the pressure and
-volumetric velocity will be evaluated for each frequency. Points are
-separated by semicolons, and the components of the points are
-separated by commas.
 
 The second block describes where to find the frequency-dependent
 mechanical properties of the medium. All parameters are given in SI
@@ -96,6 +105,12 @@ computed. There are three possibilities for this parameter:
   - Specify `list(f1,f2,f3,...)`: Here, the program computes all of
     the frequencies explicitly listed between parentheses. The list
     may have any length, as long as it contains at least one element.
+
+The second parameter in this block also describes a list of three-dimensional points
+(using the same units as the mesh file) at which the pressure and
+volumetric velocity will be evaluated for each frequency. Points are
+separated by semicolons, and the components of the points are
+separated by commas.
 
 The fourth block of parameters shown above describes properties of the
 discretization, i.e., of _how_ the problem (formulated as a PDE)
