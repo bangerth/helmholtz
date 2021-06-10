@@ -237,6 +237,11 @@ over time.
 
 *TODO:* Update with the exact contents of these files once known.
 
+When the program has successfully finished all computations, it
+generates a file `<outputfileprefix>success_signal.txt` in the
+instance folder, and terminates. This file is removed at the beginning
+of the program run should it exist.
+
 
 ### The directory `visualization/`
 

@@ -1235,6 +1235,11 @@ int main(int argc, char *argv[])
       instance_folder = std::string(".");
     }
 
+  // First remove the success file, should one exist:
+  std::remove ((instance_folder + "/" +
+                output_file_prefix +
+                "success_signal.txt").c_str());
+  
   logger = std::ofstream (instance_folder + "/" +
                           output_file_prefix +
                           "output.log");
@@ -1356,6 +1361,12 @@ int main(int argc, char *argv[])
       // we don't do that, the next call to this program won't produce
       // anything at all.
       std::remove ((instance_folder + "/termination_signal").c_str());
+
+      // Finally also indicate success:
+      std::ofstream success_signal (instance_folder + "/" +
+                                    output_file_prefix +
+                                    "success_signal.txt");
+      success_signal << "SUCCESS" << std::endl;
     }
   catch (std::exception &exc)
     {
