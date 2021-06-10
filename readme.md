@@ -254,8 +254,8 @@ is computed, and `YY` is the number of the source port.
 
 There may be times where callers of this program do not want it to continue with
 its computations. In this case, an external program should place the text `STOP`
-into a file called `termination_signal` in the current directory. This
-will terminate the program. That said, because the program outputs all
+into a file called `<outputfileprefix>termination_signal.txt` in the
+instance folder. This will terminate the program. That said, because the program outputs all
 data already computed whenever one frequency is finished, even when a
 program execution is terminated, already computed information is still
 stored in the output files.

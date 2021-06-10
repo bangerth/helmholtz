@@ -423,7 +423,9 @@ namespace TransmissionProblem
     // to abort the program below, but this may block for a bit
     // because we need to wait for the lock that guards access to the
     // output file.)
-    std::ifstream in(instance_folder + "/termination_signal");
+    std::ifstream in(instance_folder + "/" +
+                     output_file_prefix +
+                     "termination_signal.txt");
     if (!in)
       return;
 
@@ -434,7 +436,9 @@ namespace TransmissionProblem
       {
         // Close the file handle and remove the file.
         in.close();
-        std::remove ((instance_folder + "/termination_signal").c_str());
+        std::remove ((instance_folder + "/" +
+                      output_file_prefix +
+                      "termination_signal.txt").c_str());
 
         logger << "INFO *** Terminating program upon request." << std::endl;
         std::exit (1);
