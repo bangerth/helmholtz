@@ -406,6 +406,21 @@ namespace TransmissionProblem
                                           TimerOutput::wall_times);
 
 
+  // Create a file that indicates that program execution failed for
+  // some reason. Then exit the program with an error code.
+  void create_failure_file_and_exit ()
+  {
+    {
+      std::ofstream failure_signal (instance_folder + "/" +
+                                    output_file_prefix +
+                                    "solver_failure_signal.txt");
+      failure_signal << "FAILURE" << std::endl;
+    }
+    
+    std::exit(1);
+  }
+  
+  
   // Check whether an external program has left a signal that
   // indicates that the current program run should terminate without
   // computing any further frequency responses. This is done by
@@ -441,7 +456,7 @@ namespace TransmissionProblem
                       "termination_signal.txt").c_str());
 
         logger << "INFO *** Terminating program upon request." << std::endl;
-        std::exit (1);
+        create_failure_file_and_exit();
       }
 
     // The file exists, but it has the wrong content (or no content so
@@ -1235,10 +1250,13 @@ int main(int argc, char *argv[])
       instance_folder = std::string(".");
     }
 
-  // First remove the success file, should one exist:
+  // First remove the success or failure files, should they exist:
   std::remove ((instance_folder + "/" +
                 output_file_prefix +
                 "success_signal.txt").c_str());
+  std::remove ((instance_folder + "/" +
+                output_file_prefix +
+                "solver_failure_signal.txt").c_str());
   
   logger = std::ofstream (instance_folder + "/" +
                           output_file_prefix +
@@ -1380,7 +1398,7 @@ int main(int argc, char *argv[])
                 << "----------------------------------------------------"
                 << std::endl;
 
-      return 1;
+      TransmissionProblem::create_failure_file_and_exit();
     }
   catch (...)
     {
@@ -1392,7 +1410,8 @@ int main(int argc, char *argv[])
                 << "Aborting!" << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
-      return 1;
+
+      TransmissionProblem::create_failure_file_and_exit();
     }
 
   return 0;

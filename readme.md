@@ -239,8 +239,11 @@ over time.
 
 When the program has successfully finished all computations, it
 generates a file `<outputfileprefix>success_signal.txt` in the
-instance folder, and terminates. This file is removed at the beginning
-of the program run should it exist.
+instance folder, and terminates. If the solver fails for some reason,
+it instead generates a file
+`<outputfileprefix>solver_failure_signal.txt` in the instance folder.
+Both of these files are removed at the beginning of the program run
+should they exist.
 
 
 ### The directory `visualization/`
