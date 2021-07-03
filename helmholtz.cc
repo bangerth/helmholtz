@@ -70,7 +70,7 @@ namespace TransmissionProblem
   // The following namespace defines material parameters. We use SI units.
   namespace MaterialParameters
   {
-    std::vector<double> frequencies;
+    std::vector<std::pair<double,unsigned int>> frequencies;
 
     std::unique_ptr<Functions::InterpolatedTensorProductGridData<1>> density_real;
     std::unique_ptr<Functions::InterpolatedTensorProductGridData<1>> density_imag;
@@ -282,10 +282,11 @@ namespace TransmissionProblem
         const double delta_omega = (max_omega - min_omega)
                                    / (n_frequencies-1)
                                    * (1.-1e-12);
+        unsigned int index = 0;
         for (double omega = min_omega;
              omega <= max_omega;
-             omega += delta_omega)
-          MaterialParameters::frequencies.push_back (omega);
+             omega += delta_omega, ++index)
+          MaterialParameters::frequencies.emplace_back (omega,index);
       }
     else if (frequency_descriptor.find ("exp_spacing") == 0)
       {
@@ -321,10 +322,11 @@ namespace TransmissionProblem
         const double delta_log_omega = (log_max_omega - log_min_omega)
                                        / (n_frequencies - 1)
                                        * (1.-1e-12);
+        unsigned int index = 0;
         for (double log_omega = log_min_omega;
              log_omega <= log_max_omega;
-             log_omega += delta_log_omega)
-          MaterialParameters::frequencies.push_back (std::exp(log_omega));
+             log_omega += delta_log_omega, ++index)
+          MaterialParameters::frequencies.emplace_back (std::exp(log_omega),index);
       }
     else if (frequency_descriptor.find ("list") == 0)
       {
@@ -342,20 +344,24 @@ namespace TransmissionProblem
 
         // Then get the interior part, again trim spaces, and split at
         // commas
-        MaterialParameters::frequencies =
+        const std::vector<double> freq_list =
           Utilities::string_to_double
           (Utilities::split_string_list
            (Utilities::trim (parenthesized_expr.substr
                              (1,
                               parenthesized_expr.size() - 2)),
             ','));
-        AssertThrow (MaterialParameters::frequencies.size() >= 1,
+        AssertThrow (freq_list.size() >= 1,
                      ExcMessage ("Wrong format for 'list' frequency spacing."));
 
+        for (unsigned int i=0; i<freq_list.size(); ++i)
+          MaterialParameters::frequencies.emplace_back (freq_list[i], i);
+
+        
         // Because MaterialParameters::frequencies stores angular
         // frequencies, we need to multiply by 2*pi
         for (auto &f : MaterialParameters::frequencies)
-          f *= 2 * numbers::PI;
+          f.first *= 2 * numbers::PI;
       }
     else
       AssertThrow (false,
@@ -478,7 +484,7 @@ namespace TransmissionProblem
   class HelmholtzProblem
   {
   public:
-    HelmholtzProblem(const double omega);
+    HelmholtzProblem(const double omega, const unsigned int frequency_number);
 
     void run();
 
@@ -491,9 +497,10 @@ namespace TransmissionProblem
     void output_results(const unsigned int current_source_port);
 
     // The frequency that this instance of the class is supposed to
-    // solve for, along with the density and wave speed to be used for
-    // this frequency.
-    const double                  omega;
+    // solve for, its number in the list, along with the density and
+    // wave speed to be used for this frequency.
+    const double               omega;
+    const unsigned int         frequency_number;
 
     const std::complex<double> density;
     const std::complex<double> wave_speed;
@@ -520,8 +527,10 @@ namespace TransmissionProblem
 
 
   template <int dim>
-  HelmholtzProblem<dim>::HelmholtzProblem(const double omega)
+  HelmholtzProblem<dim>::HelmholtzProblem(const double omega,
+                                          const unsigned int frequency_number)
     : omega (omega)
+      , frequency_number(frequency_number)
       , density (MaterialParameters::density_real->value(Point<1>(omega)),
                  MaterialParameters::density_imag->value(Point<1>(omega)))
       , wave_speed (std::sqrt(std::complex<double>(MaterialParameters::bulk_modulus_real->value(Point<1>(omega)),
@@ -1038,10 +1047,10 @@ namespace TransmissionProblem
     const std::string file_name = instance_folder + "/" +
                                   output_file_prefix +
                                   "visualization/solution-" +
-                            std::to_string(static_cast<unsigned int>(omega/2/numbers::PI)) +
-                            "." +
-                            std::to_string(current_source_port) +
-                            ".vtu";
+                                  std::to_string(frequency_number) +
+                                  "." +
+                                  std::to_string(current_source_port) +
+                                  ".vtu";
     std::ofstream output_vtu(file_name);
     AssertThrow (output_vtu,
                  ExcMessage ("The file <" + file_name +
@@ -1096,7 +1105,8 @@ namespace TransmissionProblem
 
 
 
-  void solve_one_frequency (const double omega)
+  void solve_one_frequency (const double omega,
+                            const unsigned frequency_number)
   {
     // The main() function has created tasks for all frequencies
     // provided by the caller, but there is the possibility that a
@@ -1109,7 +1119,7 @@ namespace TransmissionProblem
 
     try
       {
-        HelmholtzProblem<3> helmholtz_problem(omega);
+        HelmholtzProblem<3> helmholtz_problem(omega,frequency_number);
         helmholtz_problem.run();
       }
     catch (const std::exception &exc)
@@ -1224,6 +1234,8 @@ namespace TransmissionProblem
                                       "frequency_response.txt");
     frequency_response << buffer.str();
   }
+
+
 } // namespace TransmissionProblem
 
 
@@ -1300,9 +1312,10 @@ int main(int argc, char *argv[])
           (n_threads >= MaterialParameters::frequencies.size()))
         {
           std::vector<std::future<void>> tasks;
-          for (const double omega : MaterialParameters::frequencies)
+          for (const auto freq : MaterialParameters::frequencies)
             tasks.emplace_back (std::async (std::launch::async,
-                                            [=]() { solve_one_frequency (omega); }));
+                                            [=]() { solve_one_frequency (freq.first,
+                                                                         freq.second); }));
 
           logger << "INFO Number of frequencies scheduled: "
                     << tasks.size() << std::endl;
@@ -1318,7 +1331,7 @@ int main(int argc, char *argv[])
         // still need to be finished. Then, each task that finishes
         // creates a continuation just before it terminates.
         {
-          std::vector<double>
+          std::vector<std::pair<double,unsigned int>>
             leftover_frequencies (MaterialParameters::frequencies.begin()+n_threads,
                                   MaterialParameters::frequencies.end());
           std::mutex mutex;
@@ -1331,11 +1344,12 @@ int main(int argc, char *argv[])
           // happen under a lock.
           //
           // Note how this lambda function calls itself.
-          std::function<void (double)> do_one_frequency
-            = [&] (const double omega) {
-                solve_one_frequency (omega);
+          std::function<void (double,unsigned int)> do_one_frequency
+            = [&] (const double omega,
+                   const unsigned int freq_no) {
+                solve_one_frequency (omega, freq_no);
 
-                double next_omega = -1e20;
+                std::pair<double,unsigned int> next_omega = {-1e20,numbers::invalid_unsigned_int};
                 {
                   std::lock_guard<std::mutex> lock(mutex);
                   if (leftover_frequencies.size() == 0)
@@ -1353,7 +1367,8 @@ int main(int argc, char *argv[])
                 // `leftover_frequency` stack. In other words, we
                 // don't up-front schedule which task will do what,
                 // but in essence implement a work-stealing strategy.)
-                do_one_frequency (next_omega);
+                do_one_frequency (next_omega.first,
+                                  next_omega.second);
           };
 
           // Now start the initial tasks.
@@ -1362,8 +1377,9 @@ int main(int argc, char *argv[])
           std::vector<std::thread> threads;
           for (unsigned int i=0; i<n_threads; ++i)
             {
-              const double omega = MaterialParameters::frequencies[i];
-              threads.emplace_back (std::thread ([=] () { do_one_frequency (omega); } ));
+              const auto omega = MaterialParameters::frequencies[i];
+              threads.emplace_back (std::thread ([=] () { do_one_frequency (omega.first,
+                                                                            omega.second); } ));
             }
 
           // Now wait for it all:
