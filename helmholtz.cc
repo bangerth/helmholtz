@@ -373,11 +373,6 @@ namespace TransmissionProblem
     fe_degree               = prm.get_integer ("Finite element polynomial degree");
     n_mesh_refinement_steps = prm.get_integer ("Number of mesh refinement steps");
 
-    Assert(fe_degree >= 2,
-           ExcMessage("The C0IP formulation for the helmholtz problem "
-                      "only works if one uses elements of polynomial "
-                      "degree at least 2."));
-
     n_threads = prm.get_integer ("Number of threads");
   }
 
