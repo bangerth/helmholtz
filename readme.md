@@ -201,12 +201,18 @@ The output of the program consists of three pieces:
 - the frequency response file in machine-readable form
 - and a number of files in the visualization directory.
 
-### The file `frequency_response.txt`
+### The file `<outputfileprefix>frequency_response.txt`
+
+After each frequency has been computed, the program appends results to
+a frequency response file.
 
 *TODO:* Update with the exact contents of these files once settled upon.
 
 
-### The file `frequency_response.csv`
+### The file `<outputfileprefix><freq#>frequency_response.csv`
+
+For each frequency computed, the program also generates a separate file with
+results in computer-readable, CSV format.
 
 *TODO:* Update with the exact contents of these files once settled upon.
 
@@ -246,17 +252,52 @@ Both of these files are removed at the beginning of the program run
 should they exist.
 
 
-### The directory `visualization/`
+### The directory `<outputfileprefix>visualization/`
 
 This directory contains one file for each input frequency and source port, with each file providing
 all of the information necessary to visualize the solution. The format used for these
 files is VTU, and the solution can be visualized with either the
 [Visit](https://wci.llnl.gov/simulation/computer-codes/visit) or
 [Paraview](https://www.paraview.org/) programs.
-The file names are of the form `visualization/solution-XXXXX.YY.vtu` where `XXXXX`
+The file names are of the form `<outputfileprefix>visualization/solution-XXXXX.YY.vtu` where `XXXXX`
 denotes the (integer part of the) frequency (in Hz) at which the solution
 is computed, and `YY` is the number of the source port.
 
+
+# Error reporting
+
+There are many ways execution of this program can run into errors. The most common are
+that something is wrong with the input: The file that is listed as containing the mesh
+does not exist, or it may not follow the structure required of this file; the file that
+describes the speed of sound does not exist, or it has invalid values (say, negative
+wave speeds). But there are also ones that could indicate a bug in the code, or that
+the program has run out of resources (say, it can't allocate enough memory).
+
+All of these errors lead to two consequences:
+
+* The program terminates with a non-zero return code.
+* The program leaves behind a file called `<instance-folder>/<output-prefix>/solver_failure_signal.txt`.
+* The program writes the error message into a file 
+  `<instance-folder>/<output-prefix>/error.log`. These error messages look similar to the following one
+  that resulted from an mesh input file that did not conform to the specifications:
+```
+    ERROR Exception while computing for frequency 100000:
+
+    --------------------------------------------------------
+    An error occurred in line <2109> of file
+    </home/bangerth/p/deal.II/1/dealii/source/grid/grid_in.cc> in function
+         void dealii::GridIn<dim, spacedim>::read_msh(std::istream&) [with int dim = 3; int spacedim = 3; std::istream = std::basic_istream<char>]
+    The violated condition was:
+         cells.size() > 0
+    Additional information:
+         While reading a gmsh file, the reader function did not find any cells.
+         This sometimes happens if the file only contains a surface mesh, but
+         not a volume mesh.
+
+         The reader function did find 0 lines and 167936 facets (surface
+         triangles or quadrilaterals).
+    --------------------------------------------------------
+```
 
 # Terminating execution
 

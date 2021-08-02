@@ -1119,10 +1119,17 @@ namespace TransmissionProblem
       }
     catch (const std::exception &exc)
       {
-        logger << "ERROR Exception while computing for frequency "
+        std::ofstream error_out (instance_folder + "/" +
+                                 output_file_prefix +
+                                 "error.log");
+
+        error_out << "ERROR Exception while computing for frequency "
                   << omega/2/numbers::PI << ":\n"
-                  << exc.what() << std::endl;
-        throw;
+                  << exc.what() << std::endl
+                  << "Aborting!" << std::endl
+                  << "----------------------------------------------------"
+                  << std::endl;
+        TransmissionProblem::create_failure_file_and_exit();
       }
 
 
@@ -1265,10 +1272,12 @@ int main(int argc, char *argv[])
                 output_file_prefix +
                 "solver_failure_signal.txt").c_str());
   
-  logger = std::ofstream (instance_folder + "/" +
-                          output_file_prefix +
-                          "output.log");
-  logger << "INFO Program started with argument '" << instance_folder << "'" << std::endl;
+  logger.open (instance_folder + "/" +
+               output_file_prefix +
+               "output.log");
+  logger << "INFO Program started with argument '"
+         << instance_folder << "'"
+         << std::endl;
 
   try
     {
@@ -1399,11 +1408,10 @@ int main(int argc, char *argv[])
     }
   catch (std::exception &exc)
     {
-      logger << std::endl
-                << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      logger << "ERROR Exception on processing: " << std::endl
+      std::ofstream error_out (instance_folder + "/" +
+                               output_file_prefix +
+                               "error.log");
+      error_out << "ERROR Exception on processing: " << std::endl
                 << exc.what() << std::endl
                 << "Aborting!" << std::endl
                 << "----------------------------------------------------"
@@ -1413,11 +1421,10 @@ int main(int argc, char *argv[])
     }
   catch (...)
     {
-      logger << std::endl
-                << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      logger << "ERROR Unknown exception!" << std::endl
+      std::ofstream error_out (instance_folder + "/" +
+                               output_file_prefix +
+                               "error.log");
+      error_out << "ERROR Unknown exception!" << std::endl
                 << "Aborting!" << std::endl
                 << "----------------------------------------------------"
                 << std::endl;
