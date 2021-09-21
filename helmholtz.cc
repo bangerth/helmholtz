@@ -386,10 +386,14 @@ namespace TransmissionProblem
   // a global map.
   struct OutputData
   {
+    // For each source port (first index), store integrated pressures
+    // and velocities at all other ports (second index)
     FullMatrix<ScalarType> P, U;
 
-    std::vector<std::complex<double>>             evaluation_point_pressures;
-    std::vector<Tensor<1,3,std::complex<double>>> evaluation_point_velocities;
+    // For each source port (first index), store pressure and velocity
+    // at all evaluation points (second index)
+    Table<2,std::complex<double>>             evaluation_point_pressures;
+    Table<2,Tensor<1,3,std::complex<double>>> evaluation_point_velocities;
 
 
     std::vector<std::string> visualization_file_names;
@@ -597,7 +601,10 @@ namespace TransmissionProblem
     
     // Figure out what boundary ids we have that describe ports. We
     // take these as all of those boundary ids that are non-zero
-    port_boundary_ids = {0,1,2}, // TODO: triangulation.get_boundary_ids();
+    port_boundary_ids = triangulation.get_boundary_ids();
+    for (const auto &id : port_boundary_ids)
+      logger << "Found boundary id " << id << std::endl;
+    
     port_boundary_ids.erase (std::find(port_boundary_ids.begin(),
                                        port_boundary_ids.end(),
                                        types::boundary_id(0)));
@@ -609,6 +616,11 @@ namespace TransmissionProblem
     output_data.U.reinit (port_boundary_ids.size(),
                           port_boundary_ids.size());
 
+    output_data.evaluation_point_pressures.reinit (port_boundary_ids.size(),
+                                                   evaluation_points.size());
+    output_data.evaluation_point_velocities.reinit (port_boundary_ids.size(),
+                                                    evaluation_points.size());
+    
     
     // As a final step, compute the areas of the various ports so we
     // can later normalize when computing average pressures and
@@ -1006,19 +1018,21 @@ namespace TransmissionProblem
 
     // *** Step 2:
     // Evaluate the solution at specific points
-    for (const auto &p : evaluation_points)
+    for (unsigned int point_index = 0; point_index<evaluation_points.size(); ++point_index)
       {
         // First evaluate the values
         output_data.evaluation_point_pressures
-          .push_back (VectorTools::point_value (*mapping, dof_handler, solution,
-                                                p));
+          [current_source_port][point_index]
+          = VectorTools::point_value (*mapping, dof_handler, solution,
+                                      evaluation_points[point_index]);
 
         // Then also the velocities. Recall from above that
         //   v = -1/(j rho omega) nabla p
         output_data.evaluation_point_velocities
-          .push_back (VectorTools::point_gradient (*mapping, dof_handler, solution,
-                                                   p));
-        output_data.evaluation_point_velocities.back()
+          [current_source_port][point_index]
+          = VectorTools::point_gradient (*mapping, dof_handler, solution,
+                                         evaluation_points[point_index]);
+        output_data.evaluation_point_velocities[current_source_port][point_index]
           *= -1./(std::complex<double>(0,1)*density*omega);
       }
   }
@@ -1154,11 +1168,13 @@ namespace TransmissionProblem
     std::ostringstream buffer;
     for (auto result : results)
       {
+        const unsigned int n_port_boundary_ids = result.second.P.m();
+    
         const unsigned int field_width = 12;
 
         // Filter out values that are in essence zero
-        for (unsigned int i=0; i<result.second.P.m(); ++i)
-          for (unsigned int j=0; j<result.second.P.n(); ++j)
+        for (unsigned int i=0; i<n_port_boundary_ids; ++i)
+          for (unsigned int j=0; j<n_port_boundary_ids; ++j)
             {
               if (std::fabs(std::real(result.second.P(i,j))) < 1e-12 * result.second.P.l1_norm())
                 result.second.P(i,j).real(0);
@@ -1166,8 +1182,8 @@ namespace TransmissionProblem
                 result.second.P(i,j).imag(0);
             }
 
-        for (unsigned int i=0; i<result.second.U.m(); ++i)
-          for (unsigned int j=0; j<result.second.U.n(); ++j)
+        for (unsigned int i=0; i<n_port_boundary_ids; ++i)
+          for (unsigned int j=0; j<n_port_boundary_ids; ++j)
             {
               if (std::fabs(std::real(result.second.P(i,j))) < 1e-12 * result.second.P.l1_norm())
                 result.second.P(i,j).real(0);
@@ -1182,10 +1198,10 @@ namespace TransmissionProblem
                << "==============================\n\n";
 
         buffer << "P = [\n";
-        for (unsigned int i=0; i<result.second.P.m(); ++i)
+        for (unsigned int i=0; i<n_port_boundary_ids; ++i)
           {
             buffer << "      [";
-            for (unsigned int j=0; j<result.second.P.n(); ++j)
+            for (unsigned int j=0; j<n_port_boundary_ids; ++j)
               buffer << std::setw(field_width) << std::right << std::real(result.second.P(i,j))
                      << (std::imag(result.second.P(i,j)) >= 0 ? '+' : '-')
                      << "j*"
@@ -1196,10 +1212,10 @@ namespace TransmissionProblem
         buffer << "]\n";
 
         buffer << "\n\nU = [\n";
-        for (unsigned int i=0; i<result.second.U.m(); ++i)
+        for (unsigned int i=0; i<n_port_boundary_ids; ++i)
           {
             buffer << "      [";
-            for (unsigned int j=0; j<result.second.P.n(); ++j)
+            for (unsigned int j=0; j<n_port_boundary_ids; ++j)
               buffer << std::setw(field_width) << std::right << std::real(result.second.U(i,j))
                      << (std::imag(result.second.U(i,j)) >= 0 ? '+' : '-')
                      << "j*"
@@ -1217,16 +1233,17 @@ namespace TransmissionProblem
         buffer << "Pressure and velocity at explicitly specified evaluation points:\n"
                << "================================================================\n\n";
 
-        for (unsigned int i=0; i<evaluation_points.size(); ++i)
-          {
-            buffer << "Point at "
-                   << evaluation_points[i] / geometry_conversion_factor
-                   << ":  pressure="
-                   << result.second.evaluation_point_pressures[i]
-                   << ", velocity="
-                   << result.second.evaluation_point_velocities[i]
-                   << '\n';
-          }
+        for (unsigned int e=0; e<evaluation_points.size(); ++e)
+          for (unsigned int i=0; i<n_port_boundary_ids; ++i)
+            {
+              buffer << "Point at "
+                     << evaluation_points[e] / geometry_conversion_factor
+                     << ":  pressure="
+                     << result.second.evaluation_point_pressures[i][e]
+                     << ", velocity="
+                     << result.second.evaluation_point_velocities[i][e]
+                     << '\n';
+            }
 
         buffer << "\n\n\n" << std::flush;
       }
