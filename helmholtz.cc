@@ -401,12 +401,6 @@ namespace TransmissionProblem
 
 
 
-  // A variable that will collect the data (value) for all frequencies
-  // omega (key). Since we will access it from different threads, we also
-  // need a mutex to guard access to it.
-  std::map<double,OutputData> results;
-  std::mutex results_mutex;
-
   TimerOutput timer_output = TimerOutput (logger, TimerOutput::summary,
                                           TimerOutput::wall_times);
 
@@ -494,7 +488,8 @@ namespace TransmissionProblem
     void solve();
     void postprocess(const unsigned int current_source_port);
     void output_results(const unsigned int current_source_port);
-
+    void output_evaluated_data ();
+    
     // The frequency that this instance of the class is supposed to
     // solve for, its number in the list, along with the density and
     // wave speed to be used for this frequency.
@@ -1072,6 +1067,108 @@ namespace TransmissionProblem
 
 
 
+  template <int dim>
+  void HelmholtzProblem<dim>::output_evaluated_data ()
+  {
+    std::ostringstream buffer;
+
+    const unsigned int n_port_boundary_ids = port_boundary_ids.size();
+    
+    const unsigned int field_width = 12;
+
+    // Filter out values that are in essence zero
+    for (unsigned int i=0; i<n_port_boundary_ids; ++i)
+      for (unsigned int j=0; j<n_port_boundary_ids; ++j)
+        {
+          if (std::fabs(std::real(output_data.P(i,j))) < 1e-12 * output_data.P.l1_norm())
+            output_data.P(i,j).real(0);
+          if (std::fabs(std::imag(output_data.P(i,j))) < 1e-12 * output_data.P.l1_norm())
+            output_data.P(i,j).imag(0);
+        }
+
+    for (unsigned int i=0; i<n_port_boundary_ids; ++i)
+      for (unsigned int j=0; j<n_port_boundary_ids; ++j)
+        {
+          if (std::fabs(std::real(output_data.P(i,j))) < 1e-12 * output_data.P.l1_norm())
+            output_data.P(i,j).real(0);
+          if (std::fabs(std::imag(output_data.P(i,j))) < 1e-12 * output_data.P.l1_norm())
+            output_data.P(i,j).imag(0);
+        }
+
+
+    buffer << "Results for frequency f="
+           << omega/2/numbers::PI << ":\n"
+           << "==============================\n\n";
+
+    buffer << "P = [\n";
+    for (unsigned int i=0; i<n_port_boundary_ids; ++i)
+      {
+        buffer << "      [";
+        for (unsigned int j=0; j<n_port_boundary_ids; ++j)
+          buffer << std::setw(field_width) << std::right << std::real(output_data.P(i,j))
+                 << (std::imag(output_data.P(i,j)) >= 0 ? '+' : '-')
+                 << "j*"
+                 << std::setw(field_width) << std::left << std::fabs(std::imag(output_data.P(i,j)))
+                 << ' ';
+        buffer << "]\n";
+      }
+    buffer << "]\n";
+
+    buffer << "\n\nU = [\n";
+    for (unsigned int i=0; i<n_port_boundary_ids; ++i)
+      {
+        buffer << "      [";
+        for (unsigned int j=0; j<n_port_boundary_ids; ++j)
+          buffer << std::setw(field_width) << std::right << std::real(output_data.U(i,j))
+                 << (std::imag(output_data.U(i,j)) >= 0 ? '+' : '-')
+                 << "j*"
+                 << std::setw(field_width) << std::left << std::fabs(std::imag(output_data.U(i,j)))
+                 << ' ';
+        buffer << "]\n";
+      }
+    buffer << "]\n";
+    buffer << "\n\n\n" << std::flush;
+
+
+    // Then also output locations, pressures, and velocities at
+    // the evaluation points. Output the location in the
+    // coordinates originally provided in the output file.
+    buffer << "Pressure and velocity at explicitly specified evaluation points:\n"
+           << "================================================================\n\n";
+
+    for (unsigned int e=0; e<evaluation_points.size(); ++e)
+      for (unsigned int i=0; i<n_port_boundary_ids; ++i)
+        {
+          buffer << "Point at "
+                 << evaluation_points[e] / geometry_conversion_factor
+                 << ":  pressure="
+                 << output_data.evaluation_point_pressures[i][e]
+                 << ", velocity="
+                 << output_data.evaluation_point_velocities[i][e]
+                 << '\n';
+        }
+
+    buffer << "\n\n\n" << std::flush;
+
+
+    // Now put it all into a file:
+    std::cerr << "Writing data to " +instance_folder + "/" +
+                                      output_file_prefix +
+                                      "_" +
+                                      std::to_string(frequency_number) +
+                                      "_" +
+      "frequency_response.txt" << std::endl;
+    std::ofstream frequency_response (instance_folder + "/" +
+                                      output_file_prefix +
+                                      "_" +
+                                      std::to_string(frequency_number) +
+                                      "_" +
+                                      "frequency_response.txt");
+    frequency_response << buffer.str();
+  }
+  
+
+
   // The same is true for the `run()` function: Just like in previous
   // programs.
   template <int dim>
@@ -1105,11 +1202,7 @@ namespace TransmissionProblem
         postprocess(current_source_port);
       }
 
-    // Finally, put the result into the output variable that we can
-    // read from main(). Make sure that access to the variable is
-    // properly guarded across threads.
-    std::lock_guard<std::mutex> guard (results_mutex);
-    results[omega] = output_data;
+    output_evaluated_data ();
   }
 
 
@@ -1145,113 +1238,6 @@ namespace TransmissionProblem
                   << std::endl;
         TransmissionProblem::create_failure_file_and_exit();
       }
-
-
-    // We have just finished another frequency. The 'run()' function
-    // just called will have put its results into a shared
-    // std::map. Re-create the output file based on what's now in this
-    // std::map so that the current state of the computations is kept
-    // up-to-date in real-time and can be looked up in the output
-    // file.
-    //
-    // Make sure that we wait for all threads to release access to the
-    // variable. The lock also makes sure that only one thread at a
-    // time accesses the output file. That said, instead of writing
-    // directly into the file, we first write into a buffer and then
-    // dump the buffer in its entirety into the output file. That's
-    // because the calling process (ARES) might want to monitor what's
-    // already been computed and check in on this file
-    // periodically. We would like this to happen with the file in its
-    // final form, not partly written.
-    std::lock_guard<std::mutex> guard (results_mutex);
-
-    std::ostringstream buffer;
-    for (auto result : results)
-      {
-        const unsigned int n_port_boundary_ids = result.second.P.m();
-    
-        const unsigned int field_width = 12;
-
-        // Filter out values that are in essence zero
-        for (unsigned int i=0; i<n_port_boundary_ids; ++i)
-          for (unsigned int j=0; j<n_port_boundary_ids; ++j)
-            {
-              if (std::fabs(std::real(result.second.P(i,j))) < 1e-12 * result.second.P.l1_norm())
-                result.second.P(i,j).real(0);
-              if (std::fabs(std::imag(result.second.P(i,j))) < 1e-12 * result.second.P.l1_norm())
-                result.second.P(i,j).imag(0);
-            }
-
-        for (unsigned int i=0; i<n_port_boundary_ids; ++i)
-          for (unsigned int j=0; j<n_port_boundary_ids; ++j)
-            {
-              if (std::fabs(std::real(result.second.P(i,j))) < 1e-12 * result.second.P.l1_norm())
-                result.second.P(i,j).real(0);
-              if (std::fabs(std::imag(result.second.P(i,j))) < 1e-12 * result.second.P.l1_norm())
-                result.second.P(i,j).imag(0);
-            }
-
-
-        const auto omega = result.first;
-        buffer << "Results for frequency f="
-               << omega/2/numbers::PI << ":\n"
-               << "==============================\n\n";
-
-        buffer << "P = [\n";
-        for (unsigned int i=0; i<n_port_boundary_ids; ++i)
-          {
-            buffer << "      [";
-            for (unsigned int j=0; j<n_port_boundary_ids; ++j)
-              buffer << std::setw(field_width) << std::right << std::real(result.second.P(i,j))
-                     << (std::imag(result.second.P(i,j)) >= 0 ? '+' : '-')
-                     << "j*"
-                     << std::setw(field_width) << std::left << std::fabs(std::imag(result.second.P(i,j)))
-                     << ' ';
-            buffer << "]\n";
-          }
-        buffer << "]\n";
-
-        buffer << "\n\nU = [\n";
-        for (unsigned int i=0; i<n_port_boundary_ids; ++i)
-          {
-            buffer << "      [";
-            for (unsigned int j=0; j<n_port_boundary_ids; ++j)
-              buffer << std::setw(field_width) << std::right << std::real(result.second.U(i,j))
-                     << (std::imag(result.second.U(i,j)) >= 0 ? '+' : '-')
-                     << "j*"
-                     << std::setw(field_width) << std::left << std::fabs(std::imag(result.second.U(i,j)))
-                     << ' ';
-            buffer << "]\n";
-          }
-        buffer << "]\n";
-        buffer << "\n\n\n" << std::flush;
-
-
-        // Then also output locations, pressures, and velocities at
-        // the evaluation points. Output the location in the
-        // coordinates originally provided in the output file.
-        buffer << "Pressure and velocity at explicitly specified evaluation points:\n"
-               << "================================================================\n\n";
-
-        for (unsigned int e=0; e<evaluation_points.size(); ++e)
-          for (unsigned int i=0; i<n_port_boundary_ids; ++i)
-            {
-              buffer << "Point at "
-                     << evaluation_points[e] / geometry_conversion_factor
-                     << ":  pressure="
-                     << result.second.evaluation_point_pressures[i][e]
-                     << ", velocity="
-                     << result.second.evaluation_point_velocities[i][e]
-                     << '\n';
-            }
-
-        buffer << "\n\n\n" << std::flush;
-      }
-
-    std::ofstream frequency_response (instance_folder + "/" +
-                                      output_file_prefix +
-                                      "frequency_response.txt");
-    frequency_response << buffer.str();
   }
 
 
@@ -1407,9 +1393,6 @@ int main(int argc, char *argv[])
           for (auto &thread : threads)
             thread.join();
         }
-
-      logger << "INFO Number of frequencies computed: "
-                << results.size() << std::endl;
 
       // Whether or not a termination signal has been sent, try to
       // remove the file that indicates this signal. That's because if
