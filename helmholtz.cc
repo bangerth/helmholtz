@@ -40,6 +40,7 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/data_out_faces.h>
 #include <deal.II/numerics/vector_tools_point_value.h>
 #include <deal.II/numerics/vector_tools_point_gradient.h>
 
@@ -593,6 +594,78 @@ namespace TransmissionProblem
     else
       Assert (false, ExcMessage("We don't know how to deal with this kind of mesh."));
 
+
+    // Finally output the mesh with ports correctly colored
+    {
+      class BoundaryIds : public DataPostprocessorScalar<dim>
+      {
+    public:
+      BoundaryIds()
+      : DataPostprocessorScalar<dim>("boundary_id", update_quadrature_points)
+          {}
+
+
+      virtual void evaluate_scalar_field(
+        const DataPostprocessorInputs::Scalar<dim> &inputs,
+        std::vector<Vector<double>> &computed_quantities) const override
+          {
+            AssertDimension(computed_quantities.size(),
+                            inputs.solution_values.size());
+
+            const typename DoFHandler<dim>::active_cell_iterator
+              cell = inputs.template get_cell<dim>();
+            
+            // First find out which face the quadrature points belong to.
+            unsigned int face=0;
+            for (; face<cell->n_faces(); ++face)
+              {
+                bool vertices_match = true;
+                for (const unsigned int v : cell->face(face)->vertex_indices())
+                  if (cell->face(face)->vertex(v).distance(inputs.evaluation_points[v]) > 1e-12)
+                    vertices_match = false;
+
+                if (vertices_match == true)
+                  break;
+              }
+            Assert (face != cell->n_faces(), ExcInternalError());
+            
+            for (unsigned int q = 0; q < computed_quantities.size(); ++q)
+              {
+                AssertDimension(computed_quantities[q].size(), 1);
+                
+                computed_quantities[q](0) = cell->face(face)->boundary_id();
+              }
+          }
+      };
+
+      BoundaryIds boundary_ids;
+        
+      
+      DataOutFaces<dim> data_out_faces;
+
+      std::unique_ptr<FiniteElement<dim>> fe;
+      Assert (triangulation.get_reference_cells().size() == 1,
+              ExcMessage("We don't know how to deal with this kind of mesh."));
+      if (triangulation.get_reference_cells()[0] == ReferenceCells::Tetrahedron)
+        fe = std::make_unique<FE_SimplexP<dim>>(TransmissionProblem::fe_degree);
+      else if (triangulation.get_reference_cells()[0] == ReferenceCells::Hexahedron)
+        fe = std::make_unique<FE_Q<dim>>(TransmissionProblem::fe_degree);
+      else
+        Assert (false, ExcMessage("We don't know how to deal with this kind of mesh."));
+
+      DoFHandler<dim> dummy_dof_handler(triangulation);
+      dummy_dof_handler.distribute_dofs(*fe);
+
+      Vector<double> dummy_solution (dummy_dof_handler.n_dofs());
+      
+      data_out_faces.attach_dof_handler(dummy_dof_handler);
+      data_out_faces.add_data_vector(dummy_solution, boundary_ids);
+      data_out_faces.build_patches();
+
+      std::ofstream out("surface.vtu");
+      data_out_faces.write_vtu(out);
+    }
+    
     
     // Figure out what boundary ids we have that describe ports. We
     // take these as all of those boundary ids that are non-zero
