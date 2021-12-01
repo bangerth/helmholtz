@@ -272,6 +272,26 @@ The file names are of the form `<outputfileprefix>visualization/solution-XXXXX.Y
 denotes the (integer part of the) frequency (in Hz) at which the solution
 is computed, and `YY` is the number of the source port.
 
+For debugging purposes, it is often useful to also see the geometry of
+the domain and how different parts of the boundary are labeled by the
+boundary indicators that are used to identify "ports". To this end,
+the program writes a file
+`<outputfileprefix>visualization/surface.vtu` right after reading in
+the mesh and before anything else happens -- that is, before much of
+anything else can go wrong in the program.
+
+When visualized, the data stored in this file might look like the
+following picture for one of the geometries with which this program
+was tested:
+
+![xxx](geometries/abaqus-geometry/boundary_ids.png)
+
+The image shows how most of the boundary of the geometry is labeled
+with boundary indicator zero (which the program interprets as "not a
+port"), whereas the left side and a thin strip along the top right
+edge are labeled with boundary indicators two and one, respectively
+(which the program then interprets as the "ports" of the geometry).
+
 
 # Error reporting
 
