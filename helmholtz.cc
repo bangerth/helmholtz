@@ -692,7 +692,10 @@ namespace TransmissionProblem
       data_out_faces.add_data_vector(dummy_solution, boundary_ids);
       data_out_faces.build_patches();
 
-      std::ofstream out("surface.vtu");
+      const std::string file_name = instance_folder + "/" +
+                                    output_file_prefix +
+                                    "visualization/surface.vtu";
+      std::ofstream out(file_name);
       data_out_faces.write_vtu(out);
     }
     
