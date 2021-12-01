@@ -629,15 +629,15 @@ namespace TransmissionProblem
     {
       class BoundaryIds : public DataPostprocessorScalar<dim>
       {
-    public:
-      BoundaryIds()
-      : DataPostprocessorScalar<dim>("boundary_id", update_quadrature_points)
+      public:
+        BoundaryIds()
+        : DataPostprocessorScalar<dim>("boundary_id", update_quadrature_points)
           {}
 
 
-      virtual void evaluate_scalar_field(
-        const DataPostprocessorInputs::Scalar<dim> &inputs,
-        std::vector<Vector<double>> &computed_quantities) const override
+        virtual void evaluate_scalar_field(
+          const DataPostprocessorInputs::Scalar<dim> &inputs,
+          std::vector<Vector<double>> &computed_quantities) const override
           {
             AssertDimension(computed_quantities.size(),
                             inputs.solution_values.size());
