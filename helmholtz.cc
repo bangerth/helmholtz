@@ -696,6 +696,13 @@ namespace TransmissionProblem
                                        port_boundary_ids.end(),
                                        types::boundary_id(0)));
 
+    AssertThrow (port_boundary_ids.size() > 0,
+                 ExcMessage ("The geometry read in from the mesh file has no "
+                             "parts of the boundary marked with boundary indicators "
+                             "other than zero. This means that it has no parts of "
+                             "the boundary specifically marked as part of a 'port'. "
+                             "We don't know what to compute then."));
+    
     // Now also correctly size the matrices we compute for each
     // frequency
     output_data.P.reinit (port_boundary_ids.size(),
