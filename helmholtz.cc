@@ -1346,9 +1346,28 @@ int main(int argc, char *argv[])
 {
   if (argc >= 2)
     {
-      instance_folder = std::string(argv[1]);
-      if (argc >= 3)
-        output_file_prefix = std::string(argv[2]);
+      if ((argv[1] == std::string("--help")) ||
+          (argv[1] == std::string("-h")))
+        {
+          std::cout << "Invoke this program as either\n"
+                    << "  ./helmholtz <instance_folder>\n"
+                    << "or\n"
+                    << "  ./helmholtz <instance_folder> <prefix>\n"
+                    << "where <instance_folder> is the directory into which output\n"
+                    << "is written, and <prefix> is a prefix to be used for all\n"
+                    << "file names in that directory.\n"
+                    << "\n"
+                    << "If <prefix> is omitted, then no prefix is used. If also\n"
+                    << "<instance_folder> is omitted, then the current directory\n"
+                    << "in which the program is executed is used."
+                    << std::endl;
+        }
+      else
+        {
+          instance_folder = std::string(argv[1]);
+          if (argc >= 3)
+            output_file_prefix = std::string(argv[2]);
+        }
     }
   else
     {
