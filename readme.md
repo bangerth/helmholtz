@@ -96,7 +96,7 @@ units (i.e., kilograms, meters, seconds) and the parameter describes
 the scaling from length units used in the mesh file to meters. In the
 example above, this corresponds to the mesh file using millimeters.
 
-The second block describes where to find the frequency-dependent
+The second block (third parameter) describes where to find the frequency-dependent
 mechanical properties of the medium. All parameters are given in SI
 units. The detailed format of this file is discussed below.
 
@@ -183,9 +183,11 @@ needs to have the following format:
 [...]
 ```
 The first line of this file is treated as a comment and
-ignored. Following lines provide the frequency at the beginning of the
-line, followed by real and imaginary parts of the density and bulk
-modulus. The file needs to end in a newline.
+ignored. Following lines provide the frequency at the beginning of each
+row of the table, followed by real and imaginary parts of the density and bulk
+modulus.
+
+The file as a whole needs to end in a newline.
 
 When asked to compute the response of a cavity at a specific
 frequency, the solver linearly interpolates between lines of the
@@ -421,9 +423,7 @@ set Mesh file name                       = ../helmholtz/geometries/cylinder/cyli
 set Geometry conversion factor to meters = 0.001
 set Evaluation points                    = 1,0.5,0.5
 
-set Wave speed                           = 343
-set Wave speed loss tangent              = 0
-set Density                              = 1.18
+set Material properties file name       = ../helmholtz/material-models/air.txt
 
 set Frequencies                          = list(100000)
 set Number of mesh refinement steps      = 0
@@ -463,9 +463,7 @@ set Mesh file name                       = ../helmholtz/geometries/cylinder/cyli
 set Geometry conversion factor to meters = 0.001
 set Evaluation points                    = 1,0.5,0.5
 
-set Wave speed                           = 343
-set Wave speed loss tangent              = 10
-set Density                              = 1.18
+set Material properties file name       = ../helmholtz/material-models/air.txt
 
 set Frequencies                          = list(100000)
 set Number of mesh refinement steps      = 0
