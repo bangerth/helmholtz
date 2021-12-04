@@ -1244,18 +1244,14 @@ namespace TransmissionProblem
 
 
     // Now put it all into a file:
-    std::cerr << "Writing data to " +instance_folder + "/" +
-                                      output_file_prefix +
-                                      "_" +
-                                      std::to_string(frequency_number) +
-                                      "_" +
-      "frequency_response.txt" << std::endl;
-    std::ofstream frequency_response (instance_folder + "/" +
-                                      output_file_prefix +
-                                      "_" +
-                                      std::to_string(frequency_number) +
-                                      "_" +
-                                      "frequency_response.txt");
+    std::string filename = (instance_folder + "/" +
+                            output_file_prefix +
+                            "_" +
+                            std::to_string(frequency_number) +
+                            "_" +
+                            "frequency_response.txt");
+    std::cerr << "Writing data to " << filename << std::endl;
+    std::ofstream frequency_response (filename);
     frequency_response << buffer.str();
   }
   
