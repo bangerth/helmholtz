@@ -644,26 +644,12 @@ namespace TransmissionProblem
 
             const typename DoFHandler<dim>::active_cell_iterator
               cell = inputs.template get_cell<dim>();
-            
-            // First find out which face the quadrature points belong to.
-            unsigned int face=0;
-            for (; face<cell->n_faces(); ++face)
-              {
-                bool vertices_match = true;
-                for (const unsigned int v : cell->face(face)->vertex_indices())
-                  if (cell->face(face)->vertex(v).distance(inputs.evaluation_points[v]) > 1e-12)
-                    vertices_match = false;
+            const unsigned int face = inputs.get_face_number();
 
-                if (vertices_match == true)
-                  break;
-              }
-            Assert (face != cell->n_faces(), ExcInternalError());
-            
-            for (unsigned int q = 0; q < computed_quantities.size(); ++q)
+            for (auto &output : computed_quantities)
               {
-                AssertDimension(computed_quantities[q].size(), 1);
-                
-                computed_quantities[q](0) = cell->face(face)->boundary_id();
+                AssertDimension(output.size(), 1);
+                output(0) = cell->face(face)->boundary_id();
               }
           }
       };
