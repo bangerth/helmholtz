@@ -503,11 +503,13 @@ namespace TransmissionProblem
     const std::complex<double> wave_speed;
 
 
-    Triangulation<dim>                   triangulation;
-    std::vector<types::boundary_id>      port_boundary_ids;
-    std::vector<double>                  port_areas;
+    Triangulation<dim>                  triangulation;
+    std::vector<types::boundary_id>     port_boundary_ids;
+    std::vector<double>                 port_areas;
 
-    std::unique_ptr<Mapping<dim>>        mapping;
+    std::unique_ptr<Mapping<dim>>       mapping;
+    Quadrature<dim>                     cell_quadrature;
+    Quadrature<dim-1>                   face_quadrature;
 
     std::unique_ptr<FiniteElement<dim>> fe;
     DoFHandler<dim>                     dof_handler;
@@ -623,7 +625,12 @@ namespace TransmissionProblem
       }
     else
       Assert (false, ExcMessage("We don't know how to deal with this kind of mesh."));
-
+    
+    cell_quadrature = triangulation.get_reference_cells()[0]
+                      .template get_gauss_type_quadrature<dim>(TransmissionProblem::fe_degree+1);
+    face_quadrature = triangulation.get_reference_cells()[0].face_reference_cell(0)
+                      .template get_gauss_type_quadrature<dim-1>(TransmissionProblem::fe_degree+1);
+    
 
     // Finally output the mesh with ports correctly colored
     {
@@ -720,11 +727,9 @@ namespace TransmissionProblem
     // can later normalize when computing average pressures and
     // velocities:
     port_areas.resize (port_boundary_ids.size(), 0.);
-    const QGauss<dim-1>  quadrature_formula(fe->degree + 2);
-    const unsigned int n_q_points = quadrature_formula.size();
     FEFaceValues<dim> fe_face_values(*mapping,
                                      *fe,
-                                     quadrature_formula,
+                                     face_quadrature,
                                      update_JxW_values);
     for (const auto cell : triangulation.active_cell_iterators())
       for (const auto face : cell->face_iterators())
@@ -740,7 +745,7 @@ namespace TransmissionProblem
                                               - port_boundary_ids.begin());
 
               fe_face_values.reinit(cell, face);
-              for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+              for (const unsigned int q_point : fe_face_values.quadrature_point_indices())
                 port_areas[this_port] += fe_face_values.JxW(q_point);
             }
   }
@@ -812,7 +817,8 @@ namespace TransmissionProblem
   {
     ScratchData(const Mapping<dim> &      mapping,
                 const FiniteElement<dim> &fe,
-                const unsigned int        quadrature_degree,
+                const Quadrature<dim>    &cell_quadrature,
+                const Quadrature<dim-1>  &face_quadrature,
                 const UpdateFlags         update_flags = update_values |
                                                  update_gradients |
                                                  update_quadrature_points |
@@ -820,10 +826,10 @@ namespace TransmissionProblem
                 const UpdateFlags face_update_flags =
                   update_values | update_gradients | update_quadrature_points |
                   update_JxW_values | update_normal_vectors)
-      : fe_values(mapping, fe, QGauss<dim>(quadrature_degree), update_flags)
+      : fe_values(mapping, fe, cell_quadrature, update_flags)
       , fe_face_values(mapping,
                        fe,
-                       QGauss<dim - 1>(quadrature_degree),
+                       face_quadrature,
                        face_update_flags)
     {}
 
@@ -974,10 +980,10 @@ namespace TransmissionProblem
     // global matrix and right hand side. As an additional benefit,
     // MeshWorker::mesh_loop() does all of this in parallel, using
     // as many processor cores as your machine happens to have.
-    const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
     ScratchData<dim>   scratch_data(*mapping,
                                     *fe,
-                                    n_gauss_points,
+                                    cell_quadrature,
+                                    face_quadrature,
                                     update_values | update_gradients |
                                     update_JxW_values,
                                     update_default);
@@ -1044,19 +1050,17 @@ namespace TransmissionProblem
 
     // *** Step 1:
     // Compute integrals of the solution
-    const QGauss<dim-1>  quadrature_formula(fe->degree + 2);
-    const unsigned int n_q_points = quadrature_formula.size();
     FEFaceValues<dim> fe_face_values(*mapping,
                                      *fe,
-                                     quadrature_formula,
+                                     face_quadrature,
                                      update_values
                                      | update_gradients
                                      | update_quadrature_points
                                      | update_normal_vectors
                                      | update_JxW_values);
 
-    std::vector<ScalarType> solution_values(n_q_points);
-    std::vector<Tensor<1,dim,ScalarType>> solution_gradients(n_q_points);
+    std::vector<ScalarType> solution_values(fe_face_values.n_quadrature_points);
+    std::vector<Tensor<1,dim,ScalarType>> solution_gradients(fe_face_values.n_quadrature_points);
     for (const auto cell : dof_handler.active_cell_iterators())
       for (const auto face : cell->face_iterators())
         if (face->at_boundary())
@@ -1075,7 +1079,7 @@ namespace TransmissionProblem
               fe_face_values.get_function_gradients(solution, solution_gradients);
 
 
-              for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
+              for (const unsigned int q_point : fe_face_values.quadrature_point_indices())
                 {
                   // Compute the integral over the pressure on each
                   // port (including the source port, where we should
