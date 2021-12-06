@@ -1345,13 +1345,7 @@ namespace TransmissionProblem
 
 // @sect3{The main() function}
 //
-// Finally for the `main()` function. There is, again, not very much to see
-// here: It looks like the ones in previous tutorial programs. There
-// is a variable that allows selecting the polynomial degree of the element
-// we want to use for solving the equation. Because the C0IP formulation
-// we use requires the element degree to be at least two, we check with
-// an assertion that whatever one sets for the polynomial degree actually
-// makes sense.
+// Finally for the `main()` function.
 int main(int argc, char *argv[])
 {
   if (argc >= 2)
