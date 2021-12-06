@@ -218,7 +218,79 @@ The output of the program consists of three pieces:
 After each frequency has been computed, the program appends results to
 a frequency response file.
 
-*TODO:* Update with the exact contents of these files once settled upon.
+The principal piece of interest in this file is the `M` matrix. For a geometry
+with `n=3` ports, this matrix is defined by stating that
+```
+|  m11   m12   m13   m14   m15   m16|   | P1 | = |b1|
+|  m21   m22   m23   m24   m25   m26|   | U1 |   |b2|
+|  m31   m32   m33   m34   m35   m36|   | P2 |   |b3|
+                                        | U2 |
+                                        | P3 |
+                                        | U3 |
+```
+where the components `b1`, `b2, `b3` of the right hand side vector correspond
+to volumetric source terms and are zero for our current situation. For a general
+case of `n` ports, the `M` matrix has size `n` times `2*n`.
+
+In the equation above, `Pi` and `Ui` are the average pressure and normal
+velocity at port `i`, where velocities are computed *into* the geometry
+and the average is computed by forming the integral of the pressure or
+velocity over the area of a port divided by the area of the port.
+
+The way the program computes the `M` matrix is by solving for situations
+where one prescribes a unit presure on one port and zero pressure on
+all other ports, and then computing the average velocity on all ports. For
+example, if one prescribes a unit pressure on port 1, then we know that
+```
+|  m11   m12   m13   m14   m15   m16|   |  1  | = |0|
+|  m21   m22   m23   m24   m25   m26|   | U11 |   |0|
+|  m31   m32   m33   m34   m35   m36|   |  0  |   |0|
+                                        | U21 |
+                                        |  0  |
+                                        | U31 |
+```
+and `U11`, `U12`, and `U13` are known. We can repeat this for all three
+ports, and this leads to the linear system
+```
+|  m11   m12   m13   m14   m15   m16|   |  1   0   0  | = |0 0 0|
+|  m21   m22   m23   m24   m25   m26|   | U11 U12 U13 |   |0 0 0|
+|  m31   m32   m33   m34   m35   m36|   |  0   1   0  |   |0 0 0|
+                                        | U21 U22 U23 |
+                                        |  0   0   1  |
+                                        | U31 U32 U33 |
+```
+Here, this means that we have 9 equations for the 18 entries of the matrix `M`.
+In general, we will have `n*n` equations for the `n*(2n)` entries of `M`. That
+means, we can choose `n*n` entries of `M` at will, and compute the rest from the
+equations we have. We will do this by choosing the elements of every other column
+of `M` in a convenient way, namely
+```
+|  m11   -1   m13    0   m15    0|   |  1   0   0  | = |0 0 0|
+|  m21    0   m23   -1   m25    0|   | U11 U12 U13 |   |0 0 0|
+|  m31    0   m33    0   m35   -1|   |  0   1   0  |   |0 0 0|
+                                     | U21 U22 U23 |
+                                     |  0   0   1  |
+                                     | U31 U32 U33 |
+```
+as this will then allow us to put all of the terms involving `Uij`
+onto the right hand side and we obtain
+```
+|  m11   m13   m15|   |  1   0   0 | = |U11 U12 U13|
+|  m21   m23   m25|   |  0   1   0 |   |U21 U22 U23|
+|  m31   m33   m35|   |  0   0   1 |   |U31 U32 U33|
+```
+This then immediately allows us to read off the entries of the
+matrix on the left, and we get that the matrix we seek is of the
+form
+```
+    |  U11   -1   U13    0   U15    0|
+M = |  U21    0   U23   -1   U25    0|
+    |  U31    0   U33    0   U35   -1|
+```
+with the obvious generalization to arbitrary numbers of ports.
+
+
+*TODO:* point values
 
 
 ### The file `<outputfileprefix><freq#>frequency_response.csv`
