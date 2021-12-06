@@ -1230,6 +1230,23 @@ namespace TransmissionProblem
         buffer << "]\n";
       }
     buffer << "]\n";
+
+
+    buffer << "\n\nM = [\n";
+    for (unsigned int i=0; i<n_port_boundary_ids; ++i)
+      {
+        buffer << "      [";
+        for (unsigned int j=0; j<n_port_boundary_ids; ++j)
+          buffer << std::setw(field_width) << std::right << std::real(output_data.U(i,j))
+                 << (std::imag(output_data.U(i,j)) >= 0 ? '+' : '-')
+                 << "j*"
+                 << std::setw(field_width) << std::left << std::fabs(std::imag(output_data.U(i,j)))
+                 << ' '
+                 << std::setw(field_width) << std::right << (i==j ? -1. : 0)
+                 << ' ';
+        buffer << "]\n";
+      }
+    buffer << "]\n";
     buffer << "\n\n\n" << std::flush;
 
 
