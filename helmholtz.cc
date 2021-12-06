@@ -1261,7 +1261,6 @@ namespace TransmissionProblem
                             std::to_string(frequency_number) +
                             "_" +
                             "frequency_response.txt");
-    std::cerr << "Writing data to " << filename << std::endl;
     std::ofstream frequency_response (filename);
     frequency_response << buffer.str();
   }
