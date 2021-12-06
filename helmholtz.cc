@@ -216,7 +216,7 @@ namespace TransmissionProblem
             break;
         }
 
-      logger << "INFO Read material parameters for "
+      logger << "INFO Material parameters file contains data for "
              << frequencies.size()
              << " frequencies ranging from "
              << frequencies.front()
@@ -558,21 +558,21 @@ namespace TransmissionProblem
     if (std::regex_match(mesh_file_name,
                          std::regex(".*\\.mphtxt", std::regex_constants::basic)))
       {
-        logger << "Reading <" << mesh_file_name
+        logger << "INFO Reading mesh file <" << mesh_file_name
                << "> in COMSOL .mphtxt format" << std::endl;
         grid_in.read_comsol_mphtxt (input);
       }
     else if (std::regex_match(mesh_file_name,
                               std::regex(".*\\.msh", std::regex_constants::basic)))
       {
-        logger << "Reading <" << mesh_file_name
+        logger << "INFO Reading mesh file <" << mesh_file_name
                << "> in GMSH .msh format" << std::endl;
         grid_in.read_msh (input);
       }
     else if (std::regex_match(mesh_file_name,
                               std::regex(".*\\.inp", std::regex_constants::basic)))
       {
-        logger << "Reading <" << mesh_file_name
+        logger << "INFO Reading mesh file <" << mesh_file_name
                << "> in ABAQUS .inp format" << std::endl;
         grid_in.read_abaqus (input);
       }
@@ -582,7 +582,9 @@ namespace TransmissionProblem
                                + mesh_file_name +
                                "> is not supported."));
 
-    std::cout << "The mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
+    logger << "INFO The mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
+
+
     // Scale the triangulation by the geometry factor
     GridTools::scale (geometry_conversion_factor, triangulation);
 
@@ -696,8 +698,10 @@ namespace TransmissionProblem
     // Figure out what boundary ids we have that describe ports. We
     // take these as all of those boundary ids that are non-zero
     port_boundary_ids = triangulation.get_boundary_ids();
+    logger << "INFO Found boundary ids ";
     for (const auto &id : port_boundary_ids)
-      logger << "Found boundary id " << id << std::endl;
+      logger << id << ' ';
+    logger << std::endl;
     
     port_boundary_ids.erase (std::find(port_boundary_ids.begin(),
                                        port_boundary_ids.end(),
@@ -759,7 +763,7 @@ namespace TransmissionProblem
 
     dof_handler.distribute_dofs(*fe);
 
-    std::cout << "The mesh has " << dof_handler.n_dofs() << " unknowns" << std::endl;
+    logger << "INFO The mesh has " << dof_handler.n_dofs() << " unknowns" << std::endl;
 
     DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
@@ -888,8 +892,6 @@ namespace TransmissionProblem
     auto cell_worker = [&](const Iterator &  cell,
                            ScratchData<dim> &scratch_data,
                            CopyData &        copy_data) {
-      std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Assemble linear system - cell") : nullptr);
-
       copy_data.cell_matrix = 0;
       copy_data.cell_rhs    = 0;
 
@@ -951,8 +953,6 @@ namespace TransmissionProblem
     // and that the `face_worker` and `boundary_worker` have added
     // to the `copy_data.face_data` array.
     auto copier = [&](const CopyData &copy_data) {
-      std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Assemble linear system - copy") : nullptr);
-
       for (unsigned int i=0; i<copy_data.cell_matrix.m(); ++i)
         for (unsigned int j=0; j<copy_data.cell_matrix.m(); ++j)
           system_matrix.add(copy_data.local_dof_indices[i],
@@ -1285,7 +1285,7 @@ namespace TransmissionProblem
       {
         check_for_termination_signal();
 
-        std::cout << "omega=" << omega
+        logger << "INFO Computing data for omega=" << omega
                   << ", source port boundary id=" << port_boundary_ids[current_source_port]
                   << std::endl;
         assemble_system(current_source_port);

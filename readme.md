@@ -231,8 +231,35 @@ results in computer-readable, CSV format.
 
 ### The file `output.log`
 
-*TODO:* Update with the exact contents of these files once settled upon.
+This file contains some status information that chronicles progress of what
+the program is doing. It will look similar to the following:
+```
+INFO Program started with argument '.'
+INFO Material parameters file contains data for 200 frequencies ranging from 10 to 10000Hz.
+INFO Number of frequencies scheduled: 1
+INFO Reading mesh file <../helmholtz/geometries/cylinder-from-dealii/tet.msh> in GMSH .msh format
+INFO The mesh has 30720 cells
+INFO Found boundary ids 0 1 2 
+INFO The mesh has 5561 unknowns
+INFO Computing data for omega=628319, source port boundary id=1
+INFO Computing data for omega=628319, source port boundary id=2
 
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      2.37s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble linear system          |         2 |     0.092s |       3.9% |
+| Creating visual output          |         2 |     0.582s |        25% |
+| Make grid                       |         1 |     0.148s |       6.3% |
+| Postprocess                     |         2 |    0.0118s |       0.5% |
+| Set up system                   |         1 |    0.0187s |      0.79% |
+| Solve linear system             |         2 |      1.52s |        64% |
++---------------------------------+-----------+------------+------------+
+```
+The information in this file is mostly interesting to see what is currently
+happening and to obtain some statistics on the mesh being used.
 
 
 ### Monitoring progress
