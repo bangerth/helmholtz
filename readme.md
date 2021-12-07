@@ -450,12 +450,14 @@ may or may not be those listed first in the input file.
 
 # How this program was tested
 
-We can check for the correctness of the program using the following
-set up:
+## No attenuation
 
-The mesh is a cylinder along the _x_-axis with length 4 and radius
+We can check for the correctness of the program using the following
+set up: Let us choose a cylinder along the _x_-axis with length 4 and radius
 1. We use a scaling factor of 0.001, so this corresponds to a length
-_L_=4mm and radius _r_=1mm.
+_L_=4mm and radius _r_=1mm. Meshes for this set up are saved in the
+`geometries/cylinder-from-dealii/` directory, along with sample input files
+discussed below.
 
 The solution to this problem is one-dimensional, and reads
 ```
@@ -466,7 +468,7 @@ with _k=omega/c_ and _a,b_ so that
   p(0) = 1
   p(L) = 0
 ```
-which implies
+if considering the source on the left end of the cylinder. This then implies
 ```
   a+b=1
   a*exp(j*omega/c*L) + b*exp(-j*omega/c*L)=0
@@ -476,7 +478,7 @@ Inserting the first of these equations into the second, and multiplying by
 ```
   (1-b)*exp(2*j*omega/c*L) + b=0
 ```
-which implies
+which then results in
 ```
   exp(2*j*omega/c*L) + (1-exp(2*j*omega/c*L))*b=0
 ```
@@ -519,7 +521,7 @@ We can test all of this for a concrete choice of wave speed `c`,
 density `rho`, and frequency `omega = 2*pi*f` using the cylinder
 of length `L=4mm` described above. Using the following input file,
 ```
-set Mesh file name                       = ../helmholtz/geometries/cylinder/cylinder-2-times-refined.msh
+set Mesh file name                       = ../helmholtz/geometries/cylinder-from-dealii/hex.msh
 set Geometry conversion factor to meters = 0.001
 set Evaluation points                    = 1,0.5,0.5
 
@@ -530,45 +532,87 @@ set Number of mesh refinement steps      = 0
 set Finite element polynomial degree     = 1
 set Number of threads                    = 1
 ```
-we have `rho=1.18 kg/m^3`, `c=343 m/s`, and `f=100 kHz` (which
+we have need to look up density and bulk modulus at the chosen
+frequency `f=100 kHz` in the `air.txt` file. Because this frequency
+exceeds the last frequency listed in that file (which is `f=10 kHz`),
+we need to read the values from the line in that file, where we find that
+`rho=1.205728 kg/m^3` and `kappa=142090.344491053`. This gives us
+`c=343.287 m/s`. At the chosen frequency of 100 kHz, this
 produces a wave length of 3.43mm, just short of the length of the
-cylinder). A visualization of the real part of the pressure solution
-looks as follows, on a hexahedral mesh with 11,121 unknowns:
+cylinder. A visualization of the real part of the pressure solution
+computed by the program looks as follows, on a hexahedral mesh with
+11,121 unknowns:
 
-![xxx](geometries/cylinder/100kHz-hex.png)
+![xxx](geometries/cylinder-from-dealii/100kHz-hex.png)
 
-For this set of frequencies, we then expect
+To verify that this computed solution is, at the very least, not completely
+wrong, we can plot the function _p(x)_ computed above (with the material
+parameters and _L_ substituted) along with the minimal and maximal
+values of the numerical solution shown in the picture above. It looks
+as follows:
+
+![xxx](geometries/cylinder-from-dealii/p_of_x.png)
+
+This comparison shows that at the very least the minimum and maximum
+values of the pressure are computed correctly; the general behavior
+of the pressure in the cylinder also matches what we see from the
+one-dimensional plot of the exact solution _p(x)_.
+
+To compare the velocities, we can also substitute the material parameters
+and length of the cylinder into the formula for _u_, and obtain for the
+exact values that
 ```
-  u_x(0) = 0-0.00144j    # 
+  u_x(0) = 0-0.00144j
 ```
 and at the right end
 ```
-  u_x(L) = 0-0.00286j    # 
+  u_x(L) = 0-0.00286j
 ```
 where at the right end, the sign needs to be flipped to obtain the
-_inward_ velocity. Indeed, on the mesh shown above, the program
+_inward_ velocity. Indeed, on the hexahedral mesh shown above, the program
 produces these values for the two ports:
 ```
-  -0.00146963j
-  +0.00290720j
+  -0.00173j
+  +0.00280j
 ```
-This matches to good accuracy the expected values, and a further
-refined mesh will result in even better accuracy.
-
-
-The results above are obtained with a purely real wave speed (loss
-angle zero, no attenuation).
+On a tetrahedral mesh with approximately the same number of unknowns,
+the values are
 ```
-set Mesh file name                       = ../helmholtz/geometries/cylinder/cylinder-2-times-refined.msh
-set Geometry conversion factor to meters = 0.001
-set Evaluation points                    = 1,0.5,0.5
+  -0.00187j
+  +0.00280j
+```
+Both are reasonably good approximations, though maybe not spectacularly
+close ones. But that may not be surprising: the mesh is quite coarse.
+We can improve the quality of the approximation by using a higher polynomial
+degree in the finite element method, by setting
+```
+set Finite element polynomial degree     = 2
+```
+In that case, the same hexahedral mesh produces values
+```
+  -0.001432j
+  +0.002817j
+```
+and the tetrahedral mesh
+```
+  -0.001436j
+  +0.002822j
+```
+both of which values are exact to within less than two per cent error.
 
+
+## With attenuation
+
+The results above were obtained with a purely real wave speed (loss
+angle zero, no attenuation). This corresponded to selecting the
+material parameters from air:
+```
 set Material properties file name       = ../helmholtz/material-models/air.txt
+```
 
-set Frequencies                          = list(100000)
-set Number of mesh refinement steps      = 0
-set Finite element polynomial degree     = 1
-set Number of threads                    = 1
+XXXXX
+```
+set Material properties file name       = ../helmholtz/material-models/air.txt
 ```
 With these values, we then get the following expected values:
 ```
@@ -593,7 +637,7 @@ deal.II can produce internally but which are typically difficult to
 generate with gmsh at high quality. Rather, gmsh generates meshes such
 as this one:
 
-![xxx](geometries/cylinder/100kHz-2-times-refined.png)
+![xxx](geometries/cylinder-from-dealii/100kHz-2-times-refined.png)
 
 On this mesh (with 8,373 unknowns), we obtain the following data for the case without attenuation:
 ```
@@ -610,7 +654,7 @@ either. That said, we can ask gmsh to refine the mesh
 once more. The solution then looks like this, on a mesh with 60,777
 unknowns:
 
-![xxx](geometries/cylinder/100kHz-3-times-refined.png)
+![xxx](geometries/cylinder-from-dealii/100kHz-3-times-refined.png)
 
 Now the corresponding values are
 ```
