@@ -298,7 +298,7 @@ with the obvious generalization to arbitrary numbers of ports.
 For each frequency computed, the program also generates a separate file with
 results in computer-readable, CSV format.
 
-*TODO:* Update with the exact contents of these files once settled upon.
+*TODO:* Update with the exact contents of these files.
 
 
 ### The file `output.log`
@@ -351,8 +351,6 @@ want something fancier, you can actually parse the contents of the
 file and update a graph of the frequency-dependent cavity response
 every time you read through the file. This way, the graph will fill in
 over time.
-
-*TODO:* Update with the exact contents of these files once known.
 
 When the program has successfully finished all computations, it
 generates a file `<outputfileprefix>success_signal.txt` in the
