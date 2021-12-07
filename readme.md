@@ -536,7 +536,7 @@ we have need to look up density and bulk modulus at the chosen
 frequency `f=100 kHz` in the `air.txt` file. Because this frequency
 exceeds the last frequency listed in that file (which is `f=10 kHz`),
 we need to read the values from the line in that file, where we find that
-`rho=1.205728 kg/m^3` and `kappa=142090.344491053`. This gives us
+`rho=1.205728 kg/m^3` and `kappa=142090.344491053 Pa`. This gives us
 `c=343.287 m/s`. At the chosen frequency of 100 kHz, this
 produces a wave length of 3.43mm, just short of the length of the
 cylinder. A visualization of the real part of the pressure solution
@@ -598,95 +598,102 @@ and the tetrahedral mesh
   -0.001436j
   +0.002822j
 ```
-both of which values are exact to within less than two per cent error.
+both of which values are exact to within less than two per cent error. Similar
+accuracy can be achieved by simply using a mesh with smaller cells. Both the
+finer mesh and the higher polynomial degree of course come with the drawback
+of longer compute times.
 
+These computations are then repeated with switched roles of input/output ports
+and the final set of results is encoded in the `M` matrix mentioned above. For example,
+for the tetrahedral mesh with polynomial degree one, the human-readable
+output file contains this information:
+```
+M = [
+      [           0-j*0.00186982             -1            0+j*0.00280168              0 ]
+      [           0+j*0.0057459               0            0-j*0.00481403             -1 ]
+]
+```
+All of this is of course also provided in tabular form in the machine-readable `.csv`
+output file.
+
+
+The input files for the four cases (tetrahedral and hexahedral meshes,
+polynomial degree one and two) along with the output files produced
+by the programs can all be found in the `geometries/cylinder-from-dealii/`
+directory.
 
 ## With attenuation
 
 The results above were obtained with a purely real wave speed (loss
 angle zero, no attenuation). This corresponded to selecting the
-material parameters from air:
+material parameters of air:
 ```
 set Material properties file name       = ../helmholtz/material-models/air.txt
 ```
-
-XXXXX
+But we can also choose values that correspond to a porous medium
+that is lossy:
 ```
-set Material properties file name       = ../helmholtz/material-models/air.txt
+set Material properties file name       = ../helmholtz/material-models/porous.txt
 ```
-With these values, we then get the following expected values:
+Reading material parameters for 100 kHz from this file tells us that
+`rho=(1.5845-0.3942j) kg/m^3` and `kappa=(141946.684+11608.3j) Pa`, and
+consequently `c=(291.437+47.84j) m/s`
+With these values, we then get the following expected (exact) values:
 ```
-  u_x(0) = 0.002238 - 0.000752j
+  u_x(0) = 0.001919+0.0003758j
 ```
 and at the right end
 ```
-  u_x(L) = 0.0005134 - 0.00125j
+  u_x(L) = -0.0004017-0.0009304j
 ```
-On the same mesh as shown in the previous figure, the obtained values
-for the inward volumetric velocities are
+where again we have to flip the sign for the second case to obtain the
+_inward_ velocity.
+On the tetrahedral mesh, the values computed by the program for the
+inward volumetric velocities are
 ```
-   0.00226466 -0.000784016j
-  -0.000514756+0.001271710j
+  0.00181 +1.61e-05j
+  0.000345+0.000942j
 ```
-which is again a decent approximation after accounting for having to
-switch the sign on the second value.
+and for the hexahedral mesh we get
+```
+  0.00186 +0.000105j
+  0.000375+0.000936j
+```
+which is again a decent, though not spectacularly, approximation.
+As before, the quality of the approximation can be improved by using
+a higher polynomial degree or a finer mesh. For polynomial degree
+two and tetrahedra, we get
+```
+  0.00193 +0.000371j
+  0.000407+0.000937j
+```
+whereas with a hexahedral mesh we have
+```
+  0.00193 +0.000373j
+  0.000406+0.000935j
+```
+both of which are again very close to the exact values.
 
 
-The experiments above were obtained on a hexahedral mesh, which
-deal.II can produce internally but which are typically difficult to
-generate with gmsh at high quality. Rather, gmsh generates meshes such
-as this one:
+## Point values
 
-![xxx](geometries/cylinder-from-dealii/100kHz-2-times-refined.png)
-
-On this mesh (with 8,373 unknowns), we obtain the following data for the case without attenuation:
-```
-  0-0.00157234j
-  0+0.00275222j
-```
-And with attenuation:
-```
-  0.002103030-0.00100064j
- -0.000452395+0.00121371j
-```
-This is not quite as accurate, though not a terrible approximation
-either. That said, we can ask gmsh to refine the mesh
-once more. The solution then looks like this, on a mesh with 60,777
-unknowns:
-
-![xxx](geometries/cylinder-from-dealii/100kHz-3-times-refined.png)
-
-Now the corresponding values are
-```
-  0-j*0.00155675
-  0+j*0.00282744
-```
-without attenuation, and
-```
-  0.002172990-0.000892128j
- -0.000500042+0.001238410j
-```
-with attenuation. These values are now substantially closer to the analytically
-obtained (correct) values shown above.
+*TODO*
 
 
-Finally, the input files above allow the evaluation of point values
-for pressure and velocity. At the point of our choice, `(1, 0.5,
-0.5)`, we can evaluate the pressure as
+## Compute times
+
+For the cases above, run times on a laptop for a single frequency are approximately as follows:
+
+ - Tetrahedal mesh, polynomial degree 1 (30,720 cells, 5,561 unknowns): 0m02s
+ - Hexahedral mesh, polynomial degree 1 (10,240 cells, 11,121 unknowns): 0m11s
+ - Tetrahedal mesh, polynomial degree 2 (30,720 cells, 42,673 unknowns):  2m30s
+ - Hexahedral mesh, polynomial degree 2 (10,240 cells, 85,345 unknowns): 11m00s
+
+This behavior can roughly be described as
 ```
-  p(1)   = -0.8297662828 - 0.4150015992e-6j
-  u_x(1) = -0.266e-8     - 0.001775594289j
+  runtime = 1e-7 seconds  *  unknowns**2.
 ```
-For the coarser of the tetrahedral meshes,
-we obtain
-```
-  pressure = -0.763803+0j
-  u_x      = -0.00212938j
-```
-whereas for the finer mesh, we get
-```
-  pressure = -0.810079+0j
-  u_x      = -0.00178777j
-```
-As before the values on the finer mesh are reasonably close to the
-analytical values.
+This is in line with theoretical predictions of run time as being quadratic
+in the number of unknowns. In practice, run times will of course be different
+on other systems, but the order of magnitude can be predicted from this sort
+of relationship.
