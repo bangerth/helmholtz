@@ -1,11 +1,10 @@
-#set Mesh file name                       = ../helmholtz/geometries/abaqus-geometry/all_hex8.inp
-set Mesh file name                       = ../helmholtz/geometries/cylinder-from-dealii/tet.msh
+set Mesh file name                       = ../helmholtz/geometries/cylinder-from-dealii/hex.msh
 set Geometry conversion factor to meters = 0.001
 set Evaluation points                    = 1,0.5,0.5
 
 set Material properties file name       = ../helmholtz/material-models/air.txt
 
-set Frequencies                          = list(10000,20000)
+set Frequencies                          = list(100000)
 set Number of mesh refinement steps      = 0
 set Finite element polynomial degree     = 1
 set Number of threads                    = 1
