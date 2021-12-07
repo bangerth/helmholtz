@@ -410,7 +410,7 @@ All of these errors lead to two consequences:
 * The program leaves behind a file called `<instance-folder>/<output-prefix>/solver_failure_signal.txt`.
 * The program writes the error message into a file 
   `<instance-folder>/<output-prefix>/error.log`. These error messages look similar to the following one
-  that resulted from an mesh input file that did not conform to the specifications:
+  that resulted from a mesh input file that did not conform to the specifications:
 ```
     ERROR Exception while computing for frequency 100000:
 
