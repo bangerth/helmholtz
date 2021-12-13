@@ -1211,8 +1211,8 @@ namespace TransmissionProblem
         for (unsigned int j=0; j<n_port_boundary_ids; ++j)
           buffer << std::setw(field_width) << std::right << std::real(output_data.P(i,j))
                  << (std::imag(output_data.P(i,j)) >= 0 ? '+' : '-')
-                 << "j*"
                  << std::setw(field_width) << std::left << std::fabs(std::imag(output_data.P(i,j)))
+                 << 'j'
                  << ' ';
         buffer << "]\n";
       }
@@ -1225,8 +1225,8 @@ namespace TransmissionProblem
         for (unsigned int j=0; j<n_port_boundary_ids; ++j)
           buffer << std::setw(field_width) << std::right << std::real(output_data.U(i,j))
                  << (std::imag(output_data.U(i,j)) >= 0 ? '+' : '-')
-                 << "j*"
                  << std::setw(field_width) << std::left << std::fabs(std::imag(output_data.U(i,j)))
+                 << 'j'
                  << ' ';
         buffer << "]\n";
       }
@@ -1240,10 +1240,10 @@ namespace TransmissionProblem
         for (unsigned int j=0; j<n_port_boundary_ids; ++j)
           buffer << std::setw(field_width) << std::right << std::real(output_data.U(i,j))
                  << (std::imag(output_data.U(i,j)) >= 0 ? '+' : '-')
-                 << "j*"
                  << std::setw(field_width) << std::left << std::fabs(std::imag(output_data.U(i,j)))
                  << ' '
                  << std::setw(field_width) << std::right << (i==j ? -1. : 0)
+                 << 'j'
                  << ' ';
         buffer << "]\n";
       }
