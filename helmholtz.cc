@@ -605,7 +605,8 @@ namespace TransmissionProblem
         const double diameter = GridTools::diameter(triangulation);
         const double delta_x = std::min(lambda, diameter) / N * fe_degree;
 
-        while (GridTools::maximal_cell_diameter(triangulation)
+        while (GridTools::maximal_cell_diameter(triangulation,
+                                                triangulation.get_reference_cells()[0].template get_default_linear_mapping<dim>())
                >= delta_x)
           triangulation.refine_global();
       }
