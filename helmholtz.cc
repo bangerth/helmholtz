@@ -1085,7 +1085,7 @@ namespace TransmissionProblem
                   // Compute the integral over the pressure on each
                   // port (including the source port, where we should
                   // eventually get an average pressure of one):
-                  output_data.P(current_source_port, this_port)
+                  output_data.P(this_port, current_source_port)
                     +=  (solution_values[q_point] *
                          fe_face_values.JxW(q_point));
 
@@ -1099,7 +1099,7 @@ namespace TransmissionProblem
                   const auto velocity = -1./(std::complex<double>(0,1)*density*omega)
                                         * solution_gradients[q_point];
 
-                  output_data.U(current_source_port, this_port)
+                  output_data.U(this_port, current_source_port)
                     +=  (velocity *
                          (-fe_face_values.normal_vector(q_point)) *
                          fe_face_values.JxW(q_point));
@@ -1110,8 +1110,8 @@ namespace TransmissionProblem
     // we get averages:
     for (unsigned int i=0; i<port_areas.size(); ++i)
       {
-        output_data.P(current_source_port, i) /= port_areas[i];
-        output_data.U(current_source_port, i) /= port_areas[i];
+        output_data.P(i, current_source_port) /= port_areas[i];
+        output_data.U(i, current_source_port) /= port_areas[i];
       }
 
 
