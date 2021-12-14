@@ -451,11 +451,15 @@ may or may not be those listed first in the input file.
 ## No attenuation
 
 We can check for the correctness of the program using the following
-set up: Let us choose a cylinder along the _x_-axis with length 4 and radius
-1. We use a scaling factor of 0.001, so this corresponds to a length
+set up: Let us choose a cylinder along the _x_-axis with length 4
+and radius 1. We use a scaling factor of 0.001, so this corresponds to a length
 _L_=4mm and radius _r_=1mm. Meshes for this set up are saved in the
 `geometries/cylinder-from-dealii/` directory, along with sample input files
-discussed below.
+discussed below. (The derivations below assume that the cylinder goes
+from _x=0_ to _x=L_, but in actual fact the geometry stored in the
+mesh files uses a geometry that goes from _x=-L/2_ to _x=L/2_. This
+only translates the solution to the left, and the only place where we
+have to come back to that is where we evaluate point values.)
 
 The solution to this problem is one-dimensional, and reads
 ```
@@ -537,7 +541,12 @@ we need to read the values from the line in that file, where we find that
 `rho=1.205728 kg/m^3` and `kappa=142090.344491053 Pa`. This gives us
 `c=343.287 m/s`. At the chosen frequency of 100 kHz, this
 produces a wave length of 3.43mm, just short of the length of the
-cylinder. A visualization of the real part of the pressure solution
+cylinder.
+
+
+### Computed port pressures
+
+A visualization of the real part of the pressure solution
 computed by the program looks as follows, on a hexahedral mesh with
 11,121 unknowns:
 
@@ -556,6 +565,9 @@ values of the pressure are computed correctly; the general behavior
 of the pressure in the cylinder also matches what we see from the
 one-dimensional plot of the exact solution _p(x)_.
 
+
+### Computed port velocities
+
 To compare the velocities, we can also substitute the material parameters
 and length of the cylinder into the formula for _u_, and obtain for the
 exact values that
@@ -570,14 +582,14 @@ where at the right end, the sign needs to be flipped to obtain the
 _inward_ velocity. Indeed, on the hexahedral mesh shown above, the program
 produces these values for the two ports:
 ```
-  -0.00173j
-  +0.00280j
+  0-0.00173j
+  0+0.00280j
 ```
 On a tetrahedral mesh with approximately the same number of unknowns,
 the values are
 ```
-  -0.00187j
-  +0.00280j
+  0-0.00187j
+  0+0.00280j
 ```
 Both are reasonably good approximations, though maybe not spectacularly
 close ones. But that may not be surprising: the mesh is quite coarse.
@@ -588,21 +600,62 @@ set Finite element polynomial degree     = 2
 ```
 In that case, the same hexahedral mesh produces values
 ```
-  -0.001432j
-  +0.002817j
+  0-0.001432j
+  0+0.002817j
 ```
 and the tetrahedral mesh
 ```
-  -0.001436j
-  +0.002822j
+  0-0.001436j
+  0+0.002822j
 ```
 both of which values are exact to within less than two per cent error. Similar
 accuracy can be achieved by simply using a mesh with smaller cells. Both the
 finer mesh and the higher polynomial degree of course come with the drawback
 of longer compute times.
 
-These computations are then repeated with switched roles of input/output ports
-and the final set of results is encoded in the `M` matrix mentioned above. For example,
+
+### Computed point pressures and velocities
+
+The input file above also asks for pressures and velocities to be computed at
+individual points -- here, specifically the point `(1, 0.5, 0.5)`, which is then
+converted with the geometry conversion factor to the location `(1mm, 0.5mm, 0.5mm)`.
+Taking into account that the actual geometry went from _x=-L/2_ to _x=L/2_,
+this point lies three quarters down the length of the cylinder and using the
+formulas above, we need to compare what the program computes with what the
+formulas say for _x=3/4L_.
+Of course, for the current example case, the solution is really one-dimensional,
+so the `y` and `z` components of that point do not matter, and we would expect
+the pressure and velocity to be
+```
+  p(x=3mm) = 1.1220+0j
+  u(x=3mm) = [0-0.007197j, 0, 0]
+```
+where the `y` and `z` components of the velocity are zero.
+
+The program computes and outputs the following values for the
+tetrahedral mesh:
+```
+Pressure and velocity at explicitly specified evaluation points:
+  Point at [0.001 0.0005 0.0005], source port with boundary id 1: \
+      p=1.14928+0j, u=[0+0.001145j, -0-1.86333e-05j, -0-4.02683e-06j]
+```
+And the following for the hexahedral mesh:
+```
+Pressure and velocity at explicitly specified evaluation points:
+  Point at [0.001 0.0005 0.0005], source port with boundary id 1: \
+      p=1.13396+0j, u=[0+0.000397294j, 0+3.60157e-18j, -0-9.60419e-18j]
+```
+
+TODO: Interpret
+
+### How these values are shown in the output files
+
+The computations above all show results where the source is at the first port
+(i.e., where we apply _p=1_) with all other ports considered outputs (i.e.,
+where we set _p=1_). The program repeats all of these computations
+with switched roles of input/output ports or, more generally: It cycles through
+all ports as source. As discussed in the section on output files above,
+the final set of results is encoded in the `M` matrix mentioned above. For example,
 for the tetrahedral mesh with polynomial degree one, the human-readable
 output file contains this information:
 ```
@@ -611,8 +664,13 @@ M = [
       [           0+0.00280168j              0            0-0.00481403j             -1 ]
 ]
 ```
+Here, each each pair of columns corresponds to a source port, with rows corresponding to
+evaluating at all ports.
+
 All of this is of course also provided in tabular form in the machine-readable `.csv`
 output file.
+
+
 
 
 The input files for the four cases (tetrahedral and hexahedral meshes,
