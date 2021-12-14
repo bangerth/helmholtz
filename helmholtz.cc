@@ -1270,8 +1270,10 @@ namespace TransmissionProblem
     for (unsigned int e=0; e<evaluation_points.size(); ++e)
       for (unsigned int i=0; i<n_port_boundary_ids; ++i)
         {
-          buffer << "Point at "
+          buffer << "Point at ["
                  << evaluation_points[e] / geometry_conversion_factor
+                 << "], source port with boundary id "
+                 << port_boundary_ids[i]
                  << ":  pressure=";
           write_complex_number (output_data.evaluation_point_pressures[i][e], 0, buffer);
 
