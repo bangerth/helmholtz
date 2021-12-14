@@ -1264,22 +1264,21 @@ namespace TransmissionProblem
     // Then also output locations, pressures, and velocities at
     // the evaluation points. Output the location in the
     // coordinates originally provided in the output file.
-    buffer << "Pressure and velocity at explicitly specified evaluation points:\n"
-           << "================================================================\n\n";
+    buffer << "Pressure and velocity at explicitly specified evaluation points:\n";
 
     for (unsigned int e=0; e<evaluation_points.size(); ++e)
       for (unsigned int i=0; i<n_port_boundary_ids; ++i)
         {
-          buffer << "Point at ["
-                 << evaluation_points[e] / geometry_conversion_factor
+          buffer << "  Point at ["
+                 << evaluation_points[e]
                  << "], source port with boundary id "
                  << port_boundary_ids[i]
-                 << ":  pressure=";
+                 << ":  p=";
           write_complex_number (output_data.evaluation_point_pressures[i][e], 0, buffer);
 
           const Tensor<1,3,std::complex<double>>
             velocity = output_data.evaluation_point_velocities[i][e];
-          buffer << ", velocity=[";
+          buffer << ", u=[";
           for (unsigned int d=0; d<dim; ++d)
             {
               write_complex_number (velocity[d], 0, buffer);
