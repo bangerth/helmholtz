@@ -469,6 +469,30 @@ namespace TransmissionProblem
   }
 
 
+  /**
+   * Provide a standardized way of writing complex numbers. Specifically,
+   * write the number `p` in the form `a+bj`. If `field_width` is a positive
+   * number, then both the real and imaginary parts are given this many
+   * characters to occupy (excluding the character 'j'), where the real
+   * part is right-aligned and the imaginary part left-aligned. If
+   * `field_width` is zero, no alignment happens.
+   */
+  void write_complex_number (const std::complex<double> &p,
+                             const unsigned int field_width,
+                             std::ostream &out)
+  {
+    if (field_width > 0)
+      out << std::setw(field_width) << std::right << std::real(p)
+          << (std::imag(p) >= 0 ? '+' : '-')
+          << std::setw(field_width+1) << std::left
+          << (std::to_string(std::fabs(std::imag(p))) + 'j');
+    else
+      out << std::real(p)
+          << (std::imag(p) >= 0 ? '+' : '-')
+          << std::fabs(std::imag(p))
+          << 'j';
+  }
+  
 
   // @sect3{The main class}
   //
@@ -1209,11 +1233,10 @@ namespace TransmissionProblem
       {
         buffer << "      [";
         for (unsigned int j=0; j<n_port_boundary_ids; ++j)
-          buffer << std::setw(field_width) << std::right << std::real(output_data.P(i,j))
-                 << (std::imag(output_data.P(i,j)) >= 0 ? '+' : '-')
-                 << std::setw(field_width) << std::left << std::fabs(std::imag(output_data.P(i,j)))
-                 << 'j'
-                 << ' ';
+          {
+            write_complex_number (output_data.P(i,j), field_width, buffer);
+            buffer << ' ';
+          }
         buffer << "]\n";
       }
     buffer << "]\n";
@@ -1223,11 +1246,10 @@ namespace TransmissionProblem
       {
         buffer << "      [";
         for (unsigned int j=0; j<n_port_boundary_ids; ++j)
-          buffer << std::setw(field_width) << std::right << std::real(output_data.U(i,j))
-                 << (std::imag(output_data.U(i,j)) >= 0 ? '+' : '-')
-                 << std::setw(field_width) << std::left << std::fabs(std::imag(output_data.U(i,j)))
-                 << 'j'
-                 << ' ';
+          {
+            write_complex_number (output_data.U(i,j), field_width, buffer);
+            buffer << ' ';
+          }
         buffer << "]\n";
       }
     buffer << "]\n";
@@ -1238,13 +1260,15 @@ namespace TransmissionProblem
       {
         buffer << "      [";
         for (unsigned int j=0; j<n_port_boundary_ids; ++j)
-          buffer << std::setw(field_width) << std::right << std::real(output_data.U(i,j))
-                 << (std::imag(output_data.U(i,j)) >= 0 ? '+' : '-')
-                 << std::setw(field_width) << std::left << std::fabs(std::imag(output_data.U(i,j)))
-                 << ' '
-                 << std::setw(field_width) << std::right << (i==j ? -1. : 0)
-                 << 'j'
-                 << ' ';
+          {
+            // Odd-numbered columns contain what's in the 'U' array:
+            write_complex_number (output_data.U(i,j), field_width, buffer);
+
+            // Even numbered columns are zeros or minus ones:
+            buffer << ' '
+                   << std::setw(field_width) << std::right << (i==j ? -1. : 0)
+                   << ' ';
+          }
         buffer << "]\n";
       }
     buffer << "]\n";
@@ -1262,13 +1286,22 @@ namespace TransmissionProblem
         {
           buffer << "Point at "
                  << evaluation_points[e] / geometry_conversion_factor
-                 << ":  pressure="
-                 << output_data.evaluation_point_pressures[i][e]
-                 << ", velocity="
-                 << output_data.evaluation_point_velocities[i][e]
-                 << '\n';
-        }
+                 << ":  pressure=";
+          write_complex_number (output_data.evaluation_point_pressures[i][e], 0, buffer);
 
+          const Tensor<1,3,std::complex<double>>
+            velocity = output_data.evaluation_point_velocities[i][e];
+          buffer << ", velocity=[";
+          for (unsigned int d=0; d<dim; ++d)
+            {
+              write_complex_number (velocity[d], 0, buffer);
+              if (d != dim-1)
+                buffer << ", ";
+            }
+          buffer << ']';
+          buffer << '\n';
+        }
+    
     buffer << "\n\n\n" << std::flush;
 
 
