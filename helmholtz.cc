@@ -1233,34 +1233,15 @@ namespace TransmissionProblem
            << omega/2/numbers::PI << ":\n"
            << "==============================\n\n";
 
-    buffer << "P = [\n";
+    // Check that the P matrix is a diagonal matrix with ones on the diagonal
     for (unsigned int i=0; i<n_port_boundary_ids; ++i)
-      {
-        buffer << "      [";
-        for (unsigned int j=0; j<n_port_boundary_ids; ++j)
-          {
-            write_complex_number (output_data.P(i,j), field_width, buffer);
-            buffer << ' ';
-          }
-        buffer << "]\n";
-      }
-    buffer << "]\n";
+      for (unsigned int j=0; j<n_port_boundary_ids; ++j)
+        Assert (std::fabs(output_data.P(i,j) - std::complex<double>(i==j ? 1 : 0., 0.))
+                < 1e-12,
+                ExcInternalError());
 
-    buffer << "\n\nU = [\n";
-    for (unsigned int i=0; i<n_port_boundary_ids; ++i)
-      {
-        buffer << "      [";
-        for (unsigned int j=0; j<n_port_boundary_ids; ++j)
-          {
-            write_complex_number (output_data.U(i,j), field_width, buffer);
-            buffer << ' ';
-          }
-        buffer << "]\n";
-      }
-    buffer << "]\n";
-
-
-    buffer << "\n\nM = [\n";
+    // Then output the 'M' matrix:
+    buffer << "M = [\n";
     for (unsigned int i=0; i<n_port_boundary_ids; ++i)
       {
         buffer << "      [";
