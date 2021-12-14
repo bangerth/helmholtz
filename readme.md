@@ -607,8 +607,8 @@ for the tetrahedral mesh with polynomial degree one, the human-readable
 output file contains this information:
 ```
 M = [
-      [           0-j*0.00186982             -1            0+j*0.00280168              0 ]
-      [           0+j*0.0057459               0            0-j*0.00481403             -1 ]
+      [           0-0.00186982j             -1            0+0.0057459j               0 ]
+      [           0+0.00280168j              0            0-0.00481403j             -1 ]
 ]
 ```
 All of this is of course also provided in tabular form in the machine-readable `.csv`
