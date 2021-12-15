@@ -1203,11 +1203,7 @@ namespace TransmissionProblem
   template <int dim>
   void HelmholtzProblem<dim>::output_evaluated_data ()
   {
-    std::ostringstream buffer;
-
     const unsigned int n_port_boundary_ids = port_boundary_ids.size();
-    
-    const unsigned int field_width = 12;
 
     // Filter out values that are in essence zero
     for (unsigned int i=0; i<n_port_boundary_ids; ++i)
@@ -1229,6 +1225,8 @@ namespace TransmissionProblem
         }
 
 
+    std::ostringstream buffer;
+    const unsigned int field_width = 12;
     buffer << "Results for frequency f="
            << omega/2/numbers::PI << ":\n"
            << "==============================\n\n";
