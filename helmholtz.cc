@@ -1224,19 +1224,20 @@ namespace TransmissionProblem
             output_data.P(i,j).imag(0);
         }
 
+    // Check that the P matrix is a diagonal matrix with ones on the diagonal
+    for (unsigned int i=0; i<n_port_boundary_ids; ++i)
+      for (unsigned int j=0; j<n_port_boundary_ids; ++j)
+        Assert (std::fabs(output_data.P(i,j) - std::complex<double>(i==j ? 1 : 0., 0.))
+                < 1e-12,
+                ExcInternalError());
+
+    // Write all of the data into the frequency_response.txt file:
     {
       std::ostringstream buffer;
       const unsigned int field_width = 12;
       buffer << "Results for frequency f="
              << omega/2/numbers::PI << ":\n"
              << "==============================\n\n";
-
-      // Check that the P matrix is a diagonal matrix with ones on the diagonal
-      for (unsigned int i=0; i<n_port_boundary_ids; ++i)
-        for (unsigned int j=0; j<n_port_boundary_ids; ++j)
-          Assert (std::fabs(output_data.P(i,j) - std::complex<double>(i==j ? 1 : 0., 0.))
-                  < 1e-12,
-                  ExcInternalError());
 
       // Then output the 'M' matrix:
       buffer << "M = [\n";
