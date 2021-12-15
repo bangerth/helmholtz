@@ -628,7 +628,7 @@ so the `y` and `z` components of that point do not matter, and we would expect
 the pressure and velocity to be
 ```
   p(x=3mm) = 1.1220+0j
-  u(x=3mm) = [0-0.007197j, 0, 0]
+  u(x=3mm) = [0-0.0007197j, 0, 0]
 ```
 where the `y` and `z` components of the velocity are zero.
 
@@ -646,7 +646,23 @@ Pressure and velocity at explicitly specified evaluation points:
       p=1.13396+0j, u=[0+0.000397294j, 0+3.60157e-18j, -0-9.60419e-18j]
 ```
 
-TODO: Interpret
+The computed pressure is clearly a good approximation of the exact value. The
+velocity is further from the exact value -- a well-understood phenomenon when
+trying to compute derivatives of the solution at individual points using
+linear finite elements. The approximation can be improved by selecting
+quadratic (polynomial degree 2) finite elements. The results then obtained
+are as follows for the tetrahedral mesh:
+```
+  Point at [0.001 0.0005 0.0005], source port with boundary id 1: \
+      p=1.12215+0j, u=[0+0.000729637j, -0-3.12669e-06j, -0-1.04111e-06j]
+```
+And as follows for the hexahedral mesh:
+```
+  Point at [0.001 0.0005 0.0005], source port with boundary id 1: \
+      p=1.12204+0j, u=[0+0.000721733j, 0+1.77855e-18j, -0-4.53434e-17j]
+```
+Both of these results are now very close to the exact value.
+
 
 ### How these values are shown in the output files
 
@@ -671,12 +687,13 @@ All of this is of course also provided in tabular form in the machine-readable `
 output file.
 
 
-
+### How to run these test cases
 
 The input files for the four cases (tetrahedral and hexahedral meshes,
 polynomial degree one and two) along with the output files produced
 by the programs can all be found in the `geometries/cylinder-from-dealii/`
 directory.
+
 
 ## With attenuation
 
