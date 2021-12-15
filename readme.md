@@ -289,8 +289,28 @@ M = |  U21    0   U23   -1   U25    0|
 ```
 with the obvious generalization to arbitrary numbers of ports.
 
+In addition to this matrix, the `frequency_response.txt` file also contains output
+that presents the pressures and velocities at the evaluation points selected in
+the input file.
 
-*TODO:* point values
+Together the output file will look like this:
+```
+Results for frequency f=100000:
+==============================
+
+M = [
+      [           0-0.00143179j             -1            0+0.0165324j               0 ]
+      [           0+0.00281691j              0            0-0.0151473j              -1 ]
+]
+
+
+
+Pressure and velocity at explicitly specified evaluation points:
+  Point at [0.001 0.0005 0.0005], source port with boundary id 1: \
+      p=1.12204+0j, u=[0+0.000721733j, 0+1.77855e-18j, -0-4.53434e-17j]
+  Point at [0.001 0.0005 0.0005], source port with boundary id 2: \
+      p=0.147756+0j, u=[0+0.0013503j, -0-3.05279e-18j, -0-6.98538e-18j]
+```
 
 
 ### The file `<outputfileprefix><freq#>frequency_response.csv`
