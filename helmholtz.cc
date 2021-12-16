@@ -1301,6 +1301,58 @@ namespace TransmissionProblem
       std::ofstream frequency_response (filename);
       frequency_response << buffer.str();
     }
+
+    // Now write the same information also into the .csv file, where
+    // it will be appended to the previous information:
+    {
+      std::ostringstream buffer;
+      buffer << omega/2/numbers::PI << ", ";
+
+      for (unsigned int i=0; i<n_port_boundary_ids; ++i)
+        {
+          for (unsigned int j=0; j<n_port_boundary_ids; ++j)
+            {
+              // Odd-numbered columns contain what's in the 'U' array:
+              write_complex_number (output_data.U(i,j), 0, buffer);
+
+              // Even numbered columns are zeros or minus ones:
+              buffer << ", "
+                     << (i==j ? -1. : 0)
+                     << ", ";
+            }
+        }
+
+      // Then also output locations, pressures, and velocities at
+      // the evaluation points. Output the location in the
+      // coordinates originally provided in the output file.
+      for (unsigned int e=0; e<evaluation_points.size(); ++e)
+        for (unsigned int i=0; i<n_port_boundary_ids; ++i)
+          {
+            write_complex_number (output_data.evaluation_point_pressures[i][e], 0, buffer);
+            buffer << ", ";
+            
+            const Tensor<1,3,std::complex<double>>
+              velocity = output_data.evaluation_point_velocities[i][e];
+            for (unsigned int d=0; d<dim; ++d)
+              {
+                write_complex_number (velocity[d], 0, buffer);
+                buffer << ", ";
+              }
+          }
+      buffer << '\n';
+      buffer << std::flush;
+
+
+      // Now put it all into a file:
+      const std::string filename = (instance_folder + "/" +
+                                    output_file_prefix +
+                                    "_" +
+                                    std::to_string(frequency_number) +
+                                    "_" +
+                                    "frequency_response.csv");
+      std::ofstream frequency_response (filename);
+      frequency_response << buffer.str();
+    }
   }
   
 
