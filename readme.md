@@ -327,27 +327,28 @@ Results for frequency f=100000:
 ==============================
 
 M = [
-      [           0-0.00143179j             -1            0+0.0165324j               0 ]
-      [           0+0.00281691j              0            0-0.0151473j              -1 ]
+      [           0-0.00186982j             -1            0+0.0057459j               0 ]
+      [           0+0.00280168j              0            0-0.00481403j             -1 ]
 ]
 
 
 
 Pressure and velocity at explicitly specified evaluation points:
-  Point at [0.001 0.0005 0.0005], source port with boundary id 1: \
-      p=1.12204+0j, u=[0+0.000721733j, 0+1.77855e-18j, -0-4.53434e-17j]
-  Point at [0.001 0.0005 0.0005], source port with boundary id 2: \
-      p=0.147756+0j, u=[0+0.0013503j, -0-3.05279e-18j, -0-6.98538e-18j]
+  Point at [0.001 0.0005 0.0005], source port with boundary id 1:  p=1.14928+0j, u=[0+0.001145j, -0-1.86333e-05j, -0-4.02683e-06j]
+  Point at [0.001 0.0005 0.0005], source port with boundary id 2:  p=0.141687+0j, u=[0+0.00135679j, -0-2.23269e-06j, -0-4.42523e-07j]
 ```
 
 
 ## The file `<outputfileprefix><freq#>frequency_response.csv` <a name="2-csv-file"></a>
 
 For each frequency computed, the program also generates a separate file with
-results in computer-readable, CSV format.
-
-*TODO:* Update with the exact contents of these files.
-
+results in computer-readable, CSV format. In these files, corresponding
+1:1 to the human-readable `.txt` file described above, the single line
+of information starts with the frequency and then has each of the numbers
+shown above in a comma-separate format. This then looks as follows:
+```
+100000, 0-0.00186982j, -1, 0+0.0057459j, 0, 0+0.00280168j, 0, 0-0.00481403j, -1, 1.14928+0j, 0+0.001145j, -0-1.86333e-05j, -0-4.02683e-06j, 0.141687+0j, 0+0.00135679j, -0-2.23269e-06j, -0-4.42523e-07j, 
+```
 
 
 ## The file `<outputfileprefix>frequency_response.csv` <a name="2-csv-file-global"></a>
@@ -744,7 +745,7 @@ Here, each each pair of columns corresponds to a source port, with rows correspo
 evaluating at all ports.
 
 All of this is of course also provided in tabular form in the machine-readable `.csv`
-output file.
+output file, see above.
 
 
 ### How to run these test cases <a name="3-how-to-test-cases"></a>
