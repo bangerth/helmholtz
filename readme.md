@@ -1,4 +1,31 @@
-# Overview
+# Table of contents
+
+  * [Overview](#1-overview)
+  * [Input](#1-input)
+    - [Calling the program](#2-calling-the-program)
+    - [The `.prm` file](#2-the-prm-file)
+    - [Describing the material properties of the medium](#2-medium)
+  * [Output](#1-output)
+    - [The file `<outputfileprefix>frequency_response.txt`](#2-txt-file)
+    - [The file `<outputfileprefix><freq->frequency_response.csv`](#2-csv-file)
+    - [The file `output.log`](#2-output-log)
+    - [Monitoring progress](#2-monitoring)
+    - [The directory `<outputfileprefix>visualization/`](#2-viz)
+  * [Error reporting](#1-error-reporting)
+  * [Terminating execution](#1-terminating)
+  * [How this program was tested](#1-testing)
+    - [No attenuation](#2-no-attenuation)
+        - [Computed port pressures](#3-computed-port-pressures)
+        - [Computed port velocities](#3-computed-port-velocities)
+        - [Computed point pressures and velocities](#3-computed-point-values)
+        - [How these values are shown in the output files](#3-output-files)
+        - [How to run these test cases](#3-how-to-test-cases)
+    - [With attenuation](#2-with-attenuation)
+        - [Point values](#3-attenuation-point-values)
+    - [Compute times](#2-run-times)
+
+
+# Overview <a name="1-overview"></a>
 
 The executable program of this project solves the equations that describe
 the acoustic response of a cavity to an applied pressure at one of a
@@ -33,9 +60,9 @@ The underlying method used for the solution of the equation is the finite elemen
 method (FEM).
 
 
-# Input
+# Input <a name="1-input"></a>
 
-## Calling the program
+## Calling the program <a name="2-calling-the-program"></a>
 
 The executable (let us assume that it is called `helmholtz.exe`) is
 called on the command line in the following way:
@@ -53,7 +80,7 @@ as a prefix. If `<instancefolder>` is omitted, then the current
 directory `"."` will be used for output files.
 
 
-## The `.prm` file
+## The `.prm` file <a name="2-the-prm-file"></a>
 
 All remaining parameters will be read from a file called
 `helmholtz.prm` located in the `<instancefolder>` passed on the
@@ -165,7 +192,7 @@ number limits how many threads (and consequently CPU cores) the
 program will use.
 
 
-## Describing the material properties of the medium
+## Describing the material properties of the medium <a name="2-medium"></a>
 
 The `.prm` file mentioned above makes reference to a file that
 contains the frequency-dependent material properties of the
@@ -206,14 +233,14 @@ air has no substantial frequency dependence to its material properties:
 ```
 
 
-# Output
+# Output <a name="1-output"></a>
 
 The output of the program consists of three pieces:
 - the frequency response file in human-readable form
 - the frequency response file in machine-readable form
 - and a number of files in the visualization directory.
 
-### The file `<outputfileprefix>frequency_response.txt`
+## The file `<outputfileprefix>frequency_response.txt` <a name="2-txt-file"></a>
 
 After each frequency has been computed, the program appends results to
 a frequency response file.
@@ -313,7 +340,7 @@ Pressure and velocity at explicitly specified evaluation points:
 ```
 
 
-### The file `<outputfileprefix><freq#>frequency_response.csv`
+## The file `<outputfileprefix><freq#>frequency_response.csv` <a name="2-csv-file"></a>
 
 For each frequency computed, the program also generates a separate file with
 results in computer-readable, CSV format.
@@ -321,7 +348,7 @@ results in computer-readable, CSV format.
 *TODO:* Update with the exact contents of these files.
 
 
-### The file `output.log`
+## The file `output.log` <a name="2-output-log"></a>
 
 This file contains some status information that chronicles progress of what
 the program is doing. It will look similar to the following:
@@ -354,7 +381,7 @@ The information in this file is mostly interesting to see what is currently
 happening and to obtain some statistics on the mesh being used.
 
 
-### Monitoring progress
+## Monitoring progress <a name="2-monitoring"></a>
 
 The `frequency_response.txt` and `frequency_response.csv` files are
 updated every time the program has finished computing the response of
@@ -381,7 +408,7 @@ Both of these files are removed at the beginning of the program run
 should they exist.
 
 
-### The directory `<outputfileprefix>visualization/`
+## The directory `<outputfileprefix>visualization/` <a name="2-viz"></a>
 
 This directory contains one file for each input frequency and source port, with each file providing
 all of the information necessary to visualize the solution. The format used for these
@@ -413,7 +440,7 @@ edge are labeled with boundary indicators two and one, respectively
 (which the program then interprets as the "ports" of the geometry).
 
 
-# Error reporting
+# Error reporting <a name="1-error-reporting"></a>
 
 There are many ways execution of this program can run into errors. The most common are
 that something is wrong with the input: The file that is listed as containing the mesh
@@ -448,7 +475,7 @@ All of these errors lead to two consequences:
     --------------------------------------------------------
 ```
 
-# Terminating execution
+# Terminating execution <a name="1-terminating"></a>
 
 There may be times where callers of this program do not want it to continue with
 its computations. In this case, an external program should place the text `STOP`
@@ -466,9 +493,9 @@ As a consequence, the frequencies already worked on at the time of termination
 may or may not be those listed first in the input file.
 
 
-# How this program was tested
+# How this program was tested <a name="1-testing"></a>
 
-## No attenuation
+## No attenuation <a name="2-no-attenuation"></a>
 
 We can check for the correctness of the program using the following
 set up: Let us choose a cylinder along the _x_-axis with length 4
@@ -564,7 +591,7 @@ produces a wave length of 3.43mm, just short of the length of the
 cylinder.
 
 
-### Computed port pressures
+### Computed port pressures <a name="3-computed-port-pressures"></a>
 
 A visualization of the real part of the pressure solution
 computed by the program looks as follows, on a hexahedral mesh with
@@ -586,7 +613,7 @@ of the pressure in the cylinder also matches what we see from the
 one-dimensional plot of the exact solution _p(x)_.
 
 
-### Computed port velocities
+### Computed port velocities <a name="3-computed-port-velocities"></a>
 
 To compare the velocities, we can also substitute the material parameters
 and length of the cylinder into the formula for _u_, and obtain for the
@@ -634,7 +661,7 @@ finer mesh and the higher polynomial degree of course come with the drawback
 of longer compute times.
 
 
-### Computed point pressures and velocities
+### Computed point pressures and velocities <a name="3-computed-point-values"></a>
 
 The input file above also asks for pressures and velocities to be computed at
 individual points -- here, specifically the point `(1, 0.5, 0.5)`, which is then
@@ -684,7 +711,7 @@ And as follows for the hexahedral mesh:
 Both of these results are now very close to the exact value.
 
 
-### How these values are shown in the output files
+### How these values are shown in the output files <a name="3-output-files"></a>
 
 The computations above all show results where the source is at the first port
 (i.e., where we apply _p=1_) with all other ports considered outputs (i.e.,
@@ -707,7 +734,7 @@ All of this is of course also provided in tabular form in the machine-readable `
 output file.
 
 
-### How to run these test cases
+### How to run these test cases <a name="3-how-to-test-cases"></a>
 
 The input files for the four cases (tetrahedral and hexahedral meshes,
 polynomial degree one and two) along with the output files produced
@@ -715,7 +742,7 @@ by the programs can all be found in the `geometries/cylinder-from-dealii/`
 directory.
 
 
-## With attenuation
+## With attenuation <a name="2-with-attenuation"></a>
 
 The results above were obtained with a purely real wave speed (loss
 angle zero, no attenuation). This corresponded to selecting the
@@ -768,12 +795,12 @@ whereas with a hexahedral mesh we have
 both of which are again very close to the exact values.
 
 
-## Point values
+### Point values <a name="3-attenuation-point-values"></a>
 
 *TODO*
 
 
-## Compute times
+## Compute times <a name="2-run-times"></a>
 
 For the cases above, run times on a laptop for a single frequency are approximately as follows:
 
