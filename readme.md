@@ -7,7 +7,8 @@
     - [Describing the material properties of the medium](#2-medium)
   * [Output](#1-output)
     - [The file `<outputfileprefix>frequency_response.txt`](#2-txt-file)
-    - [The file `<outputfileprefix><freq->frequency_response.csv`](#2-csv-file)
+    - [The file `<outputfileprefix><freq#>frequency_response.csv`](#2-csv-file)
+    - [The file `<outputfileprefix>frequency_response.csv`](#2-csv-file-global)
     - [The file `output.log`](#2-output-log)
     - [Monitoring progress](#2-monitoring)
     - [The directory `<outputfileprefix>visualization/`](#2-viz)
@@ -346,6 +347,18 @@ For each frequency computed, the program also generates a separate file with
 results in computer-readable, CSV format.
 
 *TODO:* Update with the exact contents of these files.
+
+
+
+## The file `<outputfileprefix>frequency_response.csv` <a name="2-csv-file-global"></a>
+
+It is inconvenient to deal with individual `.csv` files for each frequently.
+As a consequence, all of the `.csv` files are concatenated into a single file
+with name `<outputfileprefix>frequency_response.csv` that contains information
+about the responses to all frequencies. Since each of the single-frequency
+`.csv` files has just one line, the combined file has one line per frequency.
+The first entry in each line (just like in the individual frequency files)
+corresponds to the frequency in Hertz this line corresponds to.
 
 
 ## The file `output.log` <a name="2-output-log"></a>

@@ -1344,14 +1344,26 @@ namespace TransmissionProblem
 
 
       // Now put it all into a file:
-      const std::string filename = (instance_folder + "/" +
-                                    output_file_prefix +
-                                    "_" +
-                                    std::to_string(frequency_number) +
-                                    "_" +
-                                    "frequency_response.csv");
-      std::ofstream frequency_response (filename);
-      frequency_response << buffer.str();
+      {
+        const std::string filename = (instance_folder + "/" +
+                                      output_file_prefix +
+                                      "_" +
+                                      std::to_string(frequency_number) +
+                                      "_" +
+                                      "frequency_response.csv");
+        std::ofstream frequency_response (filename);
+        frequency_response << buffer.str();
+      }
+
+      // And at the end of it all, write the same line into the
+      // concatenated .csv file as well, in 'append' mode.
+      {
+        const std::string filename = (instance_folder + "/" +
+                                      output_file_prefix +
+                                      "frequency_response.csv");
+        std::ofstream frequency_response (filename, std::ios::app);
+        frequency_response << buffer.str();
+      }
     }
   }
   
@@ -1475,6 +1487,10 @@ int main(int argc, char *argv[])
   std::remove ((instance_folder + "/" +
                 output_file_prefix +
                 "solver_failure_signal.txt").c_str());
+  // Do the same with the global .csv file
+  std::remove ((instance_folder + "/" +
+                output_file_prefix +
+                "frequency_response.csv").c_str());
   
   logger.open (instance_folder + "/" +
                output_file_prefix +
