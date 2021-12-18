@@ -328,15 +328,15 @@ Results for frequency f=100000:
 ==============================
 
 M = [
-      [           0-0.00186982j             -1            0+0.0057459j               0 ]
-      [           0+0.00280168j              0            0-0.00481403j             -1 ]
+      [           0-0.00186982j             -1            0+0.00280168j              0 ]
+      [           0+0.00280168j              0            0-0.00186982j             -1 ]
 ]
 
 
 
 Pressure and velocity at explicitly specified evaluation points:
   Point at [0.001 0.0005 0.0005], source port with boundary id 1:  p=1.14928+0j, u=[0+0.001145j, -0-1.86333e-05j, -0-4.02683e-06j]
-  Point at [0.001 0.0005 0.0005], source port with boundary id 2:  p=0.141687+0j, u=[0+0.00135679j, -0-2.23269e-06j, -0-4.42523e-07j]
+  Point at [0.001 0.0005 0.0005], source port with boundary id 2:  p=-0.865903+0j, u=[0+0.00156858j, 0+1.4168e-05j, 0+3.14178e-06j]
 ```
 
 
@@ -348,7 +348,7 @@ results in computer-readable, CSV format. In these files, corresponding
 of information starts with the frequency and then has each of the numbers
 shown above in a comma-separate format. This then looks as follows:
 ```
-100000, 0-0.00186982j, -1, 0+0.0057459j, 0, 0+0.00280168j, 0, 0-0.00481403j, -1, 1.14928+0j, 0+0.001145j, -0-1.86333e-05j, -0-4.02683e-06j, 0.141687+0j, 0+0.00135679j, -0-2.23269e-06j, -0-4.42523e-07j, 
+100000, 0-0.00186982j, -1, 0+0.00280168j, 0, 0+0.00280168j, 0, 0-0.00186982j, -1, 1.14928+0j, 0+0.001145j, -0-1.86333e-05j, -0-4.02683e-06j, -0.865903+0j, 0+0.00156858j, 0+1.4168e-05j, 0+3.14178e-06j, 
 ```
 
 
@@ -794,8 +794,15 @@ original port assignment. This is not surprising: The geometry and
 the location of ports is symmetric, so the solution should also be
 symmetric.
 
-
-TODO
+Indeed, this is also what the program computes. For the tetrahedral
+mesh, we obtain values
+```
+  0+0.00280j
+  0-0.00187j
+```
+where the flipped sign just reflects the fact that at the right end
+the normal vector points _inward_, as opposed to the positive _x_
+direction.
 
 
 ### How these values are shown in the output files <a name="3-output-files"></a>
@@ -813,15 +820,17 @@ Results for frequency f=100000:
 ==============================
 
 M = [
-      [           0-0.00186982j             -1            0+0.0057459j               0 ]
-      [           0+0.00280168j              0            0-0.00481403j             -1 ]
+      [           0-0.00186982j             -1            0+0.00280168j              0 ]
+      [           0+0.00280168j              0            0-0.00186982j             -1 ]
 ]
 
 
 
 Pressure and velocity at explicitly specified evaluation points:
   Point at [0.001 0.0005 0.0005], source port with boundary id 1:  p=1.14928+0j, u=[0+0.001145j, -0-1.86333e-05j, -0-4.02683e-06j]
-  Point at [0.001 0.0005 0.0005], source port with boundary id 2:  p=0.141687+0j, u=[0+0.00135679j, -0-2.23269e-06j, -0-4.42523e-07j]
+  Point at [0.001 0.0005 0.0005], source port with boundary id 2:  p=-0.865903+0j, u=[0+0.00156858j, 0+1.4168e-05j, 0+3.14178e-06j]
+ts/helmholtz-build> cat _0_frequency_response.csv 
+100000, 0-0.00186982j, -1, 0+0.00280168j, 0, 0+0.00280168j, 0, 0-0.00186982j, -1, 1.14928+0j, 0+0.001145j, -0-1.86333e-05j, -0-4.02683e-06j, -0.865903+0j, 0+0.00156858j, 0+1.4168e-05j, 0+3.14178e-06j, 
 ```
 Here, each pair of columns of the matrix _M_ corresponds to a source port, with rows
 corresponding to evaluating at all ports.
