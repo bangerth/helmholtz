@@ -3,10 +3,18 @@
 
 import cmath
 
+# For the case with no attenuation
 c=343.287
-omega=2*3.1415926*100000
 rho=1.205728
+
+# For the case with attenuation
+#c=complex(291.437,47.84)
+#rho=complex(1.5845,-0.3942)
+
+
+
 L=0.004
+omega=2*3.1415926*100000
 j = complex(0,1)
 
 

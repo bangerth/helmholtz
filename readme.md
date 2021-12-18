@@ -793,7 +793,7 @@ and for the hexahedral mesh we get
   0.00186 +0.000105j
   0.000375+0.000936j
 ```
-which is again a decent, though not spectacularly, approximation.
+which is again a decent, though not spectacularly good, approximation.
 As before, the quality of the approximation can be improved by using
 a higher polynomial degree or a finer mesh. For polynomial degree
 two and tetrahedra, we get
@@ -811,7 +811,34 @@ both of which are again very close to the exact values.
 
 ### Point values <a name="3-attenuation-point-values"></a>
 
-*TODO*
+In the same spirit, the point values at the point `(1,0.5,0.5)` (to be scaled
+by the geometry scaling factor and corresponding to _x=3mm_ as explained above)
+result in exact values of
+```
+  p(x=3mm) = 0.435632-0.133640j
+  u(x=3mm) = [0.000497252+0.0003753412j, 0, 0]
+```
+The program evaluates these point values to
+```
+  p = 0.450-0.119j
+  u = [0.000519+0.000559j, 0, 0]
+```
+when using the tetrahedral mesh, and to
+```
+  p = 0.442-0.127j,
+  u = [0.000437+0.000264j, 0, 0]
+```
+when using the hexahedral meshes. Again, we can improve the accuracy by selecting
+quadratic finite elements (polynomial degree 2) for the tetrahedral mesh:
+```
+  p = 0.436-0.134j,
+  u = [0.0005050.000379j, 0, 0]
+```
+And for the hexahedral mesh:
+```
+  p = 0.435-0.134j,
+  u = [0.000500+0.000376j, 0, 0]
+```
 
 
 ## Compute times <a name="2-run-times"></a>
