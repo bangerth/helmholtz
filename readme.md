@@ -19,6 +19,7 @@
         - [Computed port pressures](#3-computed-port-pressures)
         - [Computed port velocities](#3-computed-port-velocities)
         - [Computed point pressures and velocities](#3-computed-point-values)
+        - [Switched ports](3-switched-ports)
         - [How these values are shown in the output files](#3-output-files)
         - [How to run these test cases](#3-how-to-test-cases)
     - [With attenuation](#2-with-attenuation)
@@ -723,6 +724,78 @@ And as follows for the hexahedral mesh:
       p=1.12204+0j, u=[0+0.000721733j, 0+1.77855e-18j, -0-4.53434e-17j]
 ```
 Both of these results are now very close to the exact value.
+
+
+### Switched ports <a name="3-switched-ports"></a>
+
+The results above were shown where the port with boundary id 1 is the "source"
+(i.e., has a prescribed pressure of one) and the port with boundary id 2
+is one of the other ports (where the prescribed pressure is zero).
+
+Of course, we are also interested in what happens when we switch the source
+and receiver ports. We can consider this case by again starting from the
+general solution
+```
+  p(x) = a*exp(j*k*x) + b*exp(-j*k*x)
+```
+with _k=omega/c_, but now we need to choose _a,b_ so that
+```
+  p(0) = 0
+  p(L) = 1
+```
+This now implies
+```
+  a+b=0
+  a*exp(j*k*L) + b*exp(-j*k*L)=1
+```
+Inserting the first of these equations into the second, we get
+```
+  -b * [ exp(j*k*L) - exp(-j*k*L) ] = 1
+```
+which we can express as
+```
+  b = -1 / [ exp(j*k*L) - exp(-j*k*L) ]
+```
+amd consequently the solution is
+```
+  p(x) =  a*exp(j*k*x) + b*exp(-j*k*x)
+       = -b*exp(j*k*x) + b*exp(-j*k*x)
+       = -b * [ exp(j*k*x) - exp(-j*k*x) ]
+       = [ exp(j*k*x) - exp(-j*k*x) ] / [ exp(j*k*L) - exp(-j*k*L) ]
+```
+for which it is easy to verify that indeed _p(0)=0_ and _p(L)=1_
+as desired.
+
+As before, we are interested in the velocity,
+```
+  u(x) = -1/(j rho omega) nabla p
+```
+of which only the _x_-component is nonzero and reads as
+```
+  u_x(x) = -1/(rho c) [ exp(j*k*x) + exp(-j*k*x) ]
+                    / [ exp(j*k*L) - exp(-j*k*L) ]
+```
+So, at the left end of the cylinder, we have
+```
+  u_x(0) = -2/(rho c) / [ exp(j*k*L) - exp(-j*k*L) ]
+```
+and at the right end
+```
+  u_x(L) = -1/(rho c) [ exp(j*k*L) + exp(-j*k*L) ]
+                    / [ exp(j*k*L) - exp(-j*k*L) ]
+```
+Inserting concrete values for _c_ and _k=omega/c_, we find that
+```
+  u_x(0) = 0+0.00280471j
+  u_x(L) = 0+0.00142459j
+```
+That is, up to the sign, the same but switched values as for the
+original port assignment. This is not surprising: The geometry and
+the location of ports is symmetric, so the solution should also be
+symmetric.
+
+
+TODO
 
 
 ### How these values are shown in the output files <a name="3-output-files"></a>
