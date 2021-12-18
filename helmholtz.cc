@@ -919,6 +919,9 @@ namespace TransmissionProblem
 
     using Iterator = typename DoFHandler<dim>::active_cell_iterator;
 
+    system_matrix = 0;
+    system_rhs = 0;
+    
     auto cell_worker = [&](const Iterator &  cell,
                            ScratchData<dim> &scratch_data,
                            CopyData &        copy_data) {
