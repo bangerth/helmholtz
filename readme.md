@@ -729,20 +729,29 @@ Both of these results are now very close to the exact value.
 
 The computations above all show results where the source is at the first port
 (i.e., where we apply _p=1_) with all other ports considered outputs (i.e.,
-where we set _p=1_). The program repeats all of these computations
+where we set _p=0_). The program repeats all of these computations
 with switched roles of input/output ports or, more generally: It cycles through
 all ports as source. As discussed in the section on output files above,
 the final set of results is encoded in the `M` matrix mentioned above. For example,
 for the tetrahedral mesh with polynomial degree one, the human-readable
 output file contains this information:
 ```
+Results for frequency f=100000:
+==============================
+
 M = [
       [           0-0.00186982j             -1            0+0.0057459j               0 ]
       [           0+0.00280168j              0            0-0.00481403j             -1 ]
 ]
+
+
+
+Pressure and velocity at explicitly specified evaluation points:
+  Point at [0.001 0.0005 0.0005], source port with boundary id 1:  p=1.14928+0j, u=[0+0.001145j, -0-1.86333e-05j, -0-4.02683e-06j]
+  Point at [0.001 0.0005 0.0005], source port with boundary id 2:  p=0.141687+0j, u=[0+0.00135679j, -0-2.23269e-06j, -0-4.42523e-07j]
 ```
-Here, each each pair of columns corresponds to a source port, with rows corresponding to
-evaluating at all ports.
+Here, each pair of columns of the matrix _M_ corresponds to a source port, with rows
+corresponding to evaluating at all ports.
 
 All of this is of course also provided in tabular form in the machine-readable `.csv`
 output file, see above.
