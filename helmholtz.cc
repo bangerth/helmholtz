@@ -584,33 +584,44 @@ namespace TransmissionProblem
 
     // Determine what format we want to read the mesh in: .mphtxt =>
     // COMSOL; .msh => GMSH; .inp => ABAQUS
-    if (std::regex_match(mesh_file_name,
-                         std::regex(".*\\.mphtxt", std::regex_constants::basic)))
+    try
       {
-        logger << "INFO Reading mesh file <" << mesh_file_name
-               << "> in COMSOL .mphtxt format" << std::endl;
-        grid_in.read_comsol_mphtxt (input);
+        if (std::regex_match(mesh_file_name,
+                             std::regex(".*\\.mphtxt", std::regex_constants::basic)))
+          {
+            logger << "INFO Reading mesh file <" << mesh_file_name
+                   << "> in COMSOL .mphtxt format" << std::endl;
+            grid_in.read_comsol_mphtxt (input);
+          }
+        else if (std::regex_match(mesh_file_name,
+                                  std::regex(".*\\.msh", std::regex_constants::basic)))
+          {
+            logger << "INFO Reading mesh file <" << mesh_file_name
+                   << "> in GMSH .msh format" << std::endl;
+            grid_in.read_msh (input);
+          }
+        else if (std::regex_match(mesh_file_name,
+                                  std::regex(".*\\.inp", std::regex_constants::basic)))
+          {
+            logger << "INFO Reading mesh file <" << mesh_file_name
+                   << "> in ABAQUS .inp format" << std::endl;
+            grid_in.read_abaqus (input);
+          }
+        else
+          AssertThrow (false,
+                       ExcMessage ("The file ending for the mesh file <"
+                                   + mesh_file_name +
+                                   "> is not supported."));
       }
-    else if (std::regex_match(mesh_file_name,
-                              std::regex(".*\\.msh", std::regex_constants::basic)))
+    catch (const ExcIO &)
       {
-        logger << "INFO Reading mesh file <" << mesh_file_name
-               << "> in GMSH .msh format" << std::endl;
-        grid_in.read_msh (input);
+        logger << "Couldn't read from mesh file <"
+               << instance_folder + "/" + mesh_file_name
+               << ">. See error.log for more information."
+               << std::endl;
+        throw;
       }
-    else if (std::regex_match(mesh_file_name,
-                              std::regex(".*\\.inp", std::regex_constants::basic)))
-      {
-        logger << "INFO Reading mesh file <" << mesh_file_name
-               << "> in ABAQUS .inp format" << std::endl;
-        grid_in.read_abaqus (input);
-      }
-    else
-      AssertThrow (false,
-                   ExcMessage ("The file ending for the mesh file <"
-                               + mesh_file_name +
-                               "> is not supported."));
-
+    
     logger << "INFO The mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
 
 
