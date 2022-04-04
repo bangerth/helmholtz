@@ -721,7 +721,18 @@ namespace TransmissionProblem
                                     output_file_prefix +
                                     "visualization/surface.vtu";
       std::ofstream out(file_name);
-      data_out_faces.write_vtu(out);
+      try
+        {
+          data_out_faces.write_vtu(out);
+        }
+      catch (const ExcIO &)
+        {
+          logger << "Couldn't write to file <"
+                 << file_name
+                 << ">. See the error.log file for more information."
+                 << std::endl;
+          throw;
+        }
     }
     
     
