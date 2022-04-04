@@ -583,7 +583,7 @@ namespace TransmissionProblem
     std::ifstream input (instance_folder + "/" + mesh_file_name);
 
     // Determine what format we want to read the mesh in: .mphtxt =>
-    // COMSOL; .msh => GMSH
+    // COMSOL; .msh => GMSH; .inp => ABAQUS
     if (std::regex_match(mesh_file_name,
                          std::regex(".*\\.mphtxt", std::regex_constants::basic)))
       {
