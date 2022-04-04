@@ -163,7 +163,7 @@ namespace TransmissionProblem
     geometry_conversion_factor = prm.get_double ("Geometry conversion factor to meters");
     {
       const auto points = Utilities::split_string_list (prm.get("Evaluation points"), ';');
-      for (const auto point : points)
+      for (const auto &point : points)
         {
           const auto coordinates = Utilities::split_string_list (point, ',');
           AssertDimension (coordinates.size(), 3);
@@ -765,8 +765,8 @@ namespace TransmissionProblem
                                      *fe,
                                      face_quadrature,
                                      update_JxW_values);
-    for (const auto cell : triangulation.active_cell_iterators())
-      for (const auto face : cell->face_iterators())
+    for (const auto &cell : triangulation.active_cell_iterators())
+      for (const auto &face : cell->face_iterators())
         if (face->at_boundary())
           if (std::find(port_boundary_ids.begin(),
                         port_boundary_ids.end(),
@@ -1094,8 +1094,8 @@ namespace TransmissionProblem
 
     std::vector<ScalarType> solution_values(fe_face_values.n_quadrature_points);
     std::vector<Tensor<1,dim,ScalarType>> solution_gradients(fe_face_values.n_quadrature_points);
-    for (const auto cell : dof_handler.active_cell_iterators())
-      for (const auto face : cell->face_iterators())
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      for (const auto &face : cell->face_iterators())
         if (face->at_boundary())
           if (std::find(port_boundary_ids.begin(),
                         port_boundary_ids.end(),
@@ -1539,7 +1539,7 @@ int main(int argc, char *argv[])
           (n_threads >= MaterialParameters::frequencies.size()))
         {
           std::vector<std::future<void>> tasks;
-          for (const auto freq : MaterialParameters::frequencies)
+          for (const auto &freq : MaterialParameters::frequencies)
             tasks.emplace_back (std::async (std::launch::async,
                                             [=]() { solve_one_frequency (freq.first,
                                                                          freq.second); }));
