@@ -184,7 +184,10 @@ namespace TransmissionProblem
       = prm.get ("Material properties file name");
     {
       std::ifstream material_input (material_properties_file_name);
-      AssertThrow (material_input, ExcIO());
+      AssertThrow (material_input,
+                   ExcMessage("Can't read material properties from file <"
+                              + material_properties_file_name
+                              + ">."));
 
       // discard the first line as a comment
       {
@@ -615,11 +618,10 @@ namespace TransmissionProblem
       }
     catch (const ExcIO &)
       {
-        logger << "Couldn't read from mesh file <"
-               << instance_folder + "/" + mesh_file_name
-               << ">. See error.log for more information."
-               << std::endl;
-        throw;
+        AssertThrow (false,
+                     ExcMessage ("Couldn't read from mesh file <"
+                                 + instance_folder + "/" + mesh_file_name
+                                 + ">."));
       }
     
     logger << "INFO The mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
@@ -738,11 +740,10 @@ namespace TransmissionProblem
         }
       catch (const ExcIO &)
         {
-          logger << "Couldn't write to file <"
-                 << file_name
-                 << ">. See the error.log file for more information."
-                 << std::endl;
-          throw;
+          AssertThrow (false,
+                       ExcMessage ("Couldn't write to file <"
+                                   + file_name
+                                   + ">."));
         }
     }
     
