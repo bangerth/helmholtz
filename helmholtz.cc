@@ -584,6 +584,10 @@ namespace TransmissionProblem
     GridIn<dim> grid_in;
     grid_in.attach_triangulation (triangulation);
     std::ifstream input (instance_folder + "/" + mesh_file_name);
+    AssertThrow (input,
+                 ExcMessage ("The file <" + instance_folder + "/" + mesh_file_name +
+                             "> can not be written to read from when "
+                             "trying to load a mesh."));
 
     // Determine what format we want to read the mesh in: .mphtxt =>
     // COMSOL; .msh => GMSH; .inp => ABAQUS
@@ -734,6 +738,11 @@ namespace TransmissionProblem
                                     output_file_prefix +
                                     "visualization/surface.vtu";
       std::ofstream out(file_name);
+      AssertThrow (out,
+                   ExcMessage ("The file <" + file_name +
+                               "> can not be written to when trying to write "
+                               "surface visualization data."));
+      
       try
         {
           data_out_faces.write_vtu(out);
@@ -741,7 +750,7 @@ namespace TransmissionProblem
       catch (const ExcIO &)
         {
           AssertThrow (false,
-                       ExcMessage ("Couldn't write to file <"
+                       ExcMessage ("Couldn't write to surface visualization output file <"
                                    + file_name
                                    + ">."));
         }
@@ -1219,7 +1228,17 @@ namespace TransmissionProblem
                  ExcMessage ("The file <" + file_name +
                              "> can not be written to when trying to write "
                              "visualization data."));
-    data_out.write_vtu(output_vtu);
+    try
+      {
+        data_out.write_vtu(output_vtu);
+      }
+    catch (const ExcIO &)
+      {
+        AssertThrow (false,
+                     ExcMessage ("The file <" + file_name +
+                                 "> can not be written to when trying to write "
+                                 "visualization data."));
+      }
 
     output_data.visualization_file_names.emplace_back (file_name);
   }
@@ -1325,6 +1344,11 @@ namespace TransmissionProblem
                                     "_" +
                                     "frequency_response.txt");
       std::ofstream frequency_response (filename);
+      AssertThrow (frequency_response,
+                   ExcMessage ("The file <" + filename +
+                               "> can not be written to when trying to write "
+                               "frequency response data."));
+
       frequency_response << buffer.str();
     }
 
@@ -1378,6 +1402,10 @@ namespace TransmissionProblem
                                       "_" +
                                       "frequency_response.csv");
         std::ofstream frequency_response (filename);
+        AssertThrow (frequency_response,
+                     ExcMessage ("The file <" + filename +
+                                 "> can not be written to when trying to write "
+                                 "frequency response data."));
         frequency_response << buffer.str();
       }
 
@@ -1388,6 +1416,10 @@ namespace TransmissionProblem
                                       output_file_prefix +
                                       "frequency_response.csv");
         std::ofstream frequency_response (filename, std::ios::app);
+        AssertThrow (frequency_response,
+                     ExcMessage ("The file <" + filename +
+                                 "> can not be written to when trying to write "
+                                 "frequency response data."));
         frequency_response << buffer.str();
       }
     }
