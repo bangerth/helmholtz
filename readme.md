@@ -13,6 +13,7 @@
     - [The file `output.log`](#2-output-log)
     - [Monitoring progress](#2-monitoring)
     - [The directory `<outputfileprefix>visualization/`](#2-viz)
+  * [Generating a mesh summary](#1-mesh-summary)
   * [Error reporting](#1-error-reporting)
   * [Terminating execution](#1-terminating)
   * [How this program was tested](#1-testing)
@@ -482,6 +483,47 @@ with boundary indicator zero (which the program interprets as "not a
 port"), whereas the left side and a thin strip along the top right
 edge are labeled with boundary indicators two and one, respectively
 (which the program then interprets as the "ports" of the geometry).
+
+
+# Generating a mesh summary <a name="1-mesh-summary"></a>
+
+It is sometimes useful to just check whether the solver *would* be
+able to run with a given input file. To this end, put the following
+line into the `helmholtz.prm` input file:
+```
+set Mesh summary only = true
+```
+
+If this parameter is set to `true`, then the solver will read all
+input files, generate some summary information, and stop without
+actually solving the partial differential equation. As an example, the
+`output.log` file [discussed above](#2-output-log) would then look
+similar to the following:
+```
+INFO Program started with argument '.'
+INFO Material parameters file contains data for 200 frequencies ranging from 10 to 10000Hz.
+INFO Number of frequencies scheduled: 1
+INFO Reading mesh file <../helmholtz/geometries/cylinder-from-dealii/tet.msh> in GMSH .msh format
+INFO The mesh has 30720 cells
+INFO Found boundary ids 0 1 2 
+INFO Stopping after outputting mesh summary only.
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |     0.157s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Make grid                       |         1 |     0.155s |        99% |
++---------------------------------+-----------+------------+------------+
+```
+
+The output indicates that the material parameters and the mesh were
+successfully read, and that the mesh contained faces marked with
+boundary indicators 0, 1, and 2 (where boundary indicators 1 and 2 are
+interpreted as "ports"). Furthermore, the program computes port areas as described in
+[the section that describes the file `<outputfileprefix>port_areas.txt`](#2-port-areas),
+and outputs them before stopping.
 
 
 # Error reporting <a name="1-error-reporting"></a>
