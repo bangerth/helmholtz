@@ -92,6 +92,8 @@ namespace TransmissionProblem
 
   std::vector<Point<3>> evaluation_points;
 
+  bool mesh_summary_only = false;
+  
 
   void
   declare_parameters (ParameterHandler &prm)
@@ -149,6 +151,14 @@ namespace TransmissionProblem
                        "program may use as many threads as it pleases, whereas a "
                        "positive number limits how many threads (and consequently "
                        "CPU cores) the program will use.");
+
+    prm.declare_entry ("Mesh summary only", "false",
+                       Patterns::Bool(),
+                       "If set to `true', the program stops after reading the mesh "
+                       "file and only output the summary information about the mesh "
+                       "that would ordinarily be computed as part of the simulation "
+                       "process. Specifically, this includes information about "
+                       "port boundary indicators, port areas, and similar.");
   }
 
 
@@ -380,6 +390,8 @@ namespace TransmissionProblem
     n_mesh_refinement_steps = prm.get_integer ("Number of mesh refinement steps");
 
     n_threads = prm.get_integer ("Number of threads");
+
+    mesh_summary_only = prm.get_bool ("Mesh summary only");
   }
 
 
@@ -1461,6 +1473,13 @@ namespace TransmissionProblem
 
     make_grid();
 
+    if (mesh_summary_only == true)
+      {
+        logger << "INFO Stopping after outputting mesh summary only."
+               << std::endl;
+        return;
+      }
+    
     setup_system();
 
     for (unsigned int current_source_port=0;
