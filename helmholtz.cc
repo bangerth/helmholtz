@@ -800,20 +800,45 @@ namespace TransmissionProblem
     for (const auto &cell : triangulation.active_cell_iterators())
       for (const auto &face : cell->face_iterators())
         if (face->at_boundary())
-          if (std::find(port_boundary_ids.begin(),
-                        port_boundary_ids.end(),
-                        face->boundary_id()) !=
-              port_boundary_ids.end()) // a port
-            {
-              const unsigned int this_port = (std::find(port_boundary_ids.begin(),
-                                                        port_boundary_ids.end(),
-                                                        face->boundary_id())
-                                              - port_boundary_ids.begin());
+          {
+            const auto boundary_id = face->boundary_id();
+            
+            Assert ((boundary_id == 0) ||
+                    (std::find(port_boundary_ids.begin(),
+                               port_boundary_ids.end(),
+                               face->boundary_id()) !=
+                     port_boundary_ids.end()),
+                    ExcInternalError());
+            if (boundary_id != 0)
+              {
+                const unsigned int this_port = (std::find(port_boundary_ids.begin(),
+                                                          port_boundary_ids.end(),
+                                                          boundary_id)
+                                                - port_boundary_ids.begin());
 
-              fe_face_values.reinit(cell, face);
-              for (const unsigned int q_point : fe_face_values.quadrature_point_indices())
-                port_areas[this_port] += fe_face_values.JxW(q_point);
-            }
+                fe_face_values.reinit(cell, face);
+                for (const unsigned int q_point : fe_face_values.quadrature_point_indices())
+                  port_areas[this_port] += fe_face_values.JxW(q_point);
+              }
+          }
+
+    // Output the port areas
+    const std::string file_name = instance_folder + "/" +
+                                  output_file_prefix +
+                                  "port_areas.txt";
+    std::ofstream port_area_output(file_name);
+    AssertThrow (port_area_output,
+                 ExcMessage ("The file <" + file_name +
+                             "> can not be written to when trying to write "
+                             "port area data."));
+    for (const types::boundary_id b_id : port_boundary_ids)
+      {
+        const unsigned int this_port = (std::find(port_boundary_ids.begin(),
+                                                  port_boundary_ids.end(),
+                                                  b_id)
+                                        - port_boundary_ids.begin());
+        port_area_output << b_id << ' ' << port_areas[this_port] << std::endl;
+      }
   }
 
 
