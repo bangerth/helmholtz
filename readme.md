@@ -9,6 +9,7 @@
     - [The file `<outputfileprefix>frequency_response.txt`](#2-txt-file)
     - [The file `<outputfileprefix><freq#>frequency_response.csv`](#2-csv-file)
     - [The file `<outputfileprefix>frequency_response.csv`](#2-csv-file-global)
+    - [The file `<outputfileprefix>port_areas.txt`](#2-port-areas)
     - [The file `output.log`](#2-output-log)
     - [Monitoring progress](#2-monitoring)
     - [The directory `<outputfileprefix>visualization/`](#2-viz)
@@ -361,6 +362,34 @@ about the responses to all frequencies. Since each of the single-frequency
 `.csv` files has just one line, the combined file has one line per frequency.
 The first entry in each line (just like in the individual frequency files)
 corresponds to the frequency in Hertz this line corresponds to.
+
+
+## The file `<outputfileprefix>port_areas.txt` <a name="2-port-areas"></a>
+
+For debugging purposes, it is often useful to have information about
+the geometry being used. The solver outputs useful information about
+the geometry in two ways. First, it outputs a file that can be used to
+visualize the geometry along with the assignment of boundary
+indicators as described below in [the section about the file
+`<outputfileprefix>visualization/surface.vtu`](#2-viz). Second, the
+program writes a file `<outputfileprefix>port_areas.txt` that lists
+all of the non-zero boundary indicators that designate ports along
+with the areas of these ports. The areas are computed by summing over
+the areas of all triangles or quadrilaterals at the boundary with the
+given boundary indicator.
+
+The `<outputfileprefix>port_areas.txt` file then looks like this:
+```
+1 3.06147e-06
+2 3.06147e-06
+```
+This is from a geometry that describes a cylinder with radius 1mm and
+where the two ends of the cylinder have boundary indicators 1 and 2,
+respectively. The areas should of course then be pi times 1mm squared,
+i.e., `3.141e-06` (square meters), but because the exact geometry of
+each port (a circle of radius 1mm) is approximated by a set of
+relatively large triangles, the computed area is that of a polygon,
+not a circle, and so is less than the exact value.
 
 
 ## The file `output.log` <a name="2-output-log"></a>
