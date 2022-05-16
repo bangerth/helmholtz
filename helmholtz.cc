@@ -59,6 +59,11 @@
 #include <regex>
 
 
+#ifdef _MSC_BUILD
+#define dir_sep_d  "\\"
+#else
+#define dir_sep_d  "/"
+#endif
 std::string instance_folder;
 std::string output_file_prefix;
   
@@ -166,7 +171,7 @@ namespace TransmissionProblem
   read_parameters (ParameterHandler &prm)
   {
     // First read parameter values from the input file 'helmholtz.prm'
-    prm.parse_input (instance_folder + "/helmholtz.prm");
+    prm.parse_input (instance_folder + dir_sep_d + "helmholtz.prm");
 
     // Start with geometry things: The mesh, the scaling factor, evaluation points
     mesh_file_name = prm.get ("Mesh file name");
@@ -193,7 +198,7 @@ namespace TransmissionProblem
     const std::string material_properties_file_name
       = prm.get ("Material properties file name");
     {
-      std::ifstream material_input (material_properties_file_name);
+      std::ifstream material_input (instance_folder + dir_sep_d + material_properties_file_name);
       AssertThrow (material_input,
                    ExcMessage("Can't read material properties from file <"
                               + material_properties_file_name
@@ -428,7 +433,7 @@ namespace TransmissionProblem
   void create_failure_file_and_exit ()
   {
     {
-      std::ofstream failure_signal (instance_folder + "/" +
+      std::ofstream failure_signal (instance_folder + dir_sep_d +
                                     output_file_prefix +
                                     "solver_failure_signal.txt");
       failure_signal << "FAILURE" << std::endl;
@@ -455,7 +460,7 @@ namespace TransmissionProblem
     // to abort the program below, but this may block for a bit
     // because we need to wait for the lock that guards access to the
     // output file.)
-    std::ifstream in(instance_folder + "/" +
+    std::ifstream in(instance_folder + dir_sep_d +
                      output_file_prefix +
                      "termination_signal.txt");
     if (!in)
@@ -468,7 +473,7 @@ namespace TransmissionProblem
       {
         // Close the file handle and remove the file.
         in.close();
-        std::remove ((instance_folder + "/" +
+        std::remove ((instance_folder + dir_sep_d +
                       output_file_prefix +
                       "termination_signal.txt").c_str());
 
@@ -758,7 +763,7 @@ namespace TransmissionProblem
       data_out_faces.add_data_vector(dummy_solution, boundary_ids);
       data_out_faces.build_patches();
 
-      const std::string file_name = instance_folder + "/" +
+      const std::string file_name = instance_folder + dir_sep_d +
                                     output_file_prefix +
                                     "visualization/surface.vtu";
       std::ofstream out(file_name);
@@ -1271,7 +1276,7 @@ namespace TransmissionProblem
     data_out.add_data_vector(solution, "solution");
     data_out.build_patches(fe->degree);
 
-    const std::string file_name = instance_folder + "/" +
+    const std::string file_name = instance_folder + dir_sep_d +
                                   output_file_prefix +
                                   "visualization/solution-" +
                                   std::to_string(frequency_number) +
@@ -1467,7 +1472,7 @@ namespace TransmissionProblem
       // And at the end of it all, write the same line into the
       // concatenated .csv file as well, in 'append' mode.
       {
-        const std::string filename = (instance_folder + "/" +
+        const std::string filename = (instance_folder + dir_sep_d +
                                       output_file_prefix +
                                       "frequency_response.csv");
         std::ofstream frequency_response (filename, std::ios::app);
@@ -1546,7 +1551,7 @@ namespace TransmissionProblem
       }
     catch (const std::exception &exc)
       {
-        std::ofstream error_out (instance_folder + "/" +
+        std::ofstream error_out (instance_folder + dir_sep_d +
                                  output_file_prefix +
                                  "error.log");
 
@@ -1601,18 +1606,18 @@ int main(int argc, char *argv[])
     }
 
   // First remove the success or failure files, should they exist:
-  std::remove ((instance_folder + "/" +
+  std::remove ((instance_folder + dir_sep_d +
                 output_file_prefix +
                 "success_signal.txt").c_str());
   std::remove ((instance_folder + "/" +
                 output_file_prefix +
                 "solver_failure_signal.txt").c_str());
   // Do the same with the global .csv file
-  std::remove ((instance_folder + "/" +
+  std::remove ((instance_folder + dir_sep_d +
                 output_file_prefix +
                 "frequency_response.csv").c_str());
   
-  logger.open (instance_folder + "/" +
+  logger.open (instance_folder + dir_sep_d +
                output_file_prefix +
                "output.log");
   logger << "INFO Program started with argument '"
@@ -1745,7 +1750,7 @@ int main(int argc, char *argv[])
     }
   catch (std::exception &exc)
     {
-      std::ofstream error_out (instance_folder + "/" +
+      std::ofstream error_out (instance_folder + dir_sep_d +
                                output_file_prefix +
                                "error.log");
       error_out << "ERROR Exception on processing: " << std::endl
@@ -1758,7 +1763,7 @@ int main(int argc, char *argv[])
     }
   catch (...)
     {
-      std::ofstream error_out (instance_folder + "/" +
+      std::ofstream error_out (instance_folder + dir_sep_d +
                                output_file_prefix +
                                "error.log");
       error_out << "ERROR Unknown exception!" << std::endl
