@@ -508,7 +508,7 @@ namespace TransmissionProblem
             << (std::imag(p) >= 0 ? '+' : '-');
 
         std::ostringstream s;
-        s << std::fabs(std::imag(p)) << 'j';
+        s << std::fabs(std::imag(p)) << "*j";
 
         out << std::setw(field_width+1) << std::left << s.str();
       }
@@ -516,7 +516,7 @@ namespace TransmissionProblem
       out << std::real(p)
           << (std::imag(p) >= 0 ? '+' : '-')
           << std::fabs(std::imag(p))
-          << 'j';
+          << "*j";
   }
   
 
