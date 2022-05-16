@@ -197,6 +197,7 @@ namespace TransmissionProblem
     // Next up: Material parameters.
     const std::string material_properties_file_name
       = prm.get ("Material properties file name");
+    logger << "debug  Material properties file name = " << material_properties_file_name << "\r\n";
     {
       std::ifstream material_input (instance_folder + dir_sep_d + material_properties_file_name);
       AssertThrow (material_input,
