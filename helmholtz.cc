@@ -1,9 +1,20 @@
-/* ---------------------------------------------------------------------
+#/* ---------------------------------------------------------------------
  *
  * Copyright (C) 2021 by Wolfgang Bangerth and SAATI Co.
  *
  * ---------------------------------------------------------------------
  */
+
+/* notes from wolfgang:
+You can always get the latest version from the github repository:
+	https://urlsand.esvalabs.com/?u=https%3A%2F%2Fgithub.com%2Fbangerth%2Fhelmholtz&e=a9a925b0&h=f79f86f5&f=y&p=y
+Click on helmholtz.cc
+	https://urlsand.esvalabs.com/?u=https%3A%2F%2Fgithub.com%2Fbangerth%2Fhelmholtz%2Fblob%2Fmaster%2Fhelmholtz.cc&e=a9a925b0&h=3338f99f&f=y&p=y
+and then either click on "Raw" to see the actual file (which is also here:
+	https://urlsand.esvalabs.com/?u=https%3A%2F%2Fraw.githubusercontent.com%2Fbangerth%2Fhelmholtz%2Fmaster%2Fhelmholtz.cc&e=a9a925b0&h=a2d05443&f=y&p=y
+) or two symbols to the right to copy it into your OS buffer for pasting into
+an editor.
+*/
 
 
 #include <deal.II/base/quadrature_lib.h>
@@ -64,9 +75,43 @@
 #else
 #define dir_sep_d  "/"
 #endif
+// i'm having some errors writing to files.  i'm testing to see if it has anything to do with the
+// directory separators.  apparenlty unix uses / and windows uses \.
+// I don't think this is the problem, but i'm leaving this in until i fix it just in case it's related to this.
+
+
+// these defines are also put into ares.exe, so they can't change unless Ares chages too.
+#define dii_termination_signal_filename_base_d		"dii_termination_signal.txt"
+#define dii_output_log_filename_base_d				"dii_output_log.txt"
+#define dii_frequency_response_filename_base_d		"dii_frequency_response.txt"
+#define dii_simulation_end_filename_base_d			"dii_finished_signal.txt"
+// "simulation end" is also the "success" signal filname
+#define dii_biharmonic_prm_filename_base_d			"dii_fea_2d_mesh_solver.prm" 
+#define dii_visualization_dir_name_base_d			"visualization"
+
+// added for helmholtz 3D volume solver
+#define dii_solver_failure_signal_base_d			"dll_solver_failure_signal.txt"
+#define dii_frequency_response_filename_csv_base_d	"dii_frequency_response.csv"
+#define dii_helmholtz_prm_filename_base_d			"dii_helmholtz.prm" 
+#define dii_port_areas_base_d						"dii_port_areas.txt"
+
+
+std::string dii_termination_signal_filename_st		= dii_termination_signal_filename_base_d;
+std::string dii_output_log_filename_st				= dii_output_log_filename_base_d;
+std::string dii_frequency_response_filename_st		= dii_frequency_response_filename_base_d;
+std::string dii_simulation_end_filename_st			= dii_simulation_end_filename_base_d;
+std::string dii_visualization_dir_name_st			= dii_visualization_dir_name_base_d;
+
+std::string dii_solver_failure_signal_st			= dii_solver_failure_signal_base_d;
+std::string dii_frequency_response_filename_csv_st	= dii_frequency_response_filename_csv_base_d;
+std::string dii_helmholtz_prm_filename_st			= dii_helmholtz_prm_filename_base_d;
+std::string dii_port_areas_base_st					= dii_port_areas_base_d;
+
+
 std::string instance_folder;
 std::string output_file_prefix;
-  
+int index_solver_base = 0;  // added to the solver index when generating individual frequency output files
+
 std::ofstream logger;
 
 namespace TransmissionProblem
@@ -171,7 +216,7 @@ namespace TransmissionProblem
   read_parameters (ParameterHandler &prm)
   {
     // First read parameter values from the input file 'helmholtz.prm'
-    prm.parse_input (instance_folder + dir_sep_d + "helmholtz.prm");
+    prm.parse_input (instance_folder + dir_sep_d + dii_helmholtz_prm_filename_st);
 
     // Start with geometry things: The mesh, the scaling factor, evaluation points
     mesh_file_name = prm.get ("Mesh file name");
@@ -436,7 +481,7 @@ namespace TransmissionProblem
     {
       std::ofstream failure_signal (instance_folder + dir_sep_d +
                                     output_file_prefix +
-                                    "solver_failure_signal.txt");
+                                    dii_solver_failure_signal_st);
       failure_signal << "FAILURE" << std::endl;
     }
     
@@ -463,7 +508,7 @@ namespace TransmissionProblem
     // output file.)
     std::ifstream in(instance_folder + dir_sep_d +
                      output_file_prefix +
-                     "termination_signal.txt");
+                     dii_termination_signal_filename_st);
     if (!in)
       return;
 
@@ -476,7 +521,7 @@ namespace TransmissionProblem
         in.close();
         std::remove ((instance_folder + dir_sep_d +
                       output_file_prefix +
-                      "termination_signal.txt").c_str());
+                      dii_termination_signal_filename_st).c_str());
 
         logger << "INFO *** Terminating program upon request." << std::endl;
         create_failure_file_and_exit();
@@ -766,7 +811,8 @@ namespace TransmissionProblem
 
       const std::string file_name = instance_folder + dir_sep_d +
                                     output_file_prefix +
-                                    "visualization/surface.vtu";
+                                    dii_visualization_dir_name_st + dir_sep_d +
+                                    "surface.vtu";
       std::ofstream out(file_name);
       AssertThrow (out,
                    ExcMessage ("The file <" + file_name +
@@ -858,23 +904,28 @@ namespace TransmissionProblem
               }
           }
 
-    // Output the port areas
-    const std::string file_name = instance_folder + "/" +
-                                  output_file_prefix +
-                                  "port_areas.txt";
-    std::ofstream port_area_output(file_name);
-    AssertThrow (port_area_output,
-                 ExcMessage ("The file <" + file_name +
-                             "> can not be written to when trying to write "
-                             "port area data."));
-    for (const types::boundary_id b_id : port_boundary_ids)
-      {
-        const unsigned int this_port = (std::find(port_boundary_ids.begin(),
-                                                  port_boundary_ids.end(),
-                                                  b_id)
-                                        - port_boundary_ids.begin());
-        port_area_output << b_id << ' ' << port_areas[this_port] << std::endl;
-      }
+    // Output the port areas, but again do so only once
+    std::once_flag output_port_areas;
+    std::call_once (output_port_areas,
+                    [this]()
+                      {
+                        const std::string file_name = instance_folder + dir_sep_d +
+                                                      output_file_prefix +
+                                                      dii_port_areas_base_st;
+                        std::ofstream port_area_output(file_name);
+                        AssertThrow (port_area_output,
+                                     ExcMessage ("The file <" + file_name +
+                                                 "> can not be written to when trying to write "
+                                                 "port area data."));
+                        for (const types::boundary_id b_id : port_boundary_ids)
+                          {
+                            const unsigned int this_port = (std::find(port_boundary_ids.begin(),
+                                                                      port_boundary_ids.end(),
+                                                                      b_id)
+                                                            - port_boundary_ids.begin());
+                            port_area_output << b_id << ' ' << port_areas[this_port] << std::endl;
+                          }
+                      });
   }
 
 
@@ -1279,8 +1330,9 @@ namespace TransmissionProblem
 
     const std::string file_name = instance_folder + dir_sep_d +
                                   output_file_prefix +
-                                  "visualization/solution-" +
-                                  std::to_string(frequency_number) +
+                                  dii_visualization_dir_name_st + dir_sep_d +
+                                  "solution-" +
+                                  std::to_string(frequency_number+index_solver_base) +
                                   "." +
                                   std::to_string(current_source_port) +
                                   ".vtu";
@@ -1398,12 +1450,11 @@ namespace TransmissionProblem
 
 
       // Now put it all into a file:
-      const std::string filename = (instance_folder + "/" +
+      const std::string filename = (instance_folder + dir_sep_d + "I " +
                                     output_file_prefix +
+                                    std::to_string(frequency_number+ index_solver_base) +
                                     "_" +
-                                    std::to_string(frequency_number) +
-                                    "_" +
-                                    "frequency_response.txt");
+                                    dii_frequency_response_filename_st);
       std::ofstream frequency_response (filename);
       AssertThrow (frequency_response,
                    ExcMessage ("The file <" + filename +
@@ -1456,12 +1507,11 @@ namespace TransmissionProblem
 
       // Now put it all into a file:
       {
-        const std::string filename = (instance_folder + "/" +
+        const std::string filename = (instance_folder + dir_sep_d + "I " +
                                       output_file_prefix +
+                                      std::to_string(frequency_number+ index_solver_base) +
                                       "_" +
-                                      std::to_string(frequency_number) +
-                                      "_" +
-                                      "frequency_response.csv");
+                                      dii_frequency_response_filename_csv_st);
         std::ofstream frequency_response (filename);
         AssertThrow (frequency_response,
                      ExcMessage ("The file <" + filename +
@@ -1475,7 +1525,7 @@ namespace TransmissionProblem
       {
         const std::string filename = (instance_folder + dir_sep_d +
                                       output_file_prefix +
-                                      "frequency_response.csv");
+                                      dii_frequency_response_filename_csv_st);
         std::ofstream frequency_response (filename, std::ios::app);
         AssertThrow (frequency_response,
                      ExcMessage ("The file <" + filename +
@@ -1576,53 +1626,60 @@ namespace TransmissionProblem
 // Finally for the `main()` function.
 int main(int argc, char *argv[])
 {
+  // argument list is:
+  //     problem_directory   prefix_string  index_solver_base
+  //
+  //
+  // problem_directory   = string that gives the directory where the helmholtz.prm file is located
+  //                       and where the solution files will be saved
+  // prefix_string       = string which is prefixed to the output filenames to help identify the
+  //                       output files with a particular call to this solver program.
+  //                       if you don't want to use a prefix, use "none" for the string.
+  // index_solver_base   = the output filenames are prefixed with "I ###" where ### is the zero based
+  //                       index to the frequency array being solved for.  if index_solver_base is provide,
+  //                       then it is to be an interger value added to the frequency index.  this allows
+  //                       you to start the frequency indexs in the file names at a non-zero value.
+  std::cout << "Hello there 3\r\n";
+
   if (argc >= 2)
     {
-      if ((argv[1] == std::string("--help")) ||
-          (argv[1] == std::string("-h")))
-        {
-          std::cout << "Invoke this program as either\n"
-                    << "  ./helmholtz <instance_folder>\n"
-                    << "or\n"
-                    << "  ./helmholtz <instance_folder> <prefix>\n"
-                    << "where <instance_folder> is the directory into which output\n"
-                    << "is written, and <prefix> is a prefix to be used for all\n"
-                    << "file names in that directory.\n"
-                    << "\n"
-                    << "If <prefix> is omitted, then no prefix is used. If also\n"
-                    << "<instance_folder> is omitted, then the current directory\n"
-                    << "in which the program is executed is used."
-                    << std::endl;
-        }
-      else
-        {
-          instance_folder = std::string(argv[1]);
-          if (argc >= 3)
-            output_file_prefix = std::string(argv[2]);
-        }
+      instance_folder = std::string(argv[1]);
     }
   else
     {
       instance_folder = std::string(".");
     }
+  if (argc >= 3)
+    {
+      if (strcmp(argv[2], "none"))
+        {
+          output_file_prefix = argv[2];
+        }
+    }
+  if (argc >= 4)
+    {
+      sscanf(argv[3], "%i", &index_solver_base);
+    }
+
+
 
   // First remove the success or failure files, should they exist:
   std::remove ((instance_folder + dir_sep_d +
                 output_file_prefix +
-                "success_signal.txt").c_str());
-  std::remove ((instance_folder + "/" +
+                dii_simulation_end_filename_st).c_str());
+  std::remove ((instance_folder + dir_sep_d +
                 output_file_prefix +
-                "solver_failure_signal.txt").c_str());
+                dii_solver_failure_signal_st).c_str());
   // Do the same with the global .csv file
   std::remove ((instance_folder + dir_sep_d +
                 output_file_prefix +
-                "frequency_response.csv").c_str());
+                dii_frequency_response_filename_csv_st).c_str());
   
   logger.open (instance_folder + dir_sep_d +
                output_file_prefix +
-               "output.log");
-  logger << "INFO Program started with argument '"
-         << instance_folder << "'"
+               dii_output_log_filename_st);
+  logger << "INFO Program started with argument "
+         << "  folder: '" << instance_folder << "'   file prefix: '" << output_file_prefix << "'   index base: " << index_solver_base 
          << std::endl;
 
   try
@@ -1638,13 +1695,13 @@ int main(int argc, char *argv[])
       // by how many tasks we create explicitly below.
       MultithreadInfo::set_thread_limit (1);
 
-
       // Remove any previous output file so that nobody gets confused
       // if the program were to be aborted before we write into it the
       // first time.
-      std::remove ((instance_folder + "/" +
+      // (these delete commands don't actually work, but i'll leave them in place.  ares is doing the delete functions.)  
+      std::remove ((instance_folder + dir_sep_d +
                     output_file_prefix +
-                    "frequency_response.txt").c_str());
+                    dii_frequency_response_filename_st).c_str());
 
       // Get the global set of parameters from an input file
       {
@@ -1741,12 +1798,12 @@ int main(int argc, char *argv[])
       // remove the file that indicates this signal. That's because if
       // we don't do that, the next call to this program won't produce
       // anything at all.
-      std::remove ((instance_folder + "/termination_signal").c_str());
+      std::remove ((instance_folder + dir_sep_d + dii_termination_signal_filename_st).c_str());
 
       // Finally also indicate success:
-      std::ofstream success_signal (instance_folder + "/" +
+      std::ofstream success_signal (instance_folder + dir_sep_d +
                                     output_file_prefix +
-                                    "success_signal.txt");
+                                    dii_simulation_end_filename_st);
       success_signal << "SUCCESS" << std::endl;
     }
   catch (std::exception &exc)
