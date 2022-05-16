@@ -595,50 +595,58 @@ namespace TransmissionProblem
 
     GridIn<dim> grid_in;
     grid_in.attach_triangulation (triangulation);
-    std::ifstream input (instance_folder + "/" + mesh_file_name);
-    AssertThrow (input,
-                 ExcMessage ("The file <" + instance_folder + "/" + mesh_file_name +
-                             "> can not be written to read from when "
-                             "trying to load a mesh."));
 
-    // Determine what format we want to read the mesh in: .mphtxt =>
-    // COMSOL; .msh => GMSH; .inp => ABAQUS
-    try
-      {
-        if (std::regex_match(mesh_file_name,
-                             std::regex(".*\\.mphtxt", std::regex_constants::basic)))
-          {
-            logger << "INFO Reading mesh file <" << mesh_file_name
-                   << "> in COMSOL .mphtxt format" << std::endl;
-            grid_in.read_comsol_mphtxt (input);
-          }
-        else if (std::regex_match(mesh_file_name,
-                                  std::regex(".*\\.msh", std::regex_constants::basic)))
-          {
-            logger << "INFO Reading mesh file <" << mesh_file_name
-                   << "> in GMSH .msh format" << std::endl;
-            grid_in.read_msh (input);
-          }
-        else if (std::regex_match(mesh_file_name,
-                                  std::regex(".*\\.inp", std::regex_constants::basic)))
-          {
-            logger << "INFO Reading mesh file <" << mesh_file_name
-                   << "> in ABAQUS .inp format" << std::endl;
-            grid_in.read_abaqus (input);
-          }
-        else
+    // Read in the file in question. Do this on only one thread at a
+    // time to avoid file access collisions
+    {
+      static std::mutex mutex;
+      std::lock_guard<std::mutex> lock(mutex);
+      
+      std::ifstream input (instance_folder + "/" + mesh_file_name);
+      AssertThrow (input,
+                   ExcMessage ("The file <" + instance_folder + "/" + mesh_file_name +
+                               "> can not be read from when "
+                               "trying to load a mesh."));
+
+      // Determine what format we want to read the mesh in: .mphtxt =>
+      // COMSOL; .msh => GMSH; .inp => ABAQUS
+      try
+        {
+          if (std::regex_match(mesh_file_name,
+                               std::regex(".*\\.mphtxt", std::regex_constants::basic)))
+            {
+              logger << "INFO Reading mesh file <" << mesh_file_name
+                     << "> in COMSOL .mphtxt format" << std::endl;
+              grid_in.read_comsol_mphtxt (input);
+            }
+          else if (std::regex_match(mesh_file_name,
+                                    std::regex(".*\\.msh", std::regex_constants::basic)))
+            {
+              logger << "INFO Reading mesh file <" << mesh_file_name
+                     << "> in GMSH .msh format" << std::endl;
+              grid_in.read_msh (input);
+            }
+          else if (std::regex_match(mesh_file_name,
+                                    std::regex(".*\\.inp", std::regex_constants::basic)))
+            {
+              logger << "INFO Reading mesh file <" << mesh_file_name
+                     << "> in ABAQUS .inp format" << std::endl;
+              grid_in.read_abaqus (input);
+            }
+          else
+            AssertThrow (false,
+                         ExcMessage ("The file ending for the mesh file <"
+                                     + mesh_file_name +
+                                     "> is not supported."));
+        }
+      catch (const ExcIO &)
+        {
           AssertThrow (false,
-                       ExcMessage ("The file ending for the mesh file <"
-                                   + mesh_file_name +
-                                   "> is not supported."));
-      }
-    catch (const ExcIO &)
-      {
-        AssertThrow (false,
-                     ExcMessage ("Couldn't read from mesh file <"
-                                 + instance_folder + "/" + mesh_file_name
-                                 + ">."));
-      }
+                       ExcMessage ("Couldn't read from mesh file <"
+                                   + instance_folder + "/" + mesh_file_name
+                                   + ">."));
+        }
+    }
     
     logger << "INFO The mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
 
@@ -693,7 +701,11 @@ namespace TransmissionProblem
                       .template get_gauss_type_quadrature<dim-1>(TransmissionProblem::fe_degree+1);
     
 
-    // Finally output the mesh with ports correctly colored
+    // Finally output the mesh with ports correctly colored. This has
+    // to be done only once, so guard everything appropriately.
+    std::once_flag output_boundary_visualization;
+    std::call_once (output_boundary_visualization,
+                    [this]()
     {
       class BoundaryIds : public DataPostprocessorScalar<dim>
       {
@@ -766,16 +778,22 @@ namespace TransmissionProblem
                                    + file_name
                                    + ">."));
         }
-    }
+    });
     
     
     // Figure out what boundary ids we have that describe ports. We
     // take these as all of those boundary ids that are non-zero
     port_boundary_ids = triangulation.get_boundary_ids();
-    logger << "INFO Found boundary ids ";
-    for (const auto &id : port_boundary_ids)
-      logger << id << ' ';
-    logger << std::endl;
+
+    std::once_flag output_port_ids;
+    std::call_once (output_port_ids,
+                    [this]()
+                      {
+                        logger << "INFO Found boundary ids ";
+                        for (const auto &id : port_boundary_ids)
+                          logger << id << ' ';
+                        logger << std::endl;
+                      });
     
     port_boundary_ids.erase (std::find(port_boundary_ids.begin(),
                                        port_boundary_ids.end(),
