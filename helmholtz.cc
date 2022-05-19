@@ -652,6 +652,8 @@ namespace TransmissionProblem
     {
       static std::mutex mutex;
       std::lock_guard<std::mutex> lock(mutex);
+
+      std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Read mesh file") : nullptr);
       
       std::ifstream input (instance_folder + "/" + mesh_file_name);
       AssertThrow (input,
