@@ -644,9 +644,6 @@ namespace TransmissionProblem
   {
     std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Make grid") : nullptr);
 
-    GridIn<dim> grid_in;
-    grid_in.attach_triangulation (triangulation);
-
     // Read in the file in question. Do this on only one thread at a
     // time to avoid file access collisions
     {
@@ -665,6 +662,9 @@ namespace TransmissionProblem
       // COMSOL; .msh => GMSH; .inp => ABAQUS
       try
         {
+          GridIn<dim> grid_in;
+          grid_in.attach_triangulation (triangulation);
+
           if (std::regex_match(mesh_file_name,
                                std::regex(".*\\.mphtxt", std::regex_constants::basic)))
             {
