@@ -650,56 +650,68 @@ namespace TransmissionProblem
       static std::mutex mutex;
       std::lock_guard<std::mutex> lock(mutex);
 
-      std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Read mesh file") : nullptr);
+
+      static std::unique_ptr<Triangulation<dim>> mesh_from_file;
+      static std::once_flag read_mesh_file;
+      std::call_once (read_mesh_file,
+                      [this]()
+      {
+        std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Read mesh file") : nullptr);
       
-      std::ifstream input (instance_folder + "/" + mesh_file_name);
-      AssertThrow (input,
-                   ExcMessage ("The file <" + instance_folder + "/" + mesh_file_name +
-                               "> can not be read from when "
-                               "trying to load a mesh."));
+        mesh_from_file = std::make_unique<Triangulation<dim>>();
+        
+        std::ifstream input (instance_folder + "/" + mesh_file_name);
+        AssertThrow (input,
+                     ExcMessage ("The file <" + instance_folder + "/" + mesh_file_name +
+                                 "> can not be read from when "
+                                 "trying to load a mesh."));
 
-      // Determine what format we want to read the mesh in: .mphtxt =>
-      // COMSOL; .msh => GMSH; .inp => ABAQUS
-      try
-        {
-          GridIn<dim> grid_in;
-          grid_in.attach_triangulation (triangulation);
+        // Determine what format we want to read the mesh in: .mphtxt =>
+        // COMSOL; .msh => GMSH; .inp => ABAQUS
+        try
+          {
+            GridIn<dim> grid_in;
+            grid_in.attach_triangulation (*mesh_from_file);
 
-          if (std::regex_match(mesh_file_name,
-                               std::regex(".*\\.mphtxt", std::regex_constants::basic)))
-            {
-              logger << "INFO Reading mesh file <" << mesh_file_name
-                     << "> in COMSOL .mphtxt format" << std::endl;
-              grid_in.read_comsol_mphtxt (input);
-            }
-          else if (std::regex_match(mesh_file_name,
-                                    std::regex(".*\\.msh", std::regex_constants::basic)))
-            {
-              logger << "INFO Reading mesh file <" << mesh_file_name
-                     << "> in GMSH .msh format" << std::endl;
-              grid_in.read_msh (input);
-            }
-          else if (std::regex_match(mesh_file_name,
-                                    std::regex(".*\\.inp", std::regex_constants::basic)))
-            {
-              logger << "INFO Reading mesh file <" << mesh_file_name
-                     << "> in ABAQUS .inp format" << std::endl;
-              grid_in.read_abaqus (input);
-            }
-          else
+            if (std::regex_match(mesh_file_name,
+                                 std::regex(".*\\.mphtxt", std::regex_constants::basic)))
+              {
+                logger << "INFO Reading mesh file <" << mesh_file_name
+                       << "> in COMSOL .mphtxt format" << std::endl;
+                grid_in.read_comsol_mphtxt (input);
+              }
+            else if (std::regex_match(mesh_file_name,
+                                      std::regex(".*\\.msh", std::regex_constants::basic)))
+              {
+                logger << "INFO Reading mesh file <" << mesh_file_name
+                       << "> in GMSH .msh format" << std::endl;
+                grid_in.read_msh (input);
+              }
+            else if (std::regex_match(mesh_file_name,
+                                      std::regex(".*\\.inp", std::regex_constants::basic)))
+              {
+                logger << "INFO Reading mesh file <" << mesh_file_name
+                       << "> in ABAQUS .inp format" << std::endl;
+                grid_in.read_abaqus (input);
+              }
+            else
+              AssertThrow (false,
+                           ExcMessage ("The file ending for the mesh file <"
+                                       + mesh_file_name +
+                                       "> is not supported."));
+          }
+        catch (const ExcIO &)
+          {
             AssertThrow (false,
-                         ExcMessage ("The file ending for the mesh file <"
-                                     + mesh_file_name +
-                                     "> is not supported."));
-        }
-      catch (const ExcIO &)
-        {
-          AssertThrow (false,
-                       ExcMessage ("Couldn't read from mesh file <"
-                                   + instance_folder + "/" + mesh_file_name
-                                   + ">."));
-        }
+                         ExcMessage ("Couldn't read from mesh file <"
+                                     + instance_folder + "/" + mesh_file_name
+                                     + ">."));
+          }
+      });
+
+      triangulation.copy_triangulation (*mesh_from_file);
     }
+    
     
     logger << "INFO The mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
 
