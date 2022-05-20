@@ -756,7 +756,7 @@ namespace TransmissionProblem
 
     // Finally output the mesh with ports correctly colored. This has
     // to be done only once, so guard everything appropriately.
-    std::once_flag output_boundary_visualization;
+    static std::once_flag output_boundary_visualization;
     std::call_once (output_boundary_visualization,
                     [this]()
     {
@@ -839,7 +839,7 @@ namespace TransmissionProblem
     // take these as all of those boundary ids that are non-zero
     port_boundary_ids = triangulation.get_boundary_ids();
 
-    std::once_flag output_port_ids;
+    static std::once_flag output_port_ids;
     std::call_once (output_port_ids,
                     [this]()
                       {
@@ -907,7 +907,7 @@ namespace TransmissionProblem
           }
 
     // Output the port areas, but again do so only once
-    std::once_flag output_port_areas;
+    static std::once_flag output_port_areas;
     std::call_once (output_port_areas,
                     [this]()
                       {
