@@ -728,14 +728,21 @@ namespace TransmissionProblem
       triangulation.refine_global(n_mesh_refinement_steps);
     else
       {
-        Assert (false, ExcMessage("Need to implement a scheme that is based on the wavelength"));
-
         const int N = -n_mesh_refinement_steps;
 
-        const double lambda  = 1000;
-
-        const double diameter = GridTools::diameter(triangulation);
-        const double delta_x = std::min(lambda, diameter) / N * fe_degree;
+        std::complex<double> k = omega / wave_speed;
+        
+        // We want a mesh size that can has N mesh points per wave
+        // length of the oscillatory part (which is 2*pi/kr) with the
+        // real part of k, but that can also resolve the exponential
+        // decay due to the imaginary part of k with N points. So the
+        // length scale L we need to resolve is as follows:
+        const double L = std::min (2*numbers::PI/(std::real(k)),
+                                   1./(std::imag(k)));
+        // To have N mesh points, we need a delta_x that divides by
+        // (N/fe_degree), given that that there are delta_x/fe_degree
+        // grid points in each cell:
+        const double delta_x = L/N*fe_degree;
 
         while (GridTools::maximal_cell_diameter(triangulation,
                                                 triangulation.get_reference_cells()[0].template get_default_linear_mapping<dim>())
