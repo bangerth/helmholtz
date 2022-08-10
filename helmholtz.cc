@@ -709,11 +709,12 @@ namespace TransmissionProblem
           }
       });
 
+      logger << "INFO Cloning the mesh for omega=" << omega << std::endl;
       triangulation.copy_triangulation (*mesh_from_file);
     }
     
     
-    logger << "INFO The mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
+    logger << "INFO The starting mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
 
 
     // Scale the triangulation by the geometry factor
@@ -742,6 +743,7 @@ namespace TransmissionProblem
           triangulation.refine_global();
       }
 
+    logger << "INFO The refined mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
 
     // Depending on what reference cell the triangulation uses, pick
     // the right finite element
