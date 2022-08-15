@@ -170,22 +170,37 @@ the same mesh for all frequencies.
 
 On the other hand, if the number of mesh refinement steps is negative,
 then the mesh is adapted using the following algorithm. For a given
-wave speed, we can compute the wavelength of oscillations for a
-given frequency _w_ via
+wave speed, we can compute the wave number _k_ for a given frequency _w_ via
 ```
-  lambda = c/f
-         = c/(w/(2pi))
+  k = w / c
 ```
-If `lambda` is larger than the diameter of the domain, then we replace
-it by the diameter of the domain since that is the largest wavelength
-at which the solution can vary.
-We can then determine a frequency-adapted mesh size in the following
-way: We want that there are at least _N_ grid points per wave
-length. Since there are as many grid points per cell as the polynomial
-degree _p_, this equations to requiring that the mesh size _Delta x_
-satisfies _Delta x / p <= lambda/N_
-or equivalently: _Delta x <= lambda/N * p_. The `Mesh refinement steps`
-parameter is then interpreted as _N_ if it is negative.
+where _c_ is the speed of sound for that frequency. If _c_ is complex-valued,
+then so is _k_, with real and imaginary parts _kr_, _ki_. This leads to
+a wave length of the pressure oscillations of size
+```
+  L1 = 2*pi/kr,
+```
+and a decay length due to exponential decay of
+```
+  L2 = 1/ki.
+```
+
+With a negative number of mesh refinement steps selected in the input
+file, say the value is `-N`, the mesh as read from file is refined until
+every cell has a diameter at most equal to `min(L1,L2)/(N/fe_degree)`.
+For example, if the polynomial degree of the finite element `fe_degree`
+is one (i.e., we use linear elements), then the sizes of cells will
+be so that we have at least `N` cells per wavelength (or decay length).
+If the polynomial degree is two (i.e., we use quadratic elements), then
+that means that we have at least `N/2` cells per wave or decay length;
+this makes sense because every cell has mid-cell and mid-edge nodes when
+using quadratic elements, and so the "effective size" of a cell is half
+of its geometric size.
+
+As a further modification, if the smaller of `L1` or `L2` is larger
+than the diameter of the domain, then we replace it by the diameter of
+the domain since that is the largest wavelength at which the solution
+can vary.
 
 The last parameter, `Number of threads`, indicates how many threads
 the program may use at any given time. Threads are used to compute
