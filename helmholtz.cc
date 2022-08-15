@@ -736,9 +736,12 @@ namespace TransmissionProblem
         // length of the oscillatory part (which is 2*pi/kr) with the
         // real part of k, but that can also resolve the exponential
         // decay due to the imaginary part of k with N points. So the
-        // length scale L we need to resolve is as follows:
-        const double L = std::min (2*numbers::PI/(std::real(k)),
-                                   1./(std::imag(k)));
+        // length scale L we need to resolve is as follows (with the
+        // additional modification that it cannot be larger than the
+        // size of the domain):
+        const double L = std::min ({2*numbers::PI/(std::real(k)),
+                                    1./(std::imag(k)),
+                                    GridTools::diameter (triangulation)});
         // To have N mesh points, we need a delta_x that divides by
         // (N/fe_degree), given that that there are delta_x/fe_degree
         // grid points in each cell:
