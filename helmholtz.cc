@@ -631,7 +631,19 @@ namespace TransmissionProblem
                                                    MaterialParameters::bulk_modulus_imag->value(Point<1>(omega)))
                               / density))
     , dof_handler(triangulation)
-  {}
+  {
+    AssertThrow (std::real(1./wave_speed)>0
+                 &&
+                 std::imag(1./wave_speed)<=0,
+                 ExcMessage("You need to choose bulk moduli and densities "
+                            "that lead to wave numberss for which the real "
+                            "part is positive and the  imaginary part is negative or zero. "
+                            "\n\n"
+                            "The values you have chosen resulted in a wave speed of "
+                            + std::to_string(std::real(1./wave_speed))
+                            + std::to_string(std::imag(1./wave_speed))
+                            +"*j if the frequency is omega=1."));
+  }
 
 
 
@@ -740,8 +752,10 @@ namespace TransmissionProblem
         // additional modification that it cannot be larger than the
         // size of the domain):
         const double L = std::min ({2*numbers::PI/(std::real(k)),
-                                    1./(std::imag(k)),
+                                    -1./(std::imag(k)),
                                     GridTools::diameter (triangulation)});
+        AssertThrow (L>0, ExcInternalError());
+
         // To have N mesh points, we need a delta_x that divides by
         // (N/fe_degree), given that that there are delta_x/fe_degree
         // grid points in each cell:
