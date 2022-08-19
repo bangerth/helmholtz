@@ -669,10 +669,25 @@ namespace TransmissionProblem
       std::call_once (read_mesh_file,
                       [this]()
       {
-        std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Read mesh file") : nullptr);
-      
         mesh_from_file = std::make_unique<Triangulation<dim>>();
         
+        GridGenerator::subdivided_hyper_rectangle
+          (*mesh_from_file, 
+           {1U, 1U, 1U},
+           {
+                 0,0,0
+           },
+           {
+                 1,1,1
+           }
+          );
+        mesh_from_file->begin_active()->face(0)->set_boundary_id(1);
+        mesh_from_file->begin_active()->face(1)->set_boundary_id(2);
+        
+        return;
+        
+        std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Read mesh file") : nullptr);
+      
         std::ifstream input (instance_folder + "/" + mesh_file_name);
         AssertThrow (input,
                      ExcMessage ("The file <" + instance_folder + "/" + mesh_file_name +
