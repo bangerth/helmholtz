@@ -632,6 +632,7 @@ namespace TransmissionProblem
                               / density))
     , dof_handler(triangulation)
   {
+    logger << "INFO omega=" << omega << std::endl;
     AssertThrow (std::real(1./wave_speed)>0
                  &&
                  std::imag(1./wave_speed)<=0,
@@ -721,12 +722,12 @@ namespace TransmissionProblem
           }
       });
 
-      logger << "INFO Cloning the mesh for omega=" << omega << std::endl;
+      logger << "INFO   Cloning the mesh" << std::endl;
       triangulation.copy_triangulation (*mesh_from_file);
     }
     
     
-    logger << "INFO The starting mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
+    logger << "INFO   The starting mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
 
 
     // Scale the triangulation by the geometry factor
@@ -767,7 +768,7 @@ namespace TransmissionProblem
           triangulation.refine_global();
       }
 
-    logger << "INFO The refined mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
+    logger << "INFO   The refined mesh has " << triangulation.n_active_cells() << " cells" << std::endl;
 
     // Depending on what reference cell the triangulation uses, pick
     // the right finite element
@@ -977,7 +978,7 @@ namespace TransmissionProblem
 
     dof_handler.distribute_dofs(*fe);
 
-    logger << "INFO The mesh has " << dof_handler.n_dofs() << " unknowns" << std::endl;
+    logger << "INFO   The mesh has " << dof_handler.n_dofs() << " unknowns" << std::endl;
 
     DynamicSparsityPattern c_sparsity(dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
@@ -1602,8 +1603,8 @@ namespace TransmissionProblem
       {
         check_for_termination_signal();
 
-        logger << "INFO Computing data for omega=" << omega
-                  << ", source port boundary id=" << port_boundary_ids[current_source_port]
+        logger << "INFO   Computing data for source port boundary id="
+               << port_boundary_ids[current_source_port]
                   << std::endl;
         assemble_system(current_source_port);
 
