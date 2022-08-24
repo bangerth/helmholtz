@@ -202,6 +202,12 @@ than the diameter of the domain, then we replace it by the diameter of
 the domain since that is the largest wavelength at which the solution
 can vary.
 
+_Note: Using a negative number allows the solver to choose the mesh
+size (as specified by the parameter's value), but this also means that
+for high frequencies it can happen that the mesh ends up with a very
+large number of cells -- with consequent very large memory and CPU
+time consumption._
+
 The last parameter, `Number of threads`, indicates how many threads
 the program may use at any given time. Threads are used to compute
 the frequency response for different frequencies at the same time
