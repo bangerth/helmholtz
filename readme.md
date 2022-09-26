@@ -39,7 +39,7 @@ number of ports. It then outputs the average pressure and average
 For a given frequency omega, the equations to be solved are the
 Helmholtz equations and read
 ```
-  -omega^2 p(x,y,z) - c^2 p(x,y,z) = 0
+  -omega^2 p(x,y,z) - c^2 Delta p(x,y,z) = 0
 ```
 where `c` is the (possibly complex-valued) wave speed and `p` is the
 pressure field we seek. The boundary conditions applied to this
@@ -842,12 +842,14 @@ which we can express as
 ```
   b = -1 / [ exp(j*k*L) - exp(-j*k*L) ]
 ```
-amd consequently the solution is
+and consequently the solution is
 ```
   p(x) =  a*exp(j*k*x) + b*exp(-j*k*x)
        = -b*exp(j*k*x) + b*exp(-j*k*x)
        = -b * [ exp(j*k*x) - exp(-j*k*x) ]
        = [ exp(j*k*x) - exp(-j*k*x) ] / [ exp(j*k*L) - exp(-j*k*L) ]
+       = 2*j*sin(k*x) / [ 2*j*sin(k*L) ]
+       = sin(k*x) / sin(k*L)
 ```
 for which it is easy to verify that indeed _p(0)=0_ and _p(L)=1_
 as desired.
@@ -860,17 +862,21 @@ of which only the _x_-component is nonzero and reads as
 ```
   u_x(x) = -1/(rho c) [ exp(j*k*x) + exp(-j*k*x) ]
                     / [ exp(j*k*L) - exp(-j*k*L) ]
+         = -1/(rho c) [ 2*cos(k*x) ] / [ 2*sin(k*L) ]
+         = -1/(rho c) cos(k*x) / [ j*sin(k*L) ]
+         = j/(rho c) cos(k*x) / sin(k*L).
 ```
 So, at the left end of the cylinder, we have
 ```
-  u_x(0) = -2/(rho c) / [ exp(j*k*L) - exp(-j*k*L) ]
+  u_x(0) = j/(rho c) / sin(k*L)
 ```
 and at the right end
 ```
-  u_x(L) = -1/(rho c) [ exp(j*k*L) + exp(-j*k*L) ]
-                    / [ exp(j*k*L) - exp(-j*k*L) ]
+  u_x(L) = j/(rho c) cos(k*L) / sin(k*L)
 ```
-Inserting concrete values for _c_ and _k=omega/c_, we find that
+Inserting concrete values for _rho=1.205728 kg/m^3_,
+_c=343.287 m/s_, _L=0.004m_, and
+_k=omega/c_=6.28e5/343.287 1/m=1830.3 1/m_, we find that
 ```
   u_x(0) = 0+0.00280471j
   u_x(L) = 0+0.00142459j
