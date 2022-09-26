@@ -76,9 +76,14 @@ and with attenuation.
 
 Let us consider the evaluation of the pressure at the center of the
 box for the special case without attenuation. For simplicity, we
-choose $\rho=K=1$ and consequently $c=1$ and $k=\omega$. Then
+choose $\rho=K=1$ and consequently $c=1$ and $k=\omega$. Then, based
+on the formulas in the \texttt{readme.md} file at the top level of the
+github repository, we have
 \begin{align*}
   p(x)
+  &=
+  \frac{e^{jk x} - e^{jk(2L-x)}}{1 - e^{2jkL}}
+  \\
   &=
   \frac{e^{j\omega x} - e^{-j\omega (2-x)}}{1 - e^{-2j\omega}}.
 \end{align*}
