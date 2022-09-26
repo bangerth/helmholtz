@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{amsmath}
+\usepackage{graphicx}
 
 \begin{document}
 
@@ -64,6 +65,8 @@ $L=1$, we obtain
   \\
   &= \frac{e^{\frac{jk}{2}} - e^{-\frac{3jk}{2}}}{1 - e^{-2jk}}
   \\
+  &= \frac{e^{\frac{jk}{2}} - e^{-\frac{3jk}{2}}}{e^{jk} - e^{-jk}}
+  \\
   &= \frac{e^{\frac{j\omega}{2c}} - e^{-\frac{3j\omega}{2c}}}{1 - e^{-\frac{2j\omega}{c}}}
   \\
   &= \frac{e^{\frac{j\omega}{2}\sqrt{\frac{\rho}{K}}} - e^{-\frac{3j\omega}{2}\sqrt{\frac{\rho}{K}}}}{1 - e^{-2j\omega\sqrt{\frac{\rho}{K}}}}
@@ -82,32 +85,37 @@ github repository, we have
 \begin{align*}
   p(x)
   &=
-  \frac{e^{jk x} - e^{jk(2L-x)}}{1 - e^{2jkL}}
+  \frac{e^{jkx} - e^{-jk(2L-x)}}{1 - e^{-2jkL}}.
+\end{align*}
+This formula, after a good bit of massaging, can be restated as
+follows for real-valued $k$:
+\begin{align*}
+  p(x)
+  &=
+  \frac{\sin(k(L-x))}{\sin(kL)}.
   \\
   &=
-  \frac{e^{j\omega x} - e^{-j\omega (2-x)}}{1 - e^{-2j\omega}}.
+  \frac{\sin(\omega(1-x))}{\sin(\omega)}.
 \end{align*}
 This expression, unsurprisingly, has singularities for
-$\omega=1,2,...$ Hertz, where the cavity is in resonance. As a
+$\omega=\pi,2\pi,3\pi,...$, where the cavity is in resonance. This
+corresponds to frequencies $f=0.5, 1, 1.5, \ldots$ Hertz. As a
 consequence, we better consider frequences below the first resonance,
-i.e., $\omega<1$.
+i.e., $\omega<\pi$, i.e., $f<0.5$ Hertz.
 
-That said, for the specific case of the center of the box, we get
+That said, for the specific case of the center of the box (at $x=0.5$), we get
 \begin{align*}
   p_\text{center}
-  &= \frac{e^{\frac{j\omega}{2}} - e^{-\frac{3j\omega}{2}}}{1 -
-    e^{-2j\omega}}
-  \\
-  &= e^{\frac{j\omega}{2}} \\
-  &= \cos\left({\frac{\omega}{2}}\right)
-  + j \sin\left({\frac{\omega}{2}}\right).
+  &= 
+  \frac{\sin(\omega/2)}{\sin(\omega)}.
 \end{align*}
 In the low-frequency case, $\omega\ll 1$, we have the asymptotic
 behavior
 \begin{align*}
   p_\text{center}
   &\approx
-  1-\frac{\omega^2}{8} + j \frac{\omega}{2}.
+  \frac{\omega/2}{\omega}
+  = \frac 12.
 \end{align*}
 
 We can plot what the program produces for a number of frequencies in
@@ -116,5 +124,13 @@ the range between 0.1 and 1 Hz:
 % dii_frequency_response.csv, columns 1 (frequency), 14 (real part of
 % pressure), 15 (imaginary part of pressure)
 %
+
+{\centering
+\includegraphics[width=0.7\textwidth]{no-attenuation/pressure-at-center.png}
+}
+
+As can be seen, the computations (shown as the blue crosses) are an
+excellent match for the expected theoretical behavior. Furthermore,
+the singularity (resonance) is at $f=0.5$ Hz, again as expected.
 
 \end{document}
