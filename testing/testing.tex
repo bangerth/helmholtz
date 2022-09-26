@@ -133,4 +133,28 @@ As can be seen, the computations (shown as the blue crosses) are an
 excellent match for the expected theoretical behavior. Furthermore,
 the singularity (resonance) is at $f=0.5$ Hz, again as expected.
 
+
+\subsubsection*{With attenuation}
+
+Let us now consider the case with attenuation. Specifically, we will
+choose the same box of length $L=1$, but use $\rho=1-j, K=1$ and
+consequently $c=\sqrt{\frac{K}{\rho}}=\sqrt{\frac{1}{1-j}}=\frac{1}{2^{1/4}}e^{j\pi/8}$ 
+and $k=\omega/c=2^{1/4}}e^{-j\pi/8} \omega$. Then, again based
+on the formulas in the \texttt{readme.md} file at the top level of the
+github repository, we have
+\begin{align*}
+  p(x)
+  &=
+  \frac{e^{jk(L-x)} - e^{-jk(L-x)}}{e^{jkL} - e^{-jkL}}.
+\end{align*}
+This time, because $k$ is not real valued, we cannot replace $e^{ja}$
+by $\cos(a)+j\sin(a)$, and instead need to use the expression as
+is. We can, however, simplify it to
+\begin{align*}
+  p(x)
+  &=
+  \frac{\sinh(jk(L-x))}{\sinh(jkL)}.
+\end{align*}
+
+
 \end{document}
