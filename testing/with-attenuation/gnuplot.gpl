@@ -2,6 +2,7 @@ set logsc x
 set xlabel "Frequency f"
 set ylabel "p(0.5)"
 set key top left
+set samples 1000
 
 i = {0.0,1.0}
 
@@ -11,7 +12,7 @@ c=sqrt(K/rho)
 k(omega)=omega/c
 p(omega)=sinh(i*k(omega)/2)/sinh(i*k(omega))
 
-plot [0.01:1][-2:2] \
+plot [0.01:10][-2:2] \
   "dii_frequency_response.csv" using 1:14 title "Computed real part", \
   "dii_frequency_response.csv" using 1:15 title "Computed imaginary part", \
   real(p(2*pi*x)) title "Theory real part", \
