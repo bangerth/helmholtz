@@ -1,0 +1,8 @@
+set logsc x
+set xlabel "Frequency f"
+set ylabel "p(0.5)"
+plot [0.01:1][-2:2] \
+  "dii_frequency_response.csv" using 1:14 title "Computed real part", \
+  "dii_frequency_response.csv" using 1:15 title "Computed imaginary part", \
+  sin(2*pi*x/2)/sin(2*pi*x) title "Theory real part", \
+  0 title "Theory imaginary part"
