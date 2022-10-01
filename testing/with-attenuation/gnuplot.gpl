@@ -1,6 +1,5 @@
 set logsc x
 set xlabel "Frequency f"
-set ylabel "p(0.5)"
 set key top left
 set samples 1000
 
@@ -12,8 +11,24 @@ c=sqrt(K/rho)
 k(omega)=omega/c
 p(omega)=sinh(i*k(omega)/2)/sinh(i*k(omega))
 
-plot [0.01:10][-2:2] \
+u(omega)=1./sqrt(rho*K)*cosh(i*k(omega)/2)/sinh(i*k(omega))
+
+set term png
+
+set output "pressure-at-center.png"
+set ylabel "p(0.5)"
+plot [0.01:4][-2:2] \
   "dii_frequency_response.csv" using 1:14 title "Computed real part", \
   "dii_frequency_response.csv" using 1:15 title "Computed imaginary part", \
   real(p(2*pi*x)) title "Theory real part", \
   imag(p(2*pi*x)) title "Theory imaginary part"
+
+
+
+set output "velocity-at-center.png"
+set ylabel "u(0.5)"
+plot [0.01:4][-8:8] \
+  "dii_frequency_response.csv" using 1:16 title "Computed real part", \
+  "dii_frequency_response.csv" using 1:17 title "Computed imaginary part", \
+  real(u(2*pi*x)) title "Theory real part", \
+  imag(u(2*pi*x)) title "Theory imaginary part"

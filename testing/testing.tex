@@ -4,8 +4,8 @@
 
 \begin{document}
 
-\section*{Figuring out what happens with the solver when there is
-  attenuation}
+\section*{Figuring out what happens with the solver
+  \centering when there is attenuation}
 
 I like to use simple test cases because they clarify to me what is
 \textit{not} the problem. So I will be considering the following
@@ -29,7 +29,7 @@ are read from the input file as frequency-dependent quantities, and
 which can both be complex-valued.
 
 
-\subsection*{Testing the pressure}
+\section{Testing the pressure}
 
 The set-up is chosen so that the solution is one-dimensional. As a
 consequence, the solution only depends on $x$ and we can easily derive
@@ -75,7 +75,7 @@ We will consider this expression for two special cases below, without
 and with attenuation.
 
 
-\subsubsection*{No attenuation}
+\subsection{No attenuation}
 
 Let us consider the evaluation of the pressure at the center of the
 box for the special case without attenuation. For simplicity, we
@@ -133,12 +133,17 @@ the range between 0.01 and 1 Hz:
 \includegraphics[width=0.7\textwidth]{no-attenuation/pressure-at-center.png}
 \end{center}
 
-As can be seen, the computations (shown as the blue and green crosses) are an
-excellent match for the expected theoretical behavior. Furthermore,
-the singularity (resonance) is at $f=0.5$ Hz, again as expected.
+As can be seen, the computations (shown as the purple and green crosses)
+are an excellent match for the expected theoretical behavior, at least
+in the low-frequency regime. Furthermore, the singularity (resonance)
+is at $f=0.5$ Hz, again as expected. (For higher frequencies, the
+crosses are no longer a good fit, but this is because we compute on a
+mesh that has only $4\times 4\times 4$ cells. We can not expect it to
+accurately resolve the solution for frequencies $f\ge 4$ where the
+wavelength $\lambda=c/f$ drops below the cell diameter.)
 
 
-\subsubsection*{With attenuation}
+\subsection{With attenuation}
 
 Let us now consider the case with attenuation. Specifically, we will
 choose the same box of length $L=1$, but use $\rho=1-j, K=1$ and
@@ -185,5 +190,126 @@ We can again output the results of our computations:
 \includegraphics[width=0.7\textwidth]{with-attenuation/pressure-at-center.png}
 \end{center}
 As before, the results provide an excellent match to the theoretical expectations.
+
+
+\section{Testing the velocity}
+
+We can also look at the velocity at the center point. The velocity is
+defined as $\mathbf u(\mathbf x)=j\omega \nabla p(\mathbf x)$ but
+because everything only depends on the $x$ coordinate, only one
+component of the velocity is nonzero and we can simply denote it by
+(non-bold) $u(x)=-\frac{1}{j\rho\omega}\frac{d}{dx} p(x)$.
+
+\subsection{No attenuation}
+
+With the expression for the pressure above for the case without
+attenuation, we get
+\begin{align*}
+  u(x)
+  &=
+  -\frac{1}{j\rho\omega} \frac{d}{dx} \frac{\sin(\omega(1-x))}{\sin(\omega)}
+  \\
+  &=
+  -\frac{1}{j\rho} \frac{-\cos(\omega(1-x))}{\sin(\omega)},
+\end{align*}
+and consequently
+\begin{align*}
+  u_\text{center}
+  &=
+  \frac{1}{j\rho} \frac{\cos(\omega/2)}{\sin(\omega)}
+  \\
+  &=
+  -\frac{j}{\rho} \frac{\cos(\omega/2)}{\sin(\omega)}.
+\end{align*}
+In the low-frequency regime, this expression has the asymptotic behavior
+\begin{align*}
+  u_\text{center}
+  &\approx
+  -\frac{j}{\rho} \frac{1}{\omega}.
+\end{align*}
+
+
+We can again compare this against what the program computes:
+\begin{center}
+\includegraphics[width=0.7\textwidth]{no-attenuation/velocity-at-center.png}
+\end{center}
+As before, in the low-frequency range, the agreement is
+excellent. (And, as before, the agreement is not good in the
+high-frequency range because the mesh is too coarse. There is also a
+little blip at the first resonance at $f=0.5$ Hz. This is because
+while the pressure becomes very large at the resonance, the
+\textit{exact} velocity stays bounded -- but the numerical
+approximation becomes poor.)
+
+While not shown
+in the figure, one can easily check that the asymptotic behavior
+outlined above is also respected by the actual computed data points.
+
+
+
+\subsection{With attenuation}
+
+For the case with attenuation, let us start with
+\begin{align*}
+  p(x)
+  &=
+  \frac{\sinh(jk(L-x))}{\sinh(jkL)},
+\end{align*}
+to compute
+\begin{align*}
+  u(x)
+  &=
+  -\frac{1}{j\rho\omega} \frac{d}{dx}
+  \frac{\sinh(jk(L-x))}{\sinh(jkL)}
+  \\
+  &=
+  -\frac{1}{j\rho\omega}
+  \frac{-jk\cosh(jk(L-x))}{\sinh(jkL)}
+  \\
+  &=
+  \frac{k}{\rho\omega}
+  \frac{\cosh(jk(L-x))}{\sinh(jkL)}
+  \\
+  &=
+  \frac{1}{\rho c}
+  \frac{\cosh(jk(L-x))}{\sinh(jkL)}
+  \\
+  &=
+  \frac{1}{\rho}\sqrt{\frac{\rho}{K}}
+  \frac{\cosh(jk(L-x))}{\sinh(jkL)}
+  \\
+  &=
+  \frac{1}{\sqrt{\rho K}}
+  \frac{\cosh(jk(L-x))}{\sinh(jkL)}.
+\end{align*}
+From this we then get
+\begin{align*}
+  u_\text{center}
+  &=
+  \frac{1}{\sqrt{\rho K}}
+  \frac{\cosh(jk/2)}{\sinh(jk)}.
+\end{align*}
+In the low-frequency regime, the asymptotic expansion of this
+expression is
+\begin{align*}
+  u_\text{center}
+  &\approx
+  \frac{1}{\sqrt{\rho K}}
+  \frac{1}{jk}
+  =
+  -\frac{j}{\sqrt{\rho K}}
+  \frac{\sqrt{K}}{\omega\sqrt{\rho}}
+  =
+  -\frac{j}{\omega\rho}.
+\end{align*}
+This is the same expression as for the case without attenuation,
+except that now $\rho$ may be complex-valued.
+
+If we compare the exact expression against computations, we obtain the
+following figure:
+\begin{center}
+\includegraphics[width=0.7\textwidth]{with-attenuation/velocity-at-center.png}
+\end{center}
+The match is again excellent.
 
 \end{document}
