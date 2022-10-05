@@ -550,18 +550,17 @@ namespace TransmissionProblem
     if (field_width > 0)
       {
         out << std::setw(field_width) << std::right << std::real(p)
-            << (std::imag(p) >= 0 ? '+' : '-');
+            << (std::imag(p) >= 0 ? " +" : " -");
 
         std::ostringstream s;
-        s << std::fabs(std::imag(p)) << "*j";
+        s << std::fabs(std::imag(p));
 
         out << std::setw(field_width+1) << std::left << s.str();
       }
     else
       out << std::real(p)
-          << (std::imag(p) >= 0 ? '+' : '-')
-          << std::fabs(std::imag(p))
-          << "*j";
+          << (std::imag(p) >= 0 ? " +" : " -")
+          << std::fabs(std::imag(p));
   }
   
 
