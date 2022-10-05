@@ -329,6 +329,37 @@ here. Specifically,the solution in general is given by
   \frac{1}{\sqrt{\rho K}}
   \frac{\cosh(jk(L-x))}{\sinh(jkL)}.
 \end{align*}
-We set $L=0.01$ (10mm), and recall $k=\frac{\omega}{c}=\sqrt{\frac{K}{\rho}}\omega$.
+We set $L=0.01$ (10mm), and recall
+$k=\frac{\omega}{c}=\sqrt{\frac{K}{\rho}}\omega$. Since the domain is
+smaller by a factor of 100, we increase the frequency range for which
+we compute the cavity's response by a factor of 100. We will evaluate
+the solution at the point $x=L/2$ as before.
+
+As the results in the following two sub-sections show, computational
+results are again very close to those obtain through theory, at least
+in that part of the frequency range where the mesh resolves the wave length.
+
+\subsection{No attenuation}
+
+We can again compute the response with the solver and compare it
+against the predictions of the formulas above. We again use
+$K=1,\rho=1$ as material parameters.
+
+\begin{center}
+\includegraphics[width=0.48\textwidth]{wave-guide/no-attenuation/pressure-at-center.png}
+\includegraphics[width=0.48\textwidth]{wave-guide/no-attenuation/velocity-at-center.png}
+\end{center}
+
+These results again track very well with theoretical predictions.
+
+\subsection{With attenuation}
+
+Setting instead $K=1,\rho=1-j$, we obtain the following figures that
+again show excellent match between theory and computation:
+
+\begin{center}
+\includegraphics[width=0.48\textwidth]{wave-guide/with-attenuation/pressure-at-center.png}
+\includegraphics[width=0.48\textwidth]{wave-guide/with-attenuation/velocity-at-center.png}
+\end{center}
 
 \end{document}

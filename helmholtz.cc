@@ -677,7 +677,7 @@ namespace TransmissionProblem
                  0,0,0
            },
            {
-                 1,1,1
+             0.01, 0.005, 0.005
            }
           );
         mesh_from_file->begin_active()->face(0)->set_boundary_id(1);
