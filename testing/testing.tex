@@ -130,7 +130,7 @@ the range between 0.01 and 1 Hz:
 %
 
 \begin{center}
-\includegraphics[width=0.7\textwidth]{no-attenuation/pressure-at-center.png}
+\includegraphics[width=0.7\textwidth]{unit-cube/no-attenuation/pressure-at-center.png}
 \end{center}
 
 As can be seen, the computations (shown as the purple and green crosses)
@@ -187,7 +187,7 @@ at the center of the domain.
 
 We can again output the results of our computations:
 \begin{center}
-\includegraphics[width=0.7\textwidth]{with-attenuation/pressure-at-center.png}
+\includegraphics[width=0.7\textwidth]{unit-cube/with-attenuation/pressure-at-center.png}
 \end{center}
 As before, the results provide an excellent match to the theoretical expectations.
 
@@ -231,7 +231,7 @@ In the low-frequency regime, this expression has the asymptotic behavior
 
 We can again compare this against what the program computes:
 \begin{center}
-\includegraphics[width=0.7\textwidth]{no-attenuation/velocity-at-center.png}
+\includegraphics[width=0.7\textwidth]{unit-cube/no-attenuation/velocity-at-center.png}
 \end{center}
 As before, in the low-frequency range, the agreement is
 excellent. (And, as before, the agreement is not good in the
@@ -308,8 +308,27 @@ except that now $\rho$ may be complex-valued.
 If we compare the exact expression against computations, we obtain the
 following figure:
 \begin{center}
-\includegraphics[width=0.7\textwidth]{with-attenuation/velocity-at-center.png}
+\includegraphics[width=0.7\textwidth]{unit-cube/with-attenuation/velocity-at-center.png}
 \end{center}
 The match is again excellent.
+
+
+\section{On a small, rectangular wave guide}
+
+The original report of results that deviate from those that are
+expected were for a small rectangular wave guide of size 5mm by 5mm by
+10mm. We can adapt the case above to the same situation
+here. Specifically,the solution in general is given by
+\begin{align*}
+  p(x)
+  &=
+  \frac{\sinh(jk(L-x))}{\sinh(jkL)},
+  \\
+  u(x)
+  &=
+  \frac{1}{\sqrt{\rho K}}
+  \frac{\cosh(jk(L-x))}{\sinh(jkL)}.
+\end{align*}
+We set $L=0.01$ (10mm), and recall $k=\frac{\omega}{c}=\sqrt{\frac{K}{\rho}}\omega$.
 
 \end{document}
