@@ -3,7 +3,7 @@ set Evaluation points                    = 0.5,0.5,0.5
 
 set Material properties file name       = material.txt
 
-set Frequencies                          = exp_spacing(0.01,1,100)
+set Frequencies                          = exp_spacing(0.01,10,150)
 set Number of mesh refinement steps      = 4
 set Finite element polynomial degree     = 1
 set Number of threads                    = 10
