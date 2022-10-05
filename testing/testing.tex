@@ -138,9 +138,9 @@ are an excellent match for the expected theoretical behavior, at least
 in the low-frequency regime. Furthermore, the singularity (resonance)
 is at $f=0.5$ Hz, again as expected. (For higher frequencies, the
 crosses are no longer a good fit, but this is because we compute on a
-mesh that has only $4\times 4\times 4$ cells. We can not expect it to
+mesh that has only $16\times 16\times 16$ cells. We can not expect it to
 accurately resolve the solution for frequencies $f\ge 4$ where the
-wavelength $\lambda=c/f$ drops below the cell diameter.)
+wavelength $\lambda=c/f$ drops below four cell diameters.)
 
 
 \subsection{With attenuation}
@@ -361,5 +361,53 @@ again show excellent match between theory and computation:
 \includegraphics[width=0.48\textwidth]{wave-guide/with-attenuation/pressure-at-center.png}
 \includegraphics[width=0.48\textwidth]{wave-guide/with-attenuation/velocity-at-center.png}
 \end{center}
+
+
+
+\section{Using a tetrahedral mesh for the small, rectangular wave guide}
+
+Another observation was that the mismatch between theory and
+computation appeared on a generated mesh that used tetrahedra. On the
+other hand, all of the computations above have used hexahedral meshes.
+
+To test whether this has any effects on the computational results, I
+re-ran the tests of the previous section on a mesh that subdivides the
+small rectangular wave guide into tetrahedra. This is done by
+subdividing the hexahdedra used previously into 24
+tetrahedra, and this results in cells with a substantially smaller
+size than the hexahedra used before -- for which one could expect
+higher accuracy than what was available before. As a consequence, for
+the experiments shown in this section, we start with a $8\times
+8\times 8$ hexahedral mesh instead, which after subdivision into
+tetrahedra is comparable in mesh size to the  $16\times 16\times 16$
+mesh used whenceforth.
+
+The results are shown below and illustrate that we again get excellent
+agreement, regardless of whether we use hexahedra or tetrahedra.
+
+\subsection{No attenuation}
+
+We can again compute the response with the solver and compare it
+against the predictions of the formulas above. We again use
+$K=1,\rho=1$ as material parameters.
+
+\begin{center}
+\includegraphics[width=0.48\textwidth]{wave-guide-tet/no-attenuation/pressure-at-center.png}
+\includegraphics[width=0.48\textwidth]{wave-guide-tet/no-attenuation/velocity-at-center.png}
+\end{center}
+
+These results again track very well with theoretical predictions.
+
+\subsection{With attenuation}
+
+Setting instead $K=1,\rho=1-j$, we obtain the following figures that
+again show excellent match between theory and computation:
+
+\begin{center}
+\includegraphics[width=0.48\textwidth]{wave-guide-tet/with-attenuation/pressure-at-center.png}
+\includegraphics[width=0.48\textwidth]{wave-guide-tet/with-attenuation/velocity-at-center.png}
+\end{center}
+
+
 
 \end{document}
