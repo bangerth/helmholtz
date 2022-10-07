@@ -1,0 +1,11 @@
+set Mesh file name                       = ../helmholtz/geometries/abaqus-geometry/all_hex8.inp
+set Evaluation points                    = 0.005,0.0025,0.0025
+
+set Material properties file name       = material.txt
+
+set Frequencies                          = exp_spacing(10,10000,150)
+set Number of mesh refinement steps      = 3
+set Finite element polynomial degree     = 1
+set Number of threads                    = 10
+
+#set Mesh summary only = true
