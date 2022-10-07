@@ -409,5 +409,25 @@ again show excellent match between theory and computation:
 \end{center}
 
 
+\section{Testing with realistic material properties}
+
+To further narrow the gap between the simulations above and those from
+Jason's cases, I set material properties to $\rho=1.43257-8.72485j$
+and $K=101582+2796.01j$, which leads to a wave speed of
+$c=\sqrt{\frac{\rho}{K}}=\sqrt{\frac{1.43257-8.72485j}{101582+2796.01j}}=(80.76+70.51j)$m/s. With
+$L=0.01$m, this leads to a first resonance at $f=Re(c/L)\approx 8075$
+Hz (though this resonance is heavily damped, given the material
+parameters). So we will be considering a frequency range between 10
+and 10,000 Hz.
+
+Using again the same exact solution from above, but with the altered
+material properties, we obtain the following pictures:
+\begin{center}
+\includegraphics[width=0.48\textwidth]{wave-guide-tet-real-material/pressure-at-center.png}
+\includegraphics[width=0.48\textwidth]{wave-guide-tet-real-material/velocity-at-center.png}
+\end{center}
+Again, the computed results are essentially indistinguishable to the
+theoretical predictions.
+
 
 \end{document}
