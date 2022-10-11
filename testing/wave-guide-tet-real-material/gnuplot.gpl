@@ -33,3 +33,19 @@ plot [][] \
   "dii_frequency_response.csv" using 1:17 title "Computed imaginary part", \
   real(u(2*pi*x)) title "Theory real part", \
   imag(u(2*pi*x)) title "Theory imaginary part"
+
+
+set logscale y
+
+set output "error-pressure-at-center.png"
+set ylabel "Relative error in p(0.5)"
+plot [][1e-6:1] \
+  "dii_frequency_response.csv" using 1:(abs($14-real(p(2*pi*$1)))/abs(p(2*pi*$1))) title "Real part of pressure", \
+  "dii_frequency_response.csv" using 1:(abs($15-imag(p(2*pi*$1)))/abs(p(2*pi*$1))) title "Imaginary part of pressure"
+
+set output "error-velocity-at-center.png"
+set ylabel "Relative error in u(0.5)"
+plot [][1e-6:1] \
+  "dii_frequency_response.csv" using 1:(abs($16-real(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Real part of velocity", \
+  "dii_frequency_response.csv" using 1:(abs($17-imag(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Imaginary part of velocity"
+

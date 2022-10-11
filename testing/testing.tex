@@ -429,5 +429,32 @@ material properties, we obtain the following pictures:
 Again, the computed results are essentially indistinguishable to the
 theoretical predictions.
 
+One may ask whether the error between the computed solution and theory
+is noticeable but simply not visible because of the scale of these
+graphs. To test this, the following two figures show the relative
+error, computed as the absolute values of the real and imaginary parts
+of the quantities
+\begin{align*}
+  \frac{p_\text{computed} - p_\text{theory}}{|p_\text{theory}|},
+  \qquad\qquad
+  \frac{u_\text{computed} - u_\text{theory}}{|u_\text{theory}|}.
+\end{align*}
+\begin{center}
+\includegraphics[width=0.48\textwidth]{wave-guide-tet-real-material/error-pressure-at-center.png}
+\includegraphics[width=0.48\textwidth]{wave-guide-tet-real-material/error-velocity-at-center.png}
+\end{center}
+
+These figures show that not only do the computed solutions lie on top
+of the theoretical predictions, but in fact the difference is also
+quite small even on this relatively coarse mesh: Pressure errors are
+generally less than a few percent up to the first resonance, and the
+same is true for the velocity. It is worth noting that the mesh is so
+coarse that we no longer adequately resolve the solution at the first
+resonance.
+
+To illustrate that we can obtain better results on finer meshes, the
+following figures show the same error metrics for a mesh that is once
+more refined:
+
 
 \end{document}
