@@ -1,0 +1,14 @@
+set Mesh file name                       = ../geometries/abaqus-geometry/all_hex8.inp
+set Geometry conversion factor to meters = 0.001
+
+set Material properties file name       = ../material-models/air.txt
+# set Wave speed                           = 343
+# set Wave speed loss tangent              = 10
+# set Density                              = 1.18
+
+set Frequencies                          = list(100000)
+set Evaluation points                    = 1,0.5,0.5
+
+set Number of mesh refinement steps      = 0
+set Finite element polynomial degree     = 1
+set Number of threads                    = 1
