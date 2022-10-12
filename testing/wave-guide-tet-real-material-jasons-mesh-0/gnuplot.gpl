@@ -29,8 +29,8 @@ plot [][] \
 set output "velocity-at-center.png"
 set ylabel "u(0.5)"
 plot [][] \
-  "dii_frequency_response.csv" using 1:16 title "Computed real part", \
-  "dii_frequency_response.csv" using 1:17 title "Computed imaginary part", \
+  "dii_frequency_response.csv" using 1:20 title "Computed real part", \
+  "dii_frequency_response.csv" using 1:21 title "Computed imaginary part", \
   real(u(2*pi*x)) title "Theory real part", \
   imag(u(2*pi*x)) title "Theory imaginary part"
 
@@ -41,14 +41,14 @@ set output "error-pressure-at-center.png"
 set ylabel "Relative error in p(0.5)"
 plot [][1e-6:1] \
   "dii_frequency_response.csv" using 1:(abs($14-real(p(2*pi*$1)))/abs(p(2*pi*$1))) title "Real part of pressure", \
+  "../wave-guide-tet-real-material-jasons-mesh-1/dii_frequency_response.csv" using 1:(abs($14-real(p(2*pi*$1)))/abs(p(2*pi*$1))) title "Real part of pressure, refined mesh", \
   "dii_frequency_response.csv" using 1:(abs($15-imag(p(2*pi*$1)))/abs(p(2*pi*$1))) title "Imaginary part of pressure", \
-  "../wave-guide-tet-real-material-refined/dii_frequency_response.csv" using 1:(abs($14-real(p(2*pi*$1)))/abs(p(2*pi*$1))) title "Real part of pressure, refined mesh", \
-  "../wave-guide-tet-real-material-refined/dii_frequency_response.csv" using 1:(abs($15-imag(p(2*pi*$1)))/abs(p(2*pi*$1))) title "Imaginary part of pressure, refined mesh"
+  "../wave-guide-tet-real-material-jasons-mesh-1/dii_frequency_response.csv" using 1:(abs($15-imag(p(2*pi*$1)))/abs(p(2*pi*$1))) title "Imaginary part of pressure, refined mesh"
 
 set output "error-velocity-at-center.png"
 set ylabel "Relative error in u(0.5)"
 plot [][1e-6:1] \
-  "dii_frequency_response.csv" using 1:(abs($16-real(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Real part of velocity", \
-  "dii_frequency_response.csv" using 1:(abs($17-imag(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Imaginary part of velocity", \
-  "../wave-guide-tet-real-material-refined/dii_frequency_response.csv" using 1:(abs($16-real(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Real part of velocity, refined mesh", \
-  "../wave-guide-tet-real-material-refined/dii_frequency_response.csv" using 1:(abs($17-imag(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Imaginary part of velocity, refined mesh"
+  "dii_frequency_response.csv" using 1:(abs($20-real(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Real part of velocity", \
+  "../wave-guide-tet-real-material-jasons-mesh-1/dii_frequency_response.csv" using 1:(abs($20-real(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Real part of velocity, refined mesh", \
+  "dii_frequency_response.csv" using 1:(abs($21-imag(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Imaginary part of velocity", \
+  "../wave-guide-tet-real-material-jasons-mesh-1/dii_frequency_response.csv" using 1:(abs($21-imag(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Imaginary part of velocity, refined mesh"
