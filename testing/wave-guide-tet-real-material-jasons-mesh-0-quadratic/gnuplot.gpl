@@ -1,0 +1,50 @@
+set logsc x
+set xlabel "Frequency f"
+set key top left
+set samples 1000
+
+i = {0.0,1.0}
+
+K=101582+2796.01*i
+rho=1.43257-8.72485*i
+c=sqrt(K/rho)
+k(omega)=omega/c
+L=0.01
+p(omega)=sinh(i*k(omega)*L/2)/sinh(i*k(omega)*L)
+
+u(omega)=1./sqrt(rho*K)*cosh(i*k(omega)*L/2)/sinh(i*k(omega)*L)
+
+set term png
+
+set output "pressure-at-center.png"
+set ylabel "p(0.5)"
+plot [][] \
+  "dii_frequency_response.csv" using 1:14 title "Computed real part", \
+  "dii_frequency_response.csv" using 1:15 title "Computed imaginary part", \
+  real(p(2*pi*x)) title "Theory real part", \
+  imag(p(2*pi*x)) title "Theory imaginary part"
+
+
+
+set output "velocity-at-center.png"
+set ylabel "u(0.5)"
+plot [][] \
+  "dii_frequency_response.csv" using 1:20 title "Computed real part", \
+  "dii_frequency_response.csv" using 1:21 title "Computed imaginary part", \
+  real(u(2*pi*x)) title "Theory real part", \
+  imag(u(2*pi*x)) title "Theory imaginary part"
+
+
+set logscale y
+
+set output "error-pressure-at-center.png"
+set ylabel "Relative error in p(0.5)"
+plot [][1e-6:1] \
+  "dii_frequency_response.csv" using 1:(abs($14-real(p(2*pi*$1)))/abs(p(2*pi*$1))) title "Real part of pressure", \
+  "dii_frequency_response.csv" using 1:(abs($15-imag(p(2*pi*$1)))/abs(p(2*pi*$1))) title "Imaginary part of pressure"
+
+set output "error-velocity-at-center.png"
+set ylabel "Relative error in u(0.5)"
+plot [][1e-6:1] \
+  "dii_frequency_response.csv" using 1:(abs($20-real(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Real part of velocity", \
+  "dii_frequency_response.csv" using 1:(abs($21-imag(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Imaginary part of velocity"

@@ -487,6 +487,16 @@ than with the mesh internally created:
 \includegraphics[width=0.48\textwidth]{wave-guide-tet-real-material-jasons-mesh-0/error-velocity-at-center.png}
 \end{center}
 
+In the testcase Jason sent me, computations are done with quadratic
+finite elements. We can repeat the same graphics for these as well;
+the solution values look like the ones above, but it is interesting to
+see the errors on the same scale as above -- showing that the error is
+more than an order of magnitude smaller when using quadratic elements than
+with the linear elements used before:
+\begin{center}
+\includegraphics[width=0.48\textwidth]{wave-guide-tet-real-material-jasons-mesh-0-quadratic/error-pressure-at-center.png}
+\includegraphics[width=0.48\textwidth]{wave-guide-tet-real-material-jasons-mesh-0-quadratic/error-velocity-at-center.png}
+\end{center}
 
 
 
