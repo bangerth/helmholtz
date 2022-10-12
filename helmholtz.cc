@@ -668,27 +668,27 @@ namespace TransmissionProblem
       std::call_once (read_mesh_file,
                       [this]()
       {
-        Triangulation<dim> mesh_from_file_x;
-        
-        GridGenerator::subdivided_hyper_rectangle
-          (mesh_from_file_x, 
-           {1U, 1U, 1U},
-           {
-                 0,0,0
-           },
-           {
-             0.01, 0.005, 0.005
-           }
-          );
-        mesh_from_file_x.begin_active()->face(0)->set_boundary_id(1);
-        mesh_from_file_x.begin_active()->face(1)->set_boundary_id(2);
-
         mesh_from_file = std::make_unique<Triangulation<dim>>();
         
-        GridGenerator::convert_hypercube_to_simplex_mesh (mesh_from_file_x,
-                                                          *mesh_from_file);
+        // Triangulation<dim> mesh_from_file_x;
         
-        return;
+        // GridGenerator::subdivided_hyper_rectangle
+        //   (mesh_from_file_x, 
+        //    {1U, 1U, 1U},
+        //    {
+        //          0,0,0
+        //    },
+        //    {
+        //      0.01, 0.005, 0.005
+        //    }
+        //   );
+        // mesh_from_file_x.begin_active()->face(0)->set_boundary_id(1);
+        // mesh_from_file_x.begin_active()->face(1)->set_boundary_id(2);
+
+        // GridGenerator::convert_hypercube_to_simplex_mesh (mesh_from_file_x,
+        //                                                   *mesh_from_file);
+        
+        // return;
         
         std::unique_ptr<TimerOutput::Scope> timer_section = (n_threads==1 ? std::make_unique<TimerOutput::Scope>(timer_output, "Read mesh file") : nullptr);
       
