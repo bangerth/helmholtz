@@ -330,7 +330,7 @@ here. Specifically,the solution in general is given by
   \frac{\cosh(jk(L-x))}{\sinh(jkL)}.
 \end{align*}
 We set $L=0.01$ (10mm), and recall
-$k=\frac{\omega}{c}=\sqrt{\frac{K}{\rho}}\omega$. Since the domain is
+$k=\frac{\omega}{c}=\sqrt{\frac{\rho}{K}}\omega$. Since the domain is
 smaller by a factor of 100, we increase the frequency range for which
 we compute the cavity's response by a factor of 100. We will evaluate
 the solution at the point $x=L/2$ as before.
@@ -498,6 +498,125 @@ with the linear elements used before:
 \includegraphics[width=0.48\textwidth]{wave-guide-tet-real-material-jasons-mesh-0-quadratic/error-velocity-at-center.png}
 \end{center}
 
+
+\section{Testing the impedance computations}
+
+The tests above all checked that the solution is computed correctly
+(which it apparently is, based on all of the results shown). From the
+solution, the solver then computes pressures and velocities at the
+``ports'' of the geometry, which are then further used to compute
+impedances. So let us consider these port pressures and velocities.
+
+The situation considered here is about a geometry where we prescribe
+the pressure at individual ports to either be zero or one, and that is
+reflected in the analytic expression for the pressure,
+\begin{align*}
+  p(x)
+  &=
+  \frac{\sinh(jk(L-x))}{\sinh(jkL)},
+\end{align*}
+which is either one at $x=0$ and zero at $x=L$. The velocity is given by
+\begin{align*}
+  u(x)
+  &=
+  \frac{1}{\sqrt{\rho K}}
+  \frac{\cosh(jk(L-x))}{\sinh(jkL)},
+\end{align*}
+and this evaluates to
+\begin{align*}
+  u(0)
+  &=
+  \frac{1}{\sqrt{\rho K}}
+  \frac{\cosh(jkL)}{\sinh(jkL)}
+  =
+  \frac{1}{\sqrt{\rho K}\tanh(jkL)},
+\\
+  u(L)
+  &=
+  \frac{1}{\sqrt{\rho K}}
+  \frac{\cosh(0))}{\sinh(jkL)}
+  =
+  \frac{1}{\sqrt{\rho K}\sinh(jkL)}.
+\end{align*}
+
+The impedance is defined as 
+\begin{align*}
+  Z = \frac{p(0)}{u(0)},
+\end{align*}
+where $p$ is the pressure applied to a port (which is equal to one in
+our case), and $u$ is the corresponding volumetric velocity at that
+port, averaged over the entire port. For the given situation, at
+$x=0$, this corresponds to
+\begin{align*}
+  Z = \frac{p(0)}{u(0)} 
+  = 
+  \frac{1}
+  {\frac{1}{\sqrt{\rho K}}
+  \frac{\cosh(jkL)}{\sinh(jkL)}}
+  = 
+  \sqrt{\rho K}\tanh(jkL),
+\end{align*}
+where as before $k=\frac{\omega}{c}=\sqrt{\frac{\rho}{K}}\omega$.
+
+The following figure shows the impedance so calculated analytically,
+and compares it to the values computed from the velocity output at the
+port by the program.
+\begin{center}
+\includegraphics[width=0.48\textwidth]{wave-guide-tet-real-material-jasons-mesh-0/impedance.png}
+\end{center}
+As maybe expected by now, these match well.
+
+In Jason's presentations, there are also trend lines for low-frequency
+limits. To this end, we can note that for the impedance $Z$, we can
+estimate as follows in the limit of small $\omega$:
+\begin{align*}
+  Z
+  &= 
+  \sqrt{\rho K}\tanh(\xi)
+  \\
+  &= 
+  \sqrt{\rho K}
+  \frac{\sinh(\xi)}
+       {\cosh(\xi)}
+  \\
+  &= 
+  \sqrt{\rho K}
+  \frac{e^\xi - e^{-\xi}}
+       {e^\xi + e^{-\xi}}
+  \\
+  &\approx
+  \sqrt{\rho K}
+  \frac{(1+\xi) - (1-\xi)}
+       {(1+\xi) + (1-\xi)}
+  \\ 
+  &=
+  \sqrt{\rho K}
+  \frac{2\xi}
+       {2}
+  \\
+  &=
+  \sqrt{\rho K} \xi,
+\end{align*}
+where $\xi=j\sqrt{\frac{\rho}{K}}\omega L$. Substituting $\xi$ back
+into the equation above yields, for the low-frequency limit:
+\begin{align*}
+  Z
+  &\approx
+  \sqrt{\rho K} \times j\sqrt{\frac{\rho}{K}}\omega L
+  \\
+  &=
+  j \rho L \omega.
+\end{align*}
+This formula matches the one in Jason't \texttt{readme.txt} file in a
+recent zip file, with the exception that there it divides by $S$ (the
+surface area of the port).
+
+For the material parameters used for the computations shown above, 
+$\rho=1.43257-8.72485*i$, and so at the leftmost point in the figure
+($f=1,\omega=2\pi$), we would obtain an impedance of $Z=
+(1.43257j+8.72485) \times 0.01 \times 2\pi$, that is: 
+$Z=0.548+0.09001j$. This also matches the values one can read from the
+figure above.
 
 
 \end{document}

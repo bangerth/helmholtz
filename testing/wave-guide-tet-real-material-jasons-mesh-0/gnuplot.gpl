@@ -13,6 +13,8 @@ L=0.01
 p(omega)=sinh(i*k(omega)*L/2)/sinh(i*k(omega)*L)
 
 u(omega)=1./sqrt(rho*K)*cosh(i*k(omega)*L/2)/sinh(i*k(omega)*L)
+impedance(omega)=sqrt(rho*K)*tanh(i*k(omega)*L)
+
 
 set term png
 
@@ -52,3 +54,15 @@ plot [][1e-6:1] \
   "../wave-guide-tet-real-material-jasons-mesh-1/dii_frequency_response.csv" using 1:(abs($20-real(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Real part of velocity, refined mesh", \
   "dii_frequency_response.csv" using 1:(abs($21-imag(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Imaginary part of velocity", \
   "../wave-guide-tet-real-material-jasons-mesh-1/dii_frequency_response.csv" using 1:(abs($21-imag(u(2*pi*$1)))/abs(u(2*pi*$1))) title "Imaginary part of velocity, refined mesh"
+
+
+
+make_complex(rr,ii)=rr+ii*i
+
+set output "impedance.png"
+set ylabel "Impedance Z"
+plot [][] \
+  "dii_frequency_response.csv" using 1:(real(1./make_complex($2,$3))) title "Computed real part", \
+  "dii_frequency_response.csv" using 1:(imag(1./make_complex($2,$3))) title "Computed imaginary part", \
+  real(impedance(2*pi*x)) title "Theory real part", \
+  imag(impedance(2*pi*x)) title "Theory imaginary part"
