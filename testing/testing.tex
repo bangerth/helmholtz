@@ -616,7 +616,36 @@ $\rho=1.43257-8.72485*i$, and so at the leftmost point in the figure
 ($f=1,\omega=2\pi$), we would obtain an impedance of $Z=
 (1.43257j+8.72485) \times 0.01 \times 2\pi$, that is: 
 $Z=0.548+0.09001j$. This also matches the values one can read from the
-figure above.
+figure above, which is computed based on the output of the
+program. Indeed, the program outputs the following data for frequency
+1 Hz:
+\begin{verbatim}
+Results for frequency f=1:
+==============================
 
+M = [
+      [     1.77627 -0.291653                -1     -1.77627 +0.291653                 0 ]
+      [    -1.77627 +0.291653                 0      1.77627 -0.291653                -1 ]
+]
+
+
+
+Pressure and velocity at explicitly specified evaluation points:
+  Point at [0.0025 0.0025 0.005], source port with boundary id 1:  p=0.5 -2.11074e-08, u=[9.5571e-12 +3.47268e-10, 2.15331e-10 +7.82323e-09, 1.77627 -0.291653]
+  Point at [0.0025 0.0025 0.005], source port with boundary id 2:  p=0.5 -2.11026e-08, u=[9.19934e-12 +3.34288e-10, 2.89797e-10 +1.05285e-08, -1.77627 +0.291653]
+\end{verbatim}
+That is, at the left end of the domain, the velocity is computed as
+$u(0)=1.77627-0.291653j$, and from this we can compute the impedance
+to
+\begin{align*}
+  Z = \frac{p(0)}{u(0)} =
+  \frac{1}{1.77627-0.291653j}
+  =
+  \frac{1.77627+0.291653j}{1.77627^2+0.291653^2}
+  = 
+  0.5482+0.0900,
+\end{align*}
+which is nearly exactly the value computed from the asymptotic
+expansion above.
 
 \end{document}
