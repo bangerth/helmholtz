@@ -562,7 +562,7 @@ The following figure shows the impedance so calculated analytically,
 and compares it to the values computed from the velocity output at the
 port by the program.
 \begin{center}
-\includegraphics[width=0.48\textwidth]{wave-guide-tet-real-material-jasons-mesh-0/impedance.png}
+\includegraphics[width=0.8\textwidth]{wave-guide-tet-real-material-jasons-mesh-0/impedance.png}
 \end{center}
 As maybe expected by now, these match well.
 
@@ -612,7 +612,7 @@ recent zip file, with the exception that there it divides by $S$ (the
 surface area of the port).
 
 For the material parameters used for the computations shown above, 
-$\rho=1.43257-8.72485*i$, and so at the leftmost point in the figure
+$\rho=1.43257-8.72485j$, and so at the leftmost point in the figure
 ($f=1,\omega=2\pi$), we would obtain an impedance of $Z=
 (1.43257j+8.72485) \times 0.01 \times 2\pi$, that is: 
 $Z=0.548+0.09001j$. This also matches the values one can read from the
@@ -647,5 +647,56 @@ to
 \end{align*}
 which is nearly exactly the value computed from the asymptotic
 expansion above.
+
+
+
+\section{Testing the impedance computations for a high-attenuation case}
+
+We can further test the correctness of the impedance computation for a
+case with much higher attenuation. Simply multiplying the imaginary
+part of the density by a factor of hundred achieves this. That is, we
+use $\rho=1.43257-872.485j$. This results in the following picture
+that summarizes computations on the original $5\times 5\times 10$ mm
+mesh (created by gmsh) as well as meshes that were refined once,
+twice, and three times refined globally:
+\begin{center}
+\includegraphics[width=0.8\textwidth]{wave-guide-tet-real-material-jasons-mesh-high-attenuation-0/impedance.png}
+\end{center}
+
+The figure shows that for low frequencies, the computed impedances
+agree very well with the analytical ones. For high frequencies, the
+match is not good, but improves substantially with mesh refinement (of
+course at substantially more computational cost). But this should not
+come as a surprise, taking $f=10,000$ Hz (the right edge of the
+figure) as an example: There, we have a wave number of
+$k=\frac{\omega}{c}=\omega\sqrt{\rho/K}=4063-4170j$. We can compute a
+``length scale'' for the solution based on the wave length of an
+oscillation that corresponds to the real part of $k$ and an
+exponential decay that corresponds to the imaginary part of $k$; this
+length scale is given by
+$$
+  L 
+  = \min\left\{ 
+    \frac{2\pi}{Re(k)}, -\frac{1}{Im(k)}
+  \right\}
+  = \min\left\{ 
+    \frac{2\pi}{4063}, -\frac{1}{4170}
+  \right\}
+  = \min\left\{ 
+    0.0015, 0.00024}
+  \right\}
+  = 0.00024 m,  
+$$
+or 0.24 mm. This also corresponds well to a plot of the pressure along
+the axis of the channel, as shown here:
+\begin{center}
+\includegraphics[width=0.8\textwidth]{wave-guide-tet-real-material-jasons-mesh-high-attenuation-0/solution-10kHz.png}
+\end{center}
+It is not surprising that the original mesh is unable to resolve such
+small features. It is also not surprising that mesh refinement, as
+shown in the impedance plot above, improves the situation: Every mesh
+refinement step is able to push the area where the computed solution
+closely matches the analytic solution to higher frequencies by about a
+factor of two, as one would expect.
 
 \end{document}

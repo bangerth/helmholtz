@@ -1,0 +1,13 @@
+Results for frequency f=221.504:
+==============================
+
+M = [
+      [  8.8437e-05 +4.34268e-05             -1 -7.74933e-05 +2.19697e-05              0 ]
+      [-7.74934e-05 +2.19695e-05              0   8.8437e-05 +4.34264e-05             -1 ]
+]
+
+
+
+Pressure and velocity at explicitly specified evaluation points:
+  Point at [0.0025 0.0025 0.005], source port with boundary id 1:  p=0.48006 -0.100071, u=[4.53369e-10 +1.08187e-09, 5.72338e-08 +2.38493e-07, 8.17823e-05 -6.39344e-06]
+  Point at [0.0025 0.0025 0.005], source port with boundary id 2:  p=0.480059 -0.100078, u=[7.64148e-10 +4.2004e-09, 5.8119e-08 +2.47563e-07, -8.20624e-05 +5.21671e-06]

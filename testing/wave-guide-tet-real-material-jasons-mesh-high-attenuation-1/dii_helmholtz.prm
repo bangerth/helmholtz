@@ -1,0 +1,12 @@
+set Mesh file name                       = ./5.0mm x 10mm.msh
+set Geometry conversion factor to meters = 0.001
+set Evaluation points                    = 2.5,2.5,5.0
+
+set Material properties file name       = material.txt
+
+set Frequencies                          = exp_spacing(1,10000,250)
+set Number of mesh refinement steps      = 1
+set Finite element polynomial degree     = 1
+set Number of threads                    = 10
+
+#set Mesh summary only = true

@@ -1,0 +1,1814 @@
+INFO Program started with argument   folder: '.'   file prefix: ''   index base: 0
+debug  Material properties file name = material.txt
+INFO Material parameters file contains data for 2 frequencies ranging from 100 to 200Hz.
+INFO Using processing with limited number of 10 threads.
+INFO omega=processing INFO omega=INFO omega= 10 threadsINFO omega=INFO omega= file contaINFO omega=8.76513
+7.02057INFO omega=processing INFO omega=INFO omega= 10 threadsINFO omega=INFO omega= file contaINFO omega=8.76513
+7.020577.55964
+
+INFO omega=processing INFO omega=INFO omega= 10 threadsINFO omega=INFO omega= file contaINFO omega=8.76513
+7.020577.55964
+
+INFO omega=processing INFO omega=INFO omega= 10 threadsINFO omega=INFO omega= file contaINFO omega=8.76513
+7.020577.55964
+
+6.51995
+8.14016.76563
+8.44683INFO omega=processing INFO omega=INFO omega= 10 threadsINFO omega=INFO omega= file contaINFO omega=8.76513
+7.020577.55964
+
+6.51995
+8.14016.76563
+8.44683INFO omega=processing INFO omega=INFO omega= 10 threadsINFO omega=INFO omega= file contaINFO omega=8.76513
+7.020577.55964
+
+6.51995
+8.14016.76563
+8.44683
+INFO omega=processing INFO omega=INFO omega= 10 threadsINFO omega=INFO omega= file contaINFO omega=8.76513
+7.020577.55964
+
+6.51995
+8.14016.76563
+8.44683
+
+INFO omega=processing INFO omega=INFO omega= 10 threadsINFO omega=INFO omega= file contaINFO omega=8.76513
+7.020577.55964
+
+6.51995
+8.14016.76563
+8.44683
+
+7.8445INFO omega=processing INFO omega=INFO omega= 10 threadsINFO omega=INFO omega= file contaINFO omega=8.76513
+7.020577.55964
+
+6.51995
+8.14016.76563
+8.44683
+
+7.8445
+INFO omega=processing INFO omega=INFO omega= 10 threadsINFO omega=INFO omega= file contaINFO omega=8.76513
+7.020577.55964
+
+6.51995
+8.14016.76563
+8.44683
+
+7.8445
+.28512
+INFO Reading mesh file <./5.0mm x 10mm.msh> in GMSH .msh format
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO Found boundary ids 0 1 2 
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=9.09541
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=9.43815
+INFO   Cloning the mesh
+INFO omega=9.79379
+INFO omega=9.79379
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=10.1628
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=10.5458
+INFO   Cloning the mesh
+INFO omega=10.9432
+INFO omega=11.3555
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO omega=11.7834
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=12.2275
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=12.6882
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=13.1663
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=13.6625
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO omega=14.1773
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=14.7115
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=15.2659
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=15.8411
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=16.4381
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=17.0575
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=17.7002
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=18.3672
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=19.0593
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=19.7775
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=20.5228
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=21.2961
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=22.0986
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO omega=22.9313
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=23.7954
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO omega=24.6921
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=25.6225
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=26.588
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=27.5899
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=28.6295
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=29.7084
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=30.8278
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=31.9895
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO omega=33.1949
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=34.4458
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=35.7437
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=37.0906
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=38.4883
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=39.9386
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=41.4436
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=43.0052
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=44.6257
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=46.3073
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=48.0523
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=49.863
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=51.7419
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=53.6917
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=55.7149
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=57.8143
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=59.9929
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=62.2535
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=64.5993
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=67.0336
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=69.5595
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=72.1807
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=74.9006
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=77.723
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=80.6517
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=83.6908
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=86.8445
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=90.1169
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=93.5127
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=97.0364
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=100.693
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO omega=104.487
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=108.425
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=112.51
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=116.75
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=121.149
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=125.714
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=130.451
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=135.367
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=140.468
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=145.761
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=151.254
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=156.953
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=162.868
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=169.005
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=175.373
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=181.982
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=188.839
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=195.955
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=INFO omega=211.001
+INFO   Cloning the mesh
+1.001
+203.339
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=218.952
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=227.202
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=235.764
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=244.648
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=253.867
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=263.433
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=273.359
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=283.66
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=294.349
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO omega=305.441
+INFO omega=316.95INFO   Cloning the mesh
+INFO omega=316.95INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=328.894
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=341.287
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=354.147
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=367.492
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=381.34
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=395.71
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=410.621
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=426.094
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=442.15
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO omega=458.811
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=476.1
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=494.04
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=512.656
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=531.974
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=552.02
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=572.821
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=594.406
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=616.805
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=640.047
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=664.165
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=689.192
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=715.163
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=742.111
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=770.075
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=799.093
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=829.205
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=860.451
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=892.874
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=926.52
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=961.433
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO omega=997.661
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=1035.26
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=1074.27
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=1114.75
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=1156.75
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=1200.34
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=1245.57
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=1292.51
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=1341.21
+INFO   Cloning the mesh
+INFO omega=1391.75
+INFO   The starting mesh has 1124 cells
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=1444.19
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=1498.61
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=1555.09
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=1613.68
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=1674.49
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=1737.59
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=1803.06
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=1871.01
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO omega=1941.51
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=2014.67
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=2090.59
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=2169.36
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=2251.11
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=2335.94
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=2423.96
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=2515.3
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=2610.08
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=2708.43
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=2810.49
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=2916.4
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=3026.29
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=3140.33
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=3258.66
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=3381.45
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=3508.87
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=3641.1
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=3778.3
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO omega=3920.67
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=4068.41
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=4221.72
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=4380.8
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=4545.88
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=4717.17
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=4894.93
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=5079.38
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=5270.78
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=5469.39
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=5675.49
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=5889.35
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=6111.27
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=6341.56
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=6580.52
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=6828.49
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=7085.8
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=7352.8
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=7629.87
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=7917.38
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=8215.72
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=8525.31
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=8846.56
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=9179.91
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=9525.83
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=9884.78
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=10257.3
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=10643.8
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=11044.8
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=11461
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=11892.9
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=12341.1
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=12806.1
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The refined mesh has 575488 cells
+INFO   Computing data for source port boundary id=1
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=13288.7
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=13789.4
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=14309
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=14848.2
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=15407.7
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=15988.3
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=16590.8
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=17215.9
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=17864.7
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=18537.9
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=19236.4
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=19961.3
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=20713.4
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=21494
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=22303.9
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO omega=23144.3
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=24016.5
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=24921.5
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=25860.5
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=26835
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=27846.2
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=28895.5
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=29984.4
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=31114.2
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=32286.7
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=33503.3
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=34765.8
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=36075.8
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=37435.2
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=38845.8
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=40309.6
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=41828.6
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=1
+INFO omega=43404.8
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO omega=45040.3
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=46737.5
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=48498.7
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=50326.2
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=52222.6
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=54190.5
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO omega=56232.5
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=58351.4
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO omega=60550.2
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO omega=62831.9
+INFO   Cloning the mesh
+INFO   The starting mesh has 1124 cells
+INFO   Computing data for source port boundary id=1
+INFO   The refined mesh has 575488 cells
+INFO   The mesh has 105221 unknowns
+INFO   Computing data for source port boundary id=1
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+INFO   Computing data for source port boundary id=2
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |  7.99e+03s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
++---------------------------------+-----------+------------+------------+
+
