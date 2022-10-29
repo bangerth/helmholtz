@@ -674,19 +674,20 @@ $k=\frac{\omega}{c}=\omega\sqrt{\rho/K}=4063-4170j$. We can compute a
 oscillation that corresponds to the real part of $k$ and an
 exponential decay that corresponds to the imaginary part of $k$; this
 length scale is given by
-$$
+\begin{align*}
   L 
-  = \min\left\{ 
+  &= \min\left\{ 
     \frac{2\pi}{Re(k)}, -\frac{1}{Im(k)}
   \right\}
   = \min\left\{ 
     \frac{2\pi}{4063}, -\frac{1}{4170}
   \right\}
   = \min\left\{ 
-    0.0015, 0.00024}
+    0.0015, 0.00024
   \right\}
-  = 0.00024 m,  
-$$
+  \\
+  &= 0.00024 m,  
+\end{align*}
 or 0.24 mm. This also corresponds well to a plot of the pressure along
 the axis of the channel, as shown here:
 \begin{center}
@@ -698,5 +699,34 @@ shown in the impedance plot above, improves the situation: Every mesh
 refinement step is able to push the area where the computed solution
 closely matches the analytic solution to higher frequencies by about a
 factor of two, as one would expect.
+
+The behavior we observe from the solver for too small mesh sizes can
+actually be explained as well. The solver is approximating the
+solution shown above with piecewise linear elements, using node points
+that are a distance of $h$ apart. Since the pressure at the left end
+is one, and since the distance $h$ is larger than the length scale
+mentioned above for high frequencies, one will get that the computed
+velocity is
+\begin{align*}
+  u_\text{computed}(0)
+  &=
+  -\frac{1}{j\rho\omega} \frac{d}{dx} p_\text{computed}(x)|_{x=0}
+  = \frac{1}{j\rho\omega h},
+\end{align*}
+where I've used that the slope of the computed pressure on the
+leftmost element is $-\frac{1}{h}$ (dropping from 1 to 0 in the span
+of a distance $h$). As a consequence, the impedance is
+\begin{align*}
+  Z_\text{computed} = \frac{p_\text{computed}(0)}{u_\text{computed}(0)}
+  = \frac{1}{\frac{1}{j\rho\omega h}}
+  = j\rho h \omega.
+\end{align*}
+In other words, as long as $h>L$, the computed impedance grows
+linearly with the frequency $\omega$ for a fixed $h$, but the computed
+impedance decreases with the mesh size $h$ as one refines the
+mesh. This kind of behavior is roughly represented by the impedance
+graph above.
+
+
 
 \end{document}
