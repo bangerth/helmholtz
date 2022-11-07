@@ -700,7 +700,7 @@ refinement step is able to push the area where the computed solution
 closely matches the analytic solution to higher frequencies by about a
 factor of two, as one would expect.
 
-The behavior we observe from the solver for too small mesh sizes can
+The behavior we observe from the solver for too coarse mesh sizes can
 actually be explained as well. The solver is approximating the
 solution shown above with piecewise linear elements, using node points
 that are a distance of $h$ apart. Since the pressure at the left end
@@ -727,6 +727,26 @@ impedance decreases with the mesh size $h$ as one refines the
 mesh. This kind of behavior is roughly represented by the impedance
 graph above.
 
-
+The issue can be avoided by using a sufficiently fine mesh. In
+particular, as described in the readme file, one can set the number of
+mesh refinement steps to a negative number that then indicates the
+number of cells per either wavelength or attenuation length
+scale. Setting this parameter to -2 (i.e., two cells per wavelength or
+attenuation length scale) results in the following picture:
+\begin{center}
+\includegraphics[width=0.8\textwidth]{wave-guide-tet-real-material-jasons-mesh-high-attenuation-adaptive/impedance.png}
+\end{center}
+This is a much better match: While two cells per length scale is
+clearly not sufficient to achieve good accuracy, at least the general
+trend is correct. In the figure, each step in the location of the
+crosses indicates that the frequency is now large enough that we need
+another refinement step of the mesh to resolve the respective length
+scales. This of course leads to an eightfold increase in memory, and
+an even larger increase in compute time to solve the problem. Indeed,
+computations stop shortly after 2500 Hz: while the last few
+frequencies were already exceptionally expensive to solve, the next
+refinement leads to a problem that requires 84 GB of memory -- far
+beyond what most machines today have available -- and can simply not
+be computed any more. I stopped the computations after several hours.
 
 \end{document}

@@ -1,0 +1,30 @@
+set logsc x
+set xlabel "Frequency f"
+set key top left
+set samples 1000
+
+i = {0.0,1.0}
+
+K=101582+2796.01*i
+rho=1.43257-872.485*i
+c=sqrt(K/rho)
+k(omega)=omega/c
+L=0.01
+p(omega)=sinh(i*k(omega)*L/2)/sinh(i*k(omega)*L)
+
+u(omega)=1./sqrt(rho*K)*cosh(i*k(omega)*L/2)/sinh(i*k(omega)*L)
+impedance(omega)=sqrt(rho*K)*tanh(i*k(omega)*L)
+
+
+set term png
+
+
+make_complex(rr,ii)=rr+ii*i
+
+set output "impedance.png"
+set ylabel "Impedance Z"
+plot [:10000][-10000:40000] \
+  "dii_frequency_response.csv" using 1:(real(1./make_complex($2,$3))) title "Computed real part, adaptive mesh", \
+  "dii_frequency_response.csv" using 1:(imag(1./make_complex($2,$3))) title "Computed imaginary part, adaptive mesh", \
+  real(impedance(2*pi*x)) title "Theory real part", \
+  imag(impedance(2*pi*x)) title "Theory imaginary part"
