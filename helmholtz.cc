@@ -1562,8 +1562,13 @@ namespace TransmissionProblem
       }
 
       // And at the end of it all, write the same line into the
-      // concatenated .csv file as well, in 'append' mode.
+      // concatenated .csv file as well, in 'append' mode. We need to
+      // make sure we do this under a lock so that the output from
+      // different threads doesn't happen at the same time.
       {
+        static std::mutex mutex;
+        std::lock_guard<std::mutex> lock(mutex);
+        
         const std::string filename = (instance_folder + dir_sep_d +
                                       output_file_prefix +
                                       dii_frequency_response_filename_csv_st);
