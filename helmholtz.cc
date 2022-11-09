@@ -751,11 +751,27 @@ namespace TransmissionProblem
         // decay due to the imaginary part of k with N points. So the
         // length scale L we need to resolve is as follows (with the
         // additional modification that it cannot be larger than the
-        // size of the domain):
+        // size of the domain).
+        //
+        // If we have a lossless medium (imag(k)=0), then the
+        // attenuation lengthscale is infinite.
         const double L = std::min ({2*numbers::PI/(std::real(k)),
-                                    -1./(std::imag(k)),
+                                    (imag(k) != 0 ?
+                                     -1./(std::imag(k))
+                                     :
+                                     std::numeric_limits<double>::infinity()),
                                     GridTools::diameter (triangulation)});
-        AssertThrow (L>0, ExcInternalError());
+        AssertThrow (L>0,
+                     ExcMessage ("You are using material parameters for the current "
+                                 "frequency (omega=" +
+                                 std::to_string(omega) +
+                                 ") for which one of the length scales used "
+                                 "for mesh refinement is negative. In particular, "
+                                 "the wave length is 2*pi/real(k)=" +
+                                 std::to_string(2*numbers::PI/(std::real(k))) +
+                                 " and the attenuation length scale is -1/imag(k)=" +
+                                 std::to_string(-1./(std::imag(k))) +
+                                 "."));
 
         // To have N mesh points, we need a delta_x that divides by
         // (N/fe_degree), given that that there are delta_x/fe_degree
